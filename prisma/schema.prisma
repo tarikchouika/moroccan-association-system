@@ -1,0 +1,442 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum UserRole {
+  admin
+  treasurer
+  board_member
+  member
+  guest
+}
+
+enum MembershipType {
+  active
+  honorary
+  benefactor
+  student
+}
+
+enum MemberStatus {
+  active
+  pending
+  suspended
+  resigned
+}
+
+enum AssemblyType {
+  ordinary
+  extraordinary
+  constituent
+}
+
+enum AssemblyStatus {
+  scheduled
+  held
+  cancelled
+}
+
+enum EventCategory {
+  cultural
+  training
+  fundraising
+  social
+  meeting
+  other
+}
+
+enum EventStatus {
+  draft
+  published
+  cancelled
+  completed
+}
+
+enum RegistrationStatus {
+  registered
+  attended
+  cancelled
+}
+
+enum TransactionType {
+  income
+  expense
+}
+
+enum PaymentMethod {
+  cash
+  bank_transfer
+  check
+  online
+}
+
+enum BudgetStatus {
+  draft
+  approved
+  archived
+}
+
+enum DonationType {
+  donation
+  sponsorship
+  grant
+}
+
+enum SubscriptionStatus {
+  active
+  expired
+  cancelled
+}
+
+enum DocumentType {
+  statutes
+  minutes
+  annual_report
+  financial_report
+  other
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  EXPORT
+}
+
+// ============================================================================
+// MODELS
+// ============================================================================
+
+model User {
+  id                String    @id @default(uuid()) @map("id")
+  email             String    @unique @map("email")
+  passwordHash      String    @map("password_hash")
+  firstName         String?   @map("first_name")
+  lastName          String?   @map("last_name")
+  phone             String?   @map("phone")
+  profilePictureUrl String?   @map("profile_picture_url")
+  role              UserRole  @default(member) @map("role")
+  isActive          Boolean   @default(true) @map("is_active")
+  lastLogin         DateTime? @map("last_login")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  member            Member?
+  createdEvents     Event[]   @relation("EventCreator")
+  approvedTx        Transaction[] @relation("TransactionApprover")
+  uploadedDocs      Document[] @relation("DocumentUploader")
+  auditLogs         AuditLog[]
+
+  @@index([email])
+  @@map("users")
+}
+
+model Member {
+  id                String           @id @default(uuid()) @map("id")
+  userId            String?          @unique @map("user_id")
+  membershipNumber  String           @unique @map("membership_number")
+  nationalId        String?          @map("national_id")
+  firstName         String?          @map("first_name")
+  lastName          String?          @map("last_name")
+  dateOfBirth       DateTime?        @map("date_of_birth")
+  address           String?          @map("address")
+  city              String?          @map("city")
+  profession        String?          @map("profession")
+  membershipType    MembershipType   @default(active) @map("membership_type")
+  joinedDate        DateTime         @map("joined_date")
+  expiryDate        DateTime?        @map("expiry_date")
+  status            MemberStatus     @default(active) @map("status")
+  notes             String?          @map("notes")
+  cndpConsent       Boolean          @default(false) @map("cndp_consent")
+  cndpConsentDate   DateTime?        @map("cndp_consent_date")
+  createdAt         DateTime         @default(now()) @map("created_at")
+  updatedAt         DateTime         @updatedAt @map("updated_at")
+
+  user              User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  boardMemberships  BoardMember[]
+  assemblyAttendances AssemblyAttendance[]
+  eventRegistrations EventRegistration[]
+  transactions      Transaction[]
+  subscriptions     MemberSubscription[]
+
+  @@index([membershipNumber])
+  @@index([nationalId])
+  @@index([status])
+  @@map("members")
+}
+
+model BoardPosition {
+  id          String        @id @default(uuid()) @map("id")
+  name        String        @map("name")
+  description String?       @map("description")
+
+  boardMembers BoardMember[]
+
+  @@map("board_positions")
+}
+
+model BoardMember {
+  id            String   @id @default(uuid()) @map("id")
+  memberId      String   @map("member_id")
+  positionId    String   @map("position_id")
+  electionDate  DateTime @map("election_date")
+  termEndDate   DateTime? @map("term_end_date")
+  isActive      Boolean  @default(true) @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  member        Member         @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  position      BoardPosition  @relation(fields: [positionId], references: [id])
+
+  @@unique([memberId, positionId])
+  @@map("board_members")
+}
+
+model GeneralAssembly {
+  id              String         @id @default(uuid()) @map("id")
+  title           String         @map("title")
+  type            AssemblyType   @map("type")
+  date            DateTime       @map("date")
+  startTime       DateTime?      @map("start_time")
+  endTime         DateTime?      @map("end_time")
+  location        String?        @map("location")
+  agenda          String?        @map("agenda")
+  quorumRequired  Int?           @map("quorum_required")
+  quorumAchieved  Int?           @map("quorum_achieved")
+  minutes         String?        @map("minutes")
+  status          AssemblyStatus @default(scheduled) @map("status")
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+
+  attendances     AssemblyAttendance[]
+  documents       Document[]     @relation("RelatedDocuments")
+
+  @@map("general_assemblies")
+}
+
+model AssemblyAttendance {
+  id         String   @id @default(uuid()) @map("id")
+  assemblyId String   @map("assembly_id")
+  memberId   String   @map("member_id")
+  attended   Boolean  @default(false) @map("attended")
+  voted      Boolean  @default(false) @map("voted")
+
+  assembly   GeneralAssembly @relation(fields: [assemblyId], references: [id], onDelete: Cascade)
+  member     Member          @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@unique([assemblyId, memberId])
+  @@map("assembly_attendances")
+}
+
+model Event {
+  id              String        @id @default(uuid()) @map("id")
+  title           String        @map("title")
+  description     String?       @map("description")
+  category        EventCategory @map("category")
+  startDate       DateTime      @map("start_date")
+  endDate         DateTime?     @map("end_date")
+  location        String?       @map("location")
+  maxParticipants Int?          @map("max_participants")
+  isPublic        Boolean       @default(false) @map("is_public")
+  status          EventStatus   @default(draft) @map("status")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  createdById     String?       @map("created_by")
+  createdBy       User?         @relation("EventCreator", fields: [createdById], references: [id])
+
+  registrations   EventRegistration[]
+  transactions    Transaction[]
+
+  @@index([startDate])
+  @@index([status])
+  @@map("events")
+}
+
+model EventRegistration {
+  id              String           @id @default(uuid()) @map("id")
+  eventId         String           @map("event_id")
+  memberId        String           @map("member_id")
+  registrationDate DateTime        @default(now()) @map("registration_date")
+  status          RegistrationStatus @default(registered) @map("status")
+
+  event           Event            @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  member          Member           @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, memberId])
+  @@map("event_registrations")
+}
+
+model AccountingCategory {
+  id          String              @id @default(uuid()) @map("id")
+  name        String              @map("name")
+  type        TransactionType     @map("type")
+  code        String?             @map("code")
+  parentId    String?             @map("parent_id")
+
+  parent      AccountingCategory? @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children    AccountingCategory[] @relation("CategoryHierarchy")
+
+  transactions Transaction[]
+  budgetLines  BudgetLine[]
+
+  @@map("accounting_categories")
+}
+
+model Transaction {
+  id                    String        @id @default(uuid()) @map("id")
+  date                  DateTime      @map("date")
+  description           String        @map("description")
+  amount                Decimal       @db.Decimal(15, 2) @map("amount")
+  type                  TransactionType @map("type")
+  categoryId            String?       @map("category_id")
+  paymentMethod         PaymentMethod @default(cash) @map("payment_method")
+  reference             String?       @map("reference")
+  receiptNumber         String?       @map("receipt_number")
+  memberId              String?       @map("member_id")
+  eventId               String?       @map("event_id")
+  approvedById          String?       @map("approved_by")
+  supportingDocumentUrl String?       @map("supporting_document_url")
+  notes                 String?       @map("notes")
+  createdAt             DateTime      @default(now()) @map("created_at")
+  updatedAt             DateTime      @updatedAt @map("updated_at")
+
+  category        AccountingCategory? @relation(fields: [categoryId], references: [id])
+  member          Member?             @relation(fields: [memberId], references: [id], onDelete: SetNull)
+  event           Event?              @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  approvedBy      User?               @relation("TransactionApprover", fields: [approvedById], references: [id])
+
+  @@index([date])
+  @@index([type])
+  @@index([memberId])
+  @@map("transactions")
+}
+
+model Budget {
+  id            String       @id @default(uuid()) @map("id")
+  name          String       @map("name")
+  fiscalYear    Int          @map("fiscal_year")
+  totalIncome   Decimal      @default(0) @db.Decimal(15, 2) @map("total_income")
+  totalExpenses Decimal      @default(0) @db.Decimal(15, 2) @map("total_expenses")
+  status        BudgetStatus @default(draft) @map("status")
+  approvedAt    DateTime?    @map("approved_at")
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @updatedAt @map("updated_at")
+
+  lines         BudgetLine[]
+
+  @@unique([fiscalYear])
+  @@map("budgets")
+}
+
+model BudgetLine {
+  id            String   @id @default(uuid()) @map("id")
+  budgetId      String   @map("budget_id")
+  categoryId    String?  @map("category_id")
+  plannedAmount Decimal  @db.Decimal(15, 2) @map("planned_amount")
+  actualAmount  Decimal  @default(0) @db.Decimal(15, 2) @map("actual_amount")
+  notes         String?  @map("notes")
+
+  budget        Budget             @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  category      AccountingCategory? @relation(fields: [categoryId], references: [id])
+
+  @@map("budget_lines")
+}
+
+model Donation {
+  id            String       @id @default(uuid()) @map("id")
+  donorName     String       @map("donor_name")
+  donorEmail    String?      @map("donor_email")
+  donorPhone    String?      @map("donor_phone")
+  amount        Decimal      @db.Decimal(15, 2) @map("amount")
+  date          DateTime     @map("date")
+  type          DonationType @map("type")
+  isAnonymous   Boolean      @default(false) @map("is_anonymous")
+  receiptIssued Boolean      @default(false) @map("receipt_issued")
+  receiptNumber String?      @map("receipt_number")
+  notes         String?      @map("notes")
+  createdAt     DateTime     @default(now()) @map("created_at")
+
+  @@index([date])
+  @@map("donations")
+}
+
+model SubscriptionType {
+  id              String             @id @default(uuid()) @map("id")
+  name            String             @map("name")
+  amount          Decimal            @db.Decimal(15, 2) @map("amount")
+  durationMonths  Int                @map("duration_months")
+  description     String?            @map("description")
+
+  subscriptions   MemberSubscription[]
+
+  @@map("subscription_types")
+}
+
+model MemberSubscription {
+  id                 String             @id @default(uuid()) @map("id")
+  memberId           String             @map("member_id")
+  subscriptionTypeId String             @map("subscription_type_id")
+  startDate          DateTime           @map("start_date")
+  endDate            DateTime           @map("end_date")
+  amountPaid         Decimal?           @db.Decimal(15, 2) @map("amount_paid")
+  paymentDate        DateTime?          @map("payment_date")
+  status             SubscriptionStatus @default(active) @map("status")
+  createdAt          DateTime           @default(now()) @map("created_at")
+
+  member           Member           @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  subscriptionType SubscriptionType @relation(fields: [subscriptionTypeId], references: [id])
+
+  @@index([memberId])
+  @@index([endDate])
+  @@map("member_subscriptions")
+}
+
+model Document {
+  id                String       @id @default(uuid()) @map("id")
+  title             String       @map("title")
+  type              DocumentType @map("type")
+  fileUrl           String       @map("file_url")
+  version           Int          @default(1) @map("version")
+  relatedEntityType String?      @map("related_entity_type")
+  relatedEntityId   String?      @map("related_entity_id")
+  isPublic          Boolean      @default(false) @map("is_public")
+  createdAt         DateTime     @default(now()) @map("created_at")
+  updatedAt         DateTime     @updatedAt @map("updated_at")
+
+  uploadedById      String?      @map("uploaded_by")
+  uploadedBy        User?        @relation("DocumentUploader", fields: [uploadedById], references: [id])
+
+  assembly          GeneralAssembly? @relation("RelatedDocuments", fields: [relatedEntityId], references: [id])
+
+  @@map("documents")
+}
+
+model AuditLog {
+  id        String      @id @default(uuid()) @map("id")
+  userId    String?     @map("user_id")
+  action    AuditAction @map("action")
+  tableName String      @map("table_name")
+  recordId  String?     @map("record_id")
+  oldValues Json?       @map("old_values")
+  newValues Json?       @map("new_values")
+  ipAddress String?     @map("ip_address")
+  userAgent String?     @map("user_agent")
+  createdAt DateTime    @default(now()) @map("created_at")
+
+  user      User?       @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([tableName, recordId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
