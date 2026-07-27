@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import DashboardLayout from '../components/Layout/DashboardLayout';
-import Dashboard from '../pages/Dashboard';
-import Members from '../pages/Members';
+import DashboardLayout from './components/Layout/DashboardLayout';
+import Dashboard from './pages/Dashboard';
+import Members from './pages/Members';
 
 function PlaceholderPage({ title }: { title: string }) {
   return (

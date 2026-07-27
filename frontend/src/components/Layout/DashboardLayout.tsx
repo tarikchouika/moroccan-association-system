@@ -29,7 +29,7 @@ const DashboardLayout: React.FC = () => {
       {/* Main wrapper */}
       <div className="lg:pl-64">
         {/* Topbar */}
-        <Topbar onMenuToggle={toggleMobileSidebar} />
+        <Topbar />
 
         {/* Page content */}
         <main className="p-4 sm:p-6 lg:p-8">

@@ -25,13 +25,8 @@ const IconChevronDown = () => (
   </svg>
 );
 
-// ─── Props ───
-interface TopbarProps {
-  onMenuToggle: () => void;
-}
-
 // ─── Component ───
-const Topbar: React.FC<TopbarProps> = ({ onMenuToggle }) => {
+const Topbar: React.FC = () => {
   const location = useLocation();
   const [language, setLanguage] = useState<'FR' | 'AR'>('FR');
   const [showLangDropdown, setShowLangDropdown] = useState(false);
