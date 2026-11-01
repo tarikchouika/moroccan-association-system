@@ -1,0 +1,599 @@
+     1→     1→"use client";
+     2→     2→
+     3→     3→/**
+     4→     4→ * صفحة الهبوط — منصة مامب
+     5→     5→ * واجهة عصرية RTL بهوية مغربية (أخضر عميق + ذهب + نقشة زليج)
+     6→     6→ */
+     7→     7→import { motion, useInView } from "framer-motion";
+     8→     8→import { useEffect, useRef, useState } from "react";
+     9→     9→import Link from "next/link";
+    10→    10→import {
+    11→    11→  Users, Wallet, HeartHandshake, CalendarDays, FileCheck2, Landmark,
+    12→    12→  ShieldCheck, BarChart3, Bot, ArrowLeft, CheckCircle2, Sparkles,
+    13→    13→  Building2, HandCoins, ScrollText, UserCog, Globe2, BadgeCheck,
+    14→    14→  FileSignature, Coins, Megaphone, Lock, TrendingUp, Handshake,
+    15→    15→} from "lucide-react";
+    16→    16→import { Button } from "@/components/ui/button";
+    17→    17→import { Card, CardContent } from "@/components/ui/card";
+    18→    18→import { Badge } from "@/components/ui/badge";
+    19→    19→import {
+    20→    20→  Accordion, AccordionContent, AccordionItem, AccordionTrigger,
+    21→    21→} from "@/components/ui/accordion";
+    22→    22→import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+    23→    23→import type { DemoData } from "@/generated/types";
+    24→    24→
+    25→    25→// -------------------------------------------------------------------
+    26→    26→// عداد متحرك
+    27→    27→// -------------------------------------------------------------------
+    28→    28→function Counter({ to, suffix = "", duration = 1600 }: { to: number; suffix?: string; duration?: number }) {
+    29→    29→  const ref = useRef<HTMLSpanElement>(null);
+    30→    30→  const inView = useInView(ref, { once: true, margin: "-40px" });
+    31→    31→  const [val, setVal] = useState(0);
+    32→    32→
+    33→    33→  useEffect(() => {
+    34→    34→    if (!inView) return;
+    35→    35→    let raf = 0;
+    36→    36→    const start = performance.now();
+    37→    37→    const tick = (now: number) => {
+    38→    38→      const p = Math.min((now - start) / duration, 1);
+    39→    39→      setVal(Math.round(to * (1 - Math.pow(1 - p, 3))));
+    40→    40→      if (p < 1) raf = requestAnimationFrame(tick);
+    41→    41→    };
+    42→    42→    raf = requestAnimationFrame(tick);
+    43→    43→    return () => cancelAnimationFrame(raf);
+    44→    44→  }, [inView, to, duration]);
+    45→    45→
+    46→    46→  return (
+    47→    47→    <span ref={ref} className="num font-black">
+    48→    48→      {val.toLocaleString("en-US")}
+    49→    49→      {suffix}
+    50→    50→    </span>
+    51→    51→  );
+    52→    52→}
+    53→    53→
+    54→    54→const fadeUp = {
+    55→    55→  initial: { opacity: 0, y: 24 },
+    56→    56→  whileInView: { opacity: 1, y: 0 },
+    57→    57→  viewport: { once: true, margin: "-60px" },
+    58→    58→  transition: { duration: 0.55, ease: "easeOut" as const },
+    59→    59→};
+    60→    60→
+    61→    61→// -------------------------------------------------------------------
+    62→    62→// البطل
+    63→    63→// -------------------------------------------------------------------
+    64→    64→function Hero({ stats }: { stats: DemoData["stats"] }) {
+    65→    65→  return (
+    66→    66→    <section className="gradient-hero zellige-light relative overflow-hidden">
+    67→    67→      <div className="mx-auto grid max-w-7xl gap-12 px-4 pb-16 pt-14 sm:px-6 lg:grid-cols-2 lg:pb-24 lg:pt-20">
+    68→    68→        <div className="flex flex-col justify-center">
+    69→    69→          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+    70→    70→            <Badge className="mb-5 gap-1.5 border-gold/40 bg-gold-soft px-3 py-1.5 text-[12px] font-bold text-yellow-800">
+    71→    71→              <BadgeCheck className="size-3.5" />
+    72→    72→              أول منصة مغربية شاملة لرقمنة العمل الجمعوي
+    73→    73→            </Badge>
+    74→    74→          </motion.div>
+    75→    75→
+    76→    76→          <motion.h1
+    77→    77→            initial={{ opacity: 0, y: 20 }}
+    78→    78→            animate={{ opacity: 1, y: 0 }}
+    79→    79→            transition={{ duration: 0.6, delay: 0.08 }}
+    80→    80→            className="text-4xl font-black leading-[1.25] tracking-tight sm:text-5xl lg:text-[3.4rem]"
+    81→    81→          >
+    82→    82→            رقمنة إدارة ومحاسبة
+    83→    83→            <br />
+    84→    84→            <span className="text-gradient-gold">الجمعيات المغربية</span>
+    85→    85→            <br />
+    86→    86→            باحترافية وأمان
+    87→    87→          </motion.h1>
+    88→    88→
+    89→    89→          <motion.p
+    90→    90→            initial={{ opacity: 0, y: 20 }}
+    91→    91→            animate={{ opacity: 1, y: 0 }}
+    92→    92→            transition={{ duration: 0.6, delay: 0.16 }}
+    93→    93→            className="mt-5 max-w-xl text-base leading-8 text-muted-foreground sm:text-lg"
+    94→    94→          >
+    95→    95→            من التأسيس إلى التقرير السنوي: انخراطات، محاسبة، تبرعات بوصولات رسمية،
+    96→    96→            فعاليات، وثائق قانونية — ومساعد جمعوي ذكي يرشدكم خطوة بخطوة،
+    97→    97→            وفق القانون 75.00 وظهير 15 نونبر 1958.
+    98→    98→          </motion.p>
+    99→    99→
+   100→   100→          <motion.div
+   101→   101→            initial={{ opacity: 0, y: 20 }}
+   102→   102→            animate={{ opacity: 1, y: 0 }}
+   103→   103→            transition={{ duration: 0.6, delay: 0.24 }}
+   104→   104→            className="mt-8 flex flex-wrap items-center gap-3"
+   105→   105→          >
+   106→   106→            <Button asChild size="lg" className="h-12 gap-2 px-7 text-base font-extrabold shadow-lg shadow-primary/25">
+   107→   107→              <Link href="/register">
+   108→   108→                ابدأوا مجاناً الآن
+   109→   109→                <ArrowLeft className="size-4" />
+   110→   110→              </Link>
+   111→   111→            </Button>
+   112→   112→            <Button asChild size="lg" variant="outline" className="h-12 gap-2 px-7 text-base font-extrabold">
+   113→   113→              <Link href="/associations">
+   114→   114→                <Building2 className="size-4" />
+   115→   115→                دليل الجمعيات
+   116→   116→              </Link>
+   117→   117→            </Button>
+   118→   118→          </motion.div>
+   119→   119→
+   120→   120→          {/* شريط الثقة */}
+   121→   121→          <motion.div
+   122→   122→            initial={{ opacity: 0 }}
+   123→   123→            animate={{ opacity: 1 }}
+   124→   124→            transition={{ delay: 0.4 }}
+   125→   125→            className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] font-bold text-muted-foreground"
+   126→   126→          >
+   127→   127→            <span className="flex items-center gap-1.5"><ScrollText className="size-4 text-primary" /> ظهير 1.58.376</span>
+   128→   128→            <span className="flex items-center gap-1.5"><ScaleIcon /> القانون 75.00</span>
+   129→   129→            <span className="flex items-center gap-1.5"><ShieldCheck className="size-4 text-primary" /> القانون 09.08 (CNDP)</span>
+   130→   130→          </motion.div>
+   131→   131→        </div>
+   132→   132→
+   133→   133→        {/* لوحة مرئية */}
+   134→   134→        <motion.div
+   135→   135→          initial={{ opacity: 0, scale: 0.94, y: 30 }}
+   136→   136→          animate={{ opacity: 1, scale: 1, y: 0 }}
+   137→   137→          transition={{ duration: 0.7, delay: 0.2 }}
+   138→   138→          className="relative hidden lg:block"
+   139→   139→        >
+   140→   140→          <div className="absolute -inset-6 rounded-[2rem] bg-primary/5 blur-2xl" aria-hidden="true" />
+   141→   141→          {/* بطاقة رئيسية: مؤشرات */}
+   142→   142→          <Card className="relative overflow-hidden rounded-2xl border-primary/15 shadow-2xl">
+   143→   143→            <div className="gradient-dark zellige-pattern flex items-center justify-between px-5 py-4 text-white">
+   144→   144→              <div className="flex items-center gap-2 text-sm font-extrabold">
+   145→   145→                <Building2 className="size-4 text-gold" />
+   146→   146→                جمعية ندوة للتنمية والتشغيل
+   147→   147→              </div>
+   148→   148→              <Badge className="border-gold/40 bg-gold/20 text-[10px] font-bold text-gold">موثقة ✓</Badge>
+   149→   149→            </div>
+   150→   150→            <CardContent className="grid grid-cols-2 gap-3 p-5">
+   151→   151→              {[
+   152→   152→                { icon: Users, label: "منخرط نشط", value: "13", tint: "text-primary bg-secondary" },
+   153→   153→                { icon: TrendingUp, label: "مدخول 2026", value: "132,620 د.م", tint: "text-emerald-700 bg-emerald-50" },
+   154→   154→                { icon: HandCoins, label: "تبرعات مسجلة", value: "70,100 د.م", tint: "text-yellow-800 bg-gold-soft" },
+   155→   155→                { icon: Wallet, label: "رصيد الخزينة", value: "84,420 د.م", tint: "text-terra bg-orange-50" },
+   156→   156→              ].map((s) => (
+   157→   157→                <div key={s.label} className="rounded-xl border border-border bg-background p-3.5">
+   158→   158→                  <span className={`mb-2 inline-flex size-8 items-center justify-center rounded-lg ${s.tint}`}>
+   159→   159→                    <s.icon className="size-4" />
+   160→   160→                  </span>
+   161→   161→                  <p className="text-[11px] font-bold text-muted-foreground">{s.label}</p>
+   162→   162→                  <p className="num mt-0.5 text-lg font-black">{s.value}</p>
+   163→   163→                </div>
+   164→   164→              ))}
+   165→   165→              {/* شريط محادثة مصغرة */}
+   166→   166→              <div className="col-span-2 rounded-xl border border-border bg-muted/50 p-3">
+   167→   167→                <p className="mb-2 flex items-center gap-1.5 text-[11px] font-extrabold text-primary">
+   168→   168→                  <Bot className="size-3.5" /> المساعد الجمعوي
+   169→   169→                </p>
+   170→   170→                <div className="space-y-1.5 text-[11px] leading-5">
+   171→   171→                  <p className="w-fit max-w-[85%] rounded-lg rounded-ss-sm bg-card border border-border px-2.5 py-1.5">
+   172→   172→                    كيف نودع ملف تأسيس الجمعية؟
+   173→   173→                  </p>
+   174→   174→                  <p className="w-fit max-w-[90%] rounded-lg rounded-se-sm bg-primary px-2.5 py-1.5 text-primary-foreground">
+   175→   175→                    التصريح يودع بمقر السلطة المحلية مع 4 نسخ من القانون الأساسي ومحضر التأسيس… <span className="underline decoration-gold decoration-2">المزيد</span>
+   176→   176→                  </p>
+   177→   177→                </div>
+   178→   178→              </div>
+   179→   179→            </CardContent>
+   180→   180→          </Card>
+   181→   181→        </motion.div>
+   182→   182→      </div>
+   183→   183→
+   184→   184→      {/* شريط الإحصائيات */}
+   185→   185→      <div className="border-t border-border/70 bg-card/60 backdrop-blur">
+   186→   186→        <div className="mx-auto grid max-w-7xl grid-cols-2 divide-x divide-x-reverse divide-border/60 px-4 py-6 text-center sm:px-6 lg:grid-cols-4">
+   187→   187→          {[
+   188→   188→            { label: "جمعية على المنصة", value: stats.associations, suffix: "" },
+   189→   189→            { label: "منخرط ومتطوع", value: stats.activeMembers, suffix: "+" },
+   190→   190→            { label: "عمليات مالية مسجلة", value: stats.transactions, suffix: "" },
+   191→   191→            { label: "درهم مُدار رقمياً", value: stats.managedAmount, suffix: "" },
+   192→   192→          ].map((s) => (
+   193→   193→            <div key={s.label} className="px-2 py-2">
+   194→   194→              <p className="text-2xl font-black text-primary sm:text-3xl">
+   195→   195→                <Counter to={s.value} suffix={s.suffix} />
+   196→   196→              </p>
+   197→   197→              <p className="mt-1 text-[12px] font-bold text-muted-foreground sm:text-[13px]">{s.label}</p>
+   198→   198→            </div>
+   199→   199→          ))}
+   200→   200→        </div>
+   201→   201→      </div>
+   202→   202→    </section>
+   203→   203→  );
+   204→   204→}
+   205→   205→
+   206→   206→function ScaleIcon() {
+   207→   207→  return <ScrollText className="size-4 text-primary" />;
+   208→   208→}
+   209→   209→
+   210→   210→// -------------------------------------------------------------------
+   211→   211→// الخصائص
+   212→   212→// -------------------------------------------------------------------
+   213→   213→const FEATURES = [
+   214→   214→  { icon: Users, title: "إدارة الانخراطات", desc: "ملفات الأعضاء، الطلبات، واجبات الانخراط السنوية بوصولات مرقمة، وتنبيهات التجديد." },
+   215→   215→  { icon: Wallet, title: "محاسبة احترافية", desc: "مدخولات ومصروفات مصنفة، ميزانية تقديرية، اعتماد ثنائي، وتقرير مالي سنوي جاهز للطبع." },
+   216→   216→  { icon: HandCoins, title: "التبرعات والوصولات", desc: "تسجيل التبرعات النقدية والعينية، توليد وصولات رسمية، وتتبع الامتثال (المساعدات الأجنبية)." },
+   217→   217→  { icon: CalendarDays, title: "الفعاليات والأنشطة", desc: "برمجة الدورات والملتقيات والقوافل، تسجيل المشاركين عمومياً، ومتابعة الحضور." },
+   218→   218→  { icon: FileCheck2, title: "الوثائق الرسمية", desc: "أرشيف موثق: القانون الأساسي، المحاضر، التقارير السنوية — بنسخ وتصنيف وحساسية." },
+   219→   219→  { icon: Landmark, title: "الهوية الرقمية للجمعية", desc: "بطاقة رقمية تجمع ICE والتعريف الجبائي والمراجع القانونية — قابلة للمشاركة والتحقق." },
+   220→   220→  { icon: BarChart3, title: "تقارير ولوحات قيادة", desc: "مؤشرات فورية ورسوم بيانية لأداء الجمعية، تصلح للعرض على الجمع العام والشركاء." },
+   221→   221→  { icon: Bot, title: "المساعد الجمعوي", desc: "مساعد ذكي يجيب عن الإجراءات والقوانين — بقاعدة معارف رسمية مُتحقق منها، بلا هلوسة." },
+   222→   222→  { icon: ShieldCheck, title: "أمان وصلاحيات دقيقة", desc: "تشفير كلمات السر، جلسات موقعة، صلاحيات لكل دور، وسجل تدقيق لكل العمليات الحساسة." },
+   223→   223→];
+   224→   224→
+   225→   225→function Features() {
+   226→   226→  return (
+   227→   227→    <section id="features" className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
+   228→   228→      <motion.div {...fadeUp} className="mx-auto mb-12 max-w-2xl text-center">
+   229→   229→        <Badge variant="outline" className="mb-4 gap-1.5 border-primary/30 px-3 py-1 text-[12px] font-bold text-primary">
+   230→   230→          <Sparkles className="size-3.5" />
+   231→   231→          خصائص شاملة
+   232→   232→        </Badge>
+   233→   233→        <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
+   234→   234→          كل ما تحتاجه جمعيتكم في <span className="text-primary">منصة واحدة</span>
+   235→   235→        </h2>
+   236→   236→        <p className="mt-4 text-base leading-7 text-muted-foreground">
+   237→   237→          صممنا كل وحدة لتخدم العمل الجمعوي اليومي كما تمليه القوانين المغربية،
+   238→   238→          مع بساطة تصلح لكل مستويات الخبرة الرقمية.
+   239→   239→        </p>
+   240→   240→      </motion.div>
+   241→   241→
+   242→   242→      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+   243→   243→        {FEATURES.map((f, i) => (
+   244→   244→          <motion.div
+   245→   245→            key={f.title}
+   246→   246→            initial={{ opacity: 0, y: 20 }}
+   247→   247→            whileInView={{ opacity: 1, y: 0 }}
+   248→   248→            viewport={{ once: true, margin: "-40px" }}
+   249→   249→            transition={{ duration: 0.45, delay: (i % 3) * 0.08 }}
+   250→   250→          >
+   251→   251→            <Card className="group h-full border-border/80 transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5">
+   252→   252→              <CardContent className="p-6">
+   253→   253→                <span className="mb-4 inline-flex size-12 items-center justify-center rounded-xl bg-secondary text-primary transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
+   254→   254→                  <f.icon className="size-6" />
+   255→   255→                </span>
+   256→   256→                <h3 className="mb-2 text-lg font-extrabold">{f.title}</h3>
+   257→   257→                <p className="text-sm leading-7 text-muted-foreground">{f.desc}</p>
+   258→   258→              </CardContent>
+   259→   259→            </Card>
+   260→   260→          </motion.div>
+   261→   261→        ))}
+   262→   262→      </div>
+   263→   263→    </section>
+   264→   264→  );
+   265→   265→}
+   266→   266→
+   267→   267→// -------------------------------------------------------------------
+   268→   268→// الأدوار الخمسة
+   269→   269→// -------------------------------------------------------------------
+   270→   270→const ROLES = [
+   271→   271→  {
+   272→   272→    value: "super",
+   273→   273→    icon: Lock,
+   274→   274→    title: "السوبر أدمين",
+   275→   275→    subtitle: "مالك المنصة",
+   276→   276→    desc: "إشراف كامل: توثيق الجمعيات الجديدة وتعليق المخالفة منها، متابعة إحصائيات المنصة، إدارة المستخدمين، وسجل تدقيق يوثق كل عملية حساسة.",
+   277→   277→    points: ["توثيق وتعليق الجمعيات", "إحصائيات المنصة الشاملة", "سجل التدقيق الكامل", "إدارة الحسابات والصلاحيات"],
+   278→   278→  },
+   279→   279→  {
+   280→   280→    value: "admin",
+   281→   281→    icon: UserCog,
+   282→   282→    title: "أدمين الجمعية",
+   283→   283→    subtitle: "أعضاء المكتب المسير",
+   284→   284→    desc: "تسيير جمعيتهم بكل أريحية: قبول الانخراطات، تسجيل العمليات المالية، رفع الوثائق، تنظيم الفعاليات، وإصدار التقارير للجمع العام.",
+   285→   285→    points: ["قبول/رفض طلبات الانخراط", "المحاسبة والميزانية", "الوثائق والتقارير الرسمية", "تنظيم الفعاليات"],
+   286→   286→  },
+   287→   287→  {
+   288→   288→    value: "coadmin",
+   289→   289→    icon: Handshake,
+   290→   290→    title: "الكوأدمين",
+   291→   291→    subtitle: "المنخرطون والمتطوعون",
+   292→   292→    desc: "صلاحيات محددة يمنحها المكتب: تنظيم فعاليات، متابعة تسجيلات المشاركين، إدارة التواصل — مع فصل واضح عن المعطيات المالية.",
+   293→   293→    points: ["تنظيم فعاليات موكلة", "استقبال تسجيلات المشاركين", "لوحة مخصصة للمهام", "بلا اطلاع على المالية"],
+   294→   294→  },
+   295→   295→  {
+   296→   296→    value: "partner",
+   297→   297→    icon: Landmark,
+   298→   298→    title: "الجهات الحكومية والخاصة",
+   299→   299→    subtitle: "الإدارات والشركاء المختصون",
+   300→   300→    desc: "حسابات شريكة موثقة تمكن الجهات المختصة من الاطلاع على المعطيات المصرح بها للجمعيات (الحالة القانونية، ICE، التقارير العمومية).",
+   301→   301→    points: ["عرض موثق للجمعيات", "التحقق من الهوية الرقمية", "التقارير العمومية", "قناة تواصل رسمية"],
+   302→   302→  },
+   303→   303→  {
+   304→   304→    value: "citizen",
+   305→   305→    icon: Globe2,
+   306→   306→    title: "المواطنون والأجانب",
+   307→   307→    subtitle: "العموم",
+   308→   308→    desc: "حساب مجاني: استكشاف الجمعيات الموثقة، التبرع مع الحصول على وصل، التسجيل في الفعاليات العمومية، وطرح الأسئلة على المساعد الجمعوي.",
+   309→   309→    points: ["دليل الجمعيات الموثقة", "التبرع بوصل رسمي", "التسجيل في الفعاليات", "المساعد الجمعوي"],
+   310→   310→  },
+   311→   311→];
+   312→   312→
+   313→   313→function Roles() {
+   314→   314→  return (
+   315→   315→    <section className="gradient-dark zellige-pattern py-20 text-white">
+   316→   316→      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+   317→   317→        <motion.div {...fadeUp} className="mx-auto mb-12 max-w-2xl text-center">
+   318→   318→          <Badge className="mb-4 gap-1.5 border-gold/40 bg-gold/15 px-3 py-1 text-[12px] font-bold text-gold">
+   319→   319→            <Users className="size-3.5" />
+   320→   320→            نظام صلاحيات من خمسة مستويات
+   321→   321→          </Badge>
+   322→   322→          <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
+   323→   323→            لكل فاعلٍ جمعوي <span className="text-gradient-gold">مكانه المناسب</span>
+   324→   324→          </h2>
+   325→   325→          <p className="mt-4 text-base leading-7 text-white/70">
+   326→   326→            من مالك المنصة إلى المواطن: صلاحيات دقيقة مفحوصة على الخادم،
+   327→   327→            تضمن الفصل بين الأدوار وحماية المعطيات الحساسة.
+   328→   328→          </p>
+   329→   329→        </motion.div>
+   330→   330→
+   331→   331→        <Tabs defaultValue="super" dir="rtl" className="w-full">
+   332→   332→          <TabsList className="mx-auto mb-8 flex h-auto w-full max-w-3xl flex-wrap justify-center gap-1 rounded-2xl border border-white/10 bg-white/5 p-1.5">
+   333→   333→            {ROLES.map((r) => (
+   334→   334→              <TabsTrigger
+   335→   335→                key={r.value}
+   336→   336→                value={r.value}
+   337→   337→                className="rounded-xl px-4 py-2.5 text-[13px] font-bold data-[state=active]:bg-gold data-[state=active]:text-[#061229]"
+   338→   338→              >
+   339→   339→                <r.icon className="me-1.5 inline size-4" />
+   340→   340→                {r.title}
+   341→   341→              </TabsTrigger>
+   342→   342→            ))}
+   343→   343→          </TabsList>
+   344→   344→          {ROLES.map((r) => (
+   345→   345→            <TabsContent key={r.value} value={r.value} className="mt-0">
+   346→   346→              <div className="grid items-center gap-6 rounded-2xl border border-white/10 bg-white/[0.04] p-6 sm:p-8 lg:grid-cols-[1.2fr_1fr]">
+   347→   347→                <div>
+   348→   348→                  <p className="mb-1 text-[12px] font-bold uppercase tracking-wide text-gold">{r.subtitle}</p>
+   349→   349→                  <h3 className="mb-3 text-2xl font-black">{r.title}</h3>
+   350→   350→                  <p className="text-sm leading-8 text-white/75">{r.desc}</p>
+   351→   351→                </div>
+   352→   352→                <ul className="space-y-2.5">
+   353→   353→                  {r.points.map((p) => (
+   354→   354→                    <li key={p} className="flex items-center gap-2.5 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-bold">
+   355→   355→                      <CheckCircle2 className="size-4 shrink-0 text-gold" />
+   356→   356→                      {p}
+   357→   357→                    </li>
+   358→   358→                  ))}
+   359→   359→                </ul>
+   360→   360→              </div>
+   361→   361→            </TabsContent>
+   362→   362→          ))}
+   363→   363→        </Tabs>
+   364→   364→      </div>
+   365→   365→    </section>
+   366→   366→  );
+   367→   367→}
+   368→   368→
+   369→   369→// -------------------------------------------------------------------
+   370→   370→// كيف تعمل المنصة
+   371→   371→// -------------------------------------------------------------------
+   372→   372→const STEPS = [
+   373→   373→  { icon: FileSignature, title: "أنشئوا الحساب", desc: "تسجيل مجاني في دقيقة: مواطن، متطوع، أو عضو مكتب جمعية." },
+   374→   374→  { icon: Building2, title: "سجلوا جمعيتكم", desc: "بطاقة تعريف كاملة تنتظر توثيق فريق المنصة — ثم تنفتح كل الوحدات." },
+   375→   375→  { icon: Megaphone, title: "سيروا ونشروا", desc: "انخراطات، محاسبة، فعاليات، وثائق — كل شيء موثق ومتتبع." },
+   376→   376→  { icon: Coins, title: "قيسوا وقروا الشركاء", desc: "تقارير رسمية وبطاقة هوية رقمية تقنع الممولين والإدارات." },
+   377→   377→];
+   378→   378→
+   379→   379→function HowItWorks() {
+   380→   380→  return (
+   381→   381→    <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
+   382→   382→      <motion.div {...fadeUp} className="mx-auto mb-14 max-w-2xl text-center">
+   383→   383→        <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
+   384→   384→          من الصفر إلى جمعية <span className="text-primary">رقمية بالكامل</span>
+   385→   385→        </h2>
+   386→   386→        <p className="mt-4 text-base leading-7 text-muted-foreground">أربع خطوات فقط تفصلكم عن تسيير جمعوي عصري.</p>
+   387→   387→      </motion.div>
+   388→   388→
+   389→   389→      <div className="relative grid gap-8 md:grid-cols-4">
+   390→   390→        <div className="absolute top-7 right-[12%] left-[12%] hidden h-0.5 bg-gradient-to-l from-primary/10 via-primary/30 to-primary/10 md:block" aria-hidden="true" />
+   391→   391→        {STEPS.map((s, i) => (
+   392→   392→          <motion.div
+   393→   393→            key={s.title}
+   394→   394→            initial={{ opacity: 0, y: 24 }}
+   395→   395→            whileInView={{ opacity: 1, y: 0 }}
+   396→   396→            viewport={{ once: true, margin: "-40px" }}
+   397→   397→            transition={{ duration: 0.5, delay: i * 0.12 }}
+   398→   398→            className="relative text-center"
+   399→   399→          >
+   400→   400→            <div className="relative z-10 mx-auto mb-4 grid size-14 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/25">
+   401→   401→              <s.icon className="size-6" />
+   402→   402→              <span className="num absolute -top-2 -start-2 grid size-6 place-items-center rounded-full bg-gold text-[11px] font-black text-[#061229]">
+   403→   403→                {i + 1}
+   404→   404→              </span>
+   405→   405→            </div>
+   406→   406→            <h3 className="mb-2 text-base font-extrabold">{s.title}</h3>
+   407→   407→            <p className="mx-auto max-w-[240px] text-[13px] leading-6 text-muted-foreground">{s.desc}</p>
+   408→   408→          </motion.div>
+   409→   409→        ))}
+   410→   410→      </div>
+   411→   411→    </section>
+   412→   412→  );
+   413→   413→}
+   414→   414→
+   415→   415→// -------------------------------------------------------------------
+   416→   416→// معاينة الجمعيات
+   417→   417→// -------------------------------------------------------------------
+   418→   418→function AssociationsPreview({ associations }: { associations: DemoData["associations"] }) {
+   419→   419→  if (!associations.length) return null;
+   420→   420→  return (
+   421→   421→    <section className="bg-muted/50 py-20">
+   422→   422→      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+   423→   423→        <motion.div {...fadeUp} className="mb-12 flex flex-wrap items-end justify-between gap-4">
+   424→   424→          <div>
+   425→   425→            <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
+   426→   426→              جمعيات <span className="text-primary">موثقة</span> على المنصة
+   427→   427→            </h2>
+   428→   428→            <p className="mt-3 max-w-xl text-base leading-7 text-muted-foreground">
+   429→   429→              كل جمعية تمر عبر مسار توثيق يتحقق من هويتها ومرجعها القانوني قبل الظهور في الدليل العمومي.
+   430→   430→            </p>
+   431→   431→          </div>
+   432→   432→          <Button asChild variant="outline" className="font-bold">
+   433→   433→            <Link href="/associations">
+   434→   434→              كل الجمعيات
+   435→   435→              <ArrowLeft className="size-4" />
+   436→   436→            </Link>
+   437→   437→          </Button>
+   438→   438→        </motion.div>
+   439→   439→
+   440→   440→        <div className="grid gap-5 md:grid-cols-3">
+   441→   441→          {associations.slice(0, 3).map((a, i) => (
+   442→   442→            <motion.div
+   443→   443→              key={a.slug}
+   444→   444→              initial={{ opacity: 0, y: 20 }}
+   445→   445→              whileInView={{ opacity: 1, y: 0 }}
+   446→   446→              viewport={{ once: true, margin: "-40px" }}
+   447→   447→              transition={{ duration: 0.45, delay: i * 0.1 }}
+   448→   448→            >
+   449→   449→              <Link href={`/associations/${a.slug}`} className="group block h-full">
+   450→   450→                <Card className="h-full transition-all duration-300 group-hover:-translate-y-1.5 group-hover:border-primary/30 group-hover:shadow-xl">
+   451→   451→                  <CardContent className="p-6">
+   452→   452→                    <div className="mb-4 flex items-start justify-between">
+   453→   453→                      <span className="grid size-12 place-items-center rounded-xl bg-secondary text-lg font-black text-primary">
+   454→   454→                        {a.acronym?.slice(0, 2) || a.name.slice(0, 2)}
+   455→   455→                      </span>
+   456→   456→                      <div className="flex flex-col items-end gap-1.5">
+   457→   457→                        {a.isVerified && (
+   458→   458→                          <Badge className="gap-1 border-primary/25 bg-secondary px-2 py-0.5 text-[10px] font-bold text-primary">
+   459→   459→                            <BadgeCheck className="size-3" /> موثقة
+   460→   460→                          </Badge>
+   461→   461→                        )}
+   462→   462→                        {a.legalStatus === "PUBLIC_UTILITY" && (
+   463→   463→                          <Badge variant="outline" className="border-gold/50 bg-gold-soft px-2 py-0.5 text-[10px] font-bold text-yellow-800">
+   464→   464→                            منفعة عامة
+   465→   465→                          </Badge>
+   466→   466→                        )}
+   467→   467→                      </div>
+   468→   468→                    </div>
+   469→   469→                    <h3 className="mb-1.5 text-lg font-extrabold leading-snug group-hover:text-primary transition-colors">{a.name}</h3>
+   470→   470→                    <p className="mb-4 line-clamp-2 text-[13px] leading-6 text-muted-foreground">{a.description}</p>
+   471→   471→                    <div className="flex items-center justify-between border-t border-border pt-4 text-[12px] font-bold text-muted-foreground">
+   472→   472→                      <span>{a.category} · {a.city}</span>
+   473→   473→                      <span className="flex items-center gap-1">
+   474→   474→                        <Users className="size-3.5" />
+   475→   475→                        <span className="num">{a.memberCount}</span> عضو
+   476→   476→                      </span>
+   477→   477→                    </div>
+   478→   478→                  </CardContent>
+   479→   479→                </Card>
+   480→   480→              </Link>
+   481→   481→            </motion.div>
+   482→   482→          ))}
+   483→   483→        </div>
+   484→   484→      </div>
+   485→   485→    </section>
+   486→   486→  );
+   487→   487→}
+   488→   488→
+   489→   489→// -------------------------------------------------------------------
+   490→   490→// نداء المساعد
+   491→   491→// -------------------------------------------------------------------
+   492→   492→function AssistantCTA() {
+   493→   493→  return (
+   494→   494→    <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
+   495→   495→      <motion.div
+   496→   496→        initial={{ opacity: 0, y: 30 }}
+   497→   497→        whileInView={{ opacity: 1, y: 0 }}
+   498→   498→        viewport={{ once: true, margin: "-60px" }}
+   499→   499→        transition={{ duration: 0.6 }}
+   500→   500→        className="gradient-dark zellige-pattern relative overflow-hidden rounded-3xl px-6 py-14 text-center text-white sm:px-12"
+   501→   501→      >
+   502→   502→        <div className="pointer-events-none absolute -top-24 left-1/2 size-72 -translate-x-1/2 rounded-full bg-gold/15 blur-3xl" aria-hidden="true" />
+   503→   503→        <span className="mx-auto mb-6 grid size-16 place-items-center rounded-2xl border border-gold/30 bg-gold/15">
+   504→   504→          <Bot className="size-8 text-gold" />
+   505→   505→        </span>
+   506→   506→        <h2 className="mx-auto max-w-2xl text-3xl font-black tracking-tight sm:text-4xl">
+   507→   507→          «المساعد الجمعوي» — <span className="text-gradient-gold">مرشدكم الموثوق</span>
+   508→   508→        </h2>
+   509→   509→        <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-white/75">
+   510→   510→          اسألوه عن خطوات تأسيس جمعية، وثائق التصريح، صفة المنفعة العامة، رقم ICE،
+   511→   511→          الخصم الضريبي للتبرعات… يجيبكم من قاعدة معارف رسمية مُتحقق منها:
+   512→   512→          <span className="font-bold text-gold"> بدون هلوسة وبدون روابط وهمية</span> —
+   513→   513→          وإن لم يعرف، يقولها بصراحة ويوجهكم للمصدر الرسمي.
+   514→   514→        </p>
+   515→   515→        <div className="mt-8 flex flex-wrap justify-center gap-3">
+   516→   516→          <Button asChild size="lg" className="h-12 gap-2 bg-gold px-7 text-base font-extrabold text-[#061229] hover:bg-gold/90">
+   517→   517→            <Link href="/assistant">
+   518→   518→              <Bot className="size-5" />
+   519→   519→              تحدثوا مع المساعد
+   520→   520→            </Link>
+   521→   521→          </Button>
+   522→   522→          <Button asChild size="lg" variant="outline" className="h-12 gap-2 border-white/25 bg-transparent px-7 text-base font-extrabold text-white hover:bg-white/10 hover:text-white">
+   523→   523→            <Link href="/legal">المرجع القانوني</Link>
+   524→   524→          </Button>
+   525→   525→        </div>
+   526→   526→      </motion.div>
+   527→   527→    </section>
+   528→   528→  );
+   529→   529→}
+   530→   530→
+   531→   531→// -------------------------------------------------------------------
+   532→   532→// الأسئلة الشائعة
+   533→   533→// -------------------------------------------------------------------
+   534→   534→const FAQS = [
+   535→   535→  {
+   536→   536→    q: "هل المنصة مجانية؟",
+   537→   537→    a: "إنشاء الحساب، دليل الجمعيات، التسجيل في الفعاليات العمومية، والمساعد الجمعوي — مجانية لكل المستخدمين. تحتفظ المنصة بحق تقديم خدمات متقدمة للجمعيات الكبيرة لاحقاً مع إشعار مسبق.",
+   538→   538→  },
+   539→   539→  {
+   540→   540→    q: "هل بيانات جمعيتنا آمنة؟",
+   541→   541→    a: "نعم: كلمات السر مشفرة، الجلسات موقعة رقمياً، الصلاحيات مفحوصة في كل طلب على الخادم، وسجل التدقيق يوثق كل عملية. معالجة المعطيات الشخصية تتم بموافقة صريحة وفق القانون 09.08 (CNDP).",
+   542→   542→  },
+   543→   543→  {
+   544→   544→    q: "هل المنصة بديلة عن الإدارات الرسمية؟",
+   545→   545→    a: "لا. مامب أداة تسيير رقمية للجمعيات: تنظم ملفاتكم ومحاسبتكم ووثائقكم وتجهزها للمساطر الرسمية. التصريح لدى السلطة المحلية، النشر بالجريدة الرسمية، وطلبات الإدارات تتم عبر قنواتها الرسمية المعتمدة.",
+   546→   546→  },
+   547→   547→  {
+   548→   548→    q: "كيف تتم عملية توثيق الجمعيات؟",
+   549→   549→    a: "عند تسجيل جمعية جديدة يراجع فريق المنصة معطياتها (المرجع القانوني، المكتب، مجال العمل) قبل منحها علامة «موثقة» وظهورها في الدليل العمومي. الجمعيات غير الموثقة تبقى في وضع قيد المصادقة.",
+   550→   550→  },
+   551→   551→  {
+   552→   552→    q: "هل يمكن للأجانب استعمال المنصة؟",
+   553→   553→    a: "نعم، المنصة مفتوحة للمواطنين والأجانب على السواء: تصفح دليل الجمعيات، التبرع، التسجيل في الفعاليات العمومية — والواجهة متوفرة بالعربية مع دعم كامل لاتجاه RTL.",
+   554→   554→  },
+   555→   555→  {
+   556→   556→    q: "ماذا لو احتاجت جمعيتنا تقريراً رسمياً؟",
+   557→   557→    a: "وحدة التقارير تولد التقرير الأدبي والمالي السنوي وقائمة الانخراطات وسجل التبرعات — كلها بصيغة قابلة للطبع والعرض على الجمع العام أو الشركاء والجهات المانحة.",
+   558→   558→  },
+   559→   559→];
+   560→   560→
+   561→   561→function FAQ() {
+   562→   562→  return (
+   563→   563→    <section className="mx-auto max-w-3xl px-4 pb-20 sm:px-6">
+   564→   564→      <motion.div {...fadeUp} className="mb-10 text-center">
+   565→   565→        <h2 className="text-3xl font-black tracking-tight sm:text-4xl">أسئلة شائعة</h2>
+   566→   566→      </motion.div>
+   567→   567→      <Accordion type="single" collapsible className="space-y-3">
+   568→   568→        {FAQS.map((f, i) => (
+   569→   569→          <AccordionItem key={i} value={`q${i}`} className="rounded-xl border border-border bg-card px-5 shadow-sm data-[state=open]:border-primary/30">
+   570→   570→            <AccordionTrigger className="py-4 text-start text-[15px] font-extrabold hover:no-underline">
+   571→   571→              {f.q}
+   572→   572→            </AccordionTrigger>
+   573→   573→            <AccordionContent className="pb-4 pt-0 text-sm leading-7 text-muted-foreground">
+   574→   574→              {f.a}
+   575→   575→            </AccordionContent>
+   576→   576→          </AccordionItem>
+   577→   577→        ))}
+   578→   578→      </Accordion>
+   579→   579→    </section>
+   580→   580→  );
+   581→   581→}
+   582→   582→
+   583→   583→// -------------------------------------------------------------------
+   584→   584→// الصفحة
+   585→   585→// -------------------------------------------------------------------
+   586→   586→export function LandingPage({ data }: { data: DemoData }) {
+   587→   587→  return (
+   588→   588→    <>
+   589→   589→      <Hero stats={data.stats} />
+   590→   590→      <Features />
+   591→   591→      <Roles />
+   592→   592→      <HowItWorks />
+   593→   593→      <AssociationsPreview associations={data.associations} />
+   594→   594→      <AssistantCTA />
+   595→   595→      <FAQ />
+   596→   596→    </>
+   597→   597→  );
+   598→   598→}
+   599→   599→
