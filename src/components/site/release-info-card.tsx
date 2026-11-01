@@ -21,7 +21,8 @@ interface ReleaseInfo {
 }
 
 function formatSize(bytes: number): string {
-  return (bytes / (1024 * 1024)).toFixed(1);
+  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} ك.ب`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} م.ب`;
 }
 
 export function ReleaseInfoCard() {
@@ -57,7 +58,7 @@ export function ReleaseInfoCard() {
   const rows: Array<{ icon: typeof Tag; label: string; value: string }> = [
     { icon: Tag, label: "الإصدار", value: info?.tag ?? "—" },
     { icon: CalendarDays, label: "تاريخ النشر", value: info?.date ?? "—" },
-    { icon: HardDrive, label: "حجم الملف", value: info?.sizeMB ? `${info.sizeMB} م.ب` : "—" },
+    { icon: HardDrive, label: "حجم الملف", value: info?.sizeMB ?? "—" },
   ];
 
   return (
