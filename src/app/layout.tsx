@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { ChatbotWidget } from "@/components/chatbot/chatbot-widget";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://mamp.pages.dev"),
   title: {
     default: "منصة مامب — إدارة الجمعيات المغربية",
     template: "%s | منصة مامب",
@@ -21,14 +22,59 @@ export const metadata: Metadata = {
     "MAMP",
   ],
   authors: [{ name: "منصة مامب" }],
+  creator: "TARIK CHOUIKA",
+  publisher: "منصة مامب",
+  alternates: { canonical: "/" },
+  manifest: "/manifest.webmanifest",
+  applicationName: "منصة مامب",
+  appleWebApp: {
+    capable: true,
+    title: "منصة مامب",
+    statusBarStyle: "black-translucent",
+  },
+  icons: {
+    icon: [
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/icon-192.png", sizes: "192x192", type: "image/png" }],
+  },
   openGraph: {
-    title: "منصة مامب — إدارة الجمعيات المغربية",
-    description:
-      "رقمنة إدارة ومحاسبة وعمل الجمعيات المغربية بشكل احترافي وآمن ومتوافق مع القوانين.",
-    siteName: "منصة مامب",
     type: "website",
     locale: "ar_MA",
+    url: "/",
+    siteName: "منصة مامب",
+    title: "منصة مامب — إدارة الجمعيات المغربية",
+    description:
+      "رقمنة إدارة ومحاسبة وعمل الجمعيات المغربية بشكل احترافي وآمن ومتوافق مع القوانين — مع مساعد جمعوي بدون هلوسة.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "منصة مامب — إدارة الجمعيات المغربية",
+        type: "image/png",
+      },
+    ],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "منصة مامب — إدارة الجمعيات المغربية",
+    description:
+      "رقمنة إدارة ومحاسبة الجمعيات المغربية — وفق القانون 75.00 وبحماية المعطيات وفق القانون 09.08.",
+    images: ["/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  category: "government",
 };
 
 export const viewport: Viewport = {

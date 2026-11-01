@@ -22,7 +22,11 @@ export async function generateMetadata({
   const { slug } = await params;
   const a = DEMO_DATA.associations.find((x) => x.slug === slug);
   if (!a) return { title: "جمعية غير موجودة" };
-  return { title: a.name, description: a.description.slice(0, 150) };
+  return {
+    title: a.name,
+    description: a.description.slice(0, 150),
+    alternates: { canonical: `/associations/${slug}/` },
+  };
 }
 
 export default async function AssociationDetailPage({

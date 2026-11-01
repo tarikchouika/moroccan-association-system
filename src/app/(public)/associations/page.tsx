@@ -5,6 +5,7 @@ import { DEMO_DATA } from "@/generated/demo-data";
 export const metadata: Metadata = {
   title: "دليل الجمعيات الموثقة",
   description: "استكشفوا الجمعيات المغربية الموثقة على منصة مامب وفق المجالات والمدن — للانخراط أو التبرع بثقة.",
+  alternates: { canonical: "/associations/" },
 };
 
 export default function AssociationsPage() {

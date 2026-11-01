@@ -1,0 +1,137 @@
+# ============================================================================
+# سير عمل بناء تطبيق أندرويد — منصة مامب (MAMP)
+# ============================================================================
+# يبني ملف APK موقّعاً بشهادة CN=TARIK CHOUIKA (صلاحية 30 سنة) وينشره في
+# إصدارات GitHub، ما يوفر رابطاً دائماً لآخر تحديث:
+#
+#   https://github.com/tarikchouika/moroccan-association-system/releases/latest/download/mamp.apk
+#
+# المطلوب (أسرار المستودع):
+#   MAMP_KEYSTORE_BASE64    — ملف المخزن (PKCS12) مرمزاً بـ base64
+#   MAMP_KEYSTORE_PASSWORD  — كلمة سر المخزن
+#   MAMP_KEY_ALIAS          — الاسم المستعار للمفتاح (mamp)
+#   MAMP_KEY_PASSWORD       — كلمة سر المفتاح
+# ============================================================================
+name: build-android-apk
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "app-android/**"
+      - ".github/workflows/build-apk.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: بناء وتوقيع APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: استخراج الكود
+        uses: actions/checkout@v4
+
+      - name: تجهيز Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: تجهيز Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: تثبيت مكونات SDK المطلوبة
+        run: |
+          yes | sdkmanager --licenses > /dev/null 2>&1 || true
+          sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools" > /dev/null
+
+      - name: التحقق من مفاتيح التوقيع
+        env:
+          KEYSTORE_BASE64: ${{ secrets.MAMP_KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "::error::مفاتيح التوقيع غير مضبوطة. أضيفوا أسرار المستودع: MAMP_KEYSTORE_BASE64 و MAMP_KEYSTORE_PASSWORD و MAMP_KEY_ALIAS و MAMP_KEY_PASSWORD"
+            exit 1
+          fi
+          echo "✓ مفاتيح التوقيع متوفرة"
+
+      - name: تجهيز مخزن التوقيع
+        env:
+          KEYSTORE_BASE64: ${{ secrets.MAMP_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.MAMP_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.MAMP_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.MAMP_KEY_PASSWORD }}
+        run: |
+          printf '%s' "$KEYSTORE_BASE64" | base64 -d > "$HOME/mamp-release.p12"
+          {
+            echo "KEYSTORE_FILE=$HOME/mamp-release.p12"
+            echo "KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD"
+            echo "KEY_ALIAS=$KEY_ALIAS"
+            echo "KEY_PASSWORD=$KEY_PASSWORD"
+          } >> "$GITHUB_ENV"
+          ls -la "$HOME/mamp-release.p12"
+
+      - name: بناء APK الموقّع
+        working-directory: app-android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon --stacktrace
+
+      - name: تجهيز ملف التوزيع
+        run: |
+          cp app-android/app/build/outputs/apk/release/app-release.apk mamp.apk
+          echo "حجم الملف: $(du -h mamp.apk | cut -f1)"
+
+      - name: استخراج بيانات الشهادة والتوقيع
+        run: |
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner 2>/dev/null | sort -V | tail -1)
+          {
+            echo "# تطبيق مامب لأندرويد — v1.0.${GITHUB_RUN_NUMBER}"
+            echo ""
+            echo "**تاريخ البناء:** $(date -u '+%Y-%m-%d %H:%M UTC')"
+            echo "**حجم الملف:** $(du -h mamp.apk | cut -f1)"
+            echo ""
+            echo "## التوقيع الرقمي"
+            echo '```'
+            "$APKSIGNER" verify --print-certs mamp.apk 2>/dev/null | grep -E "Signer #1 certificate (DN|SHA-256)" || true
+            echo '```'
+            echo ""
+            echo "## بصمة الملف (SHA-256)"
+            echo '```'
+            sha256sum mamp.apk | cut -d' ' -f1
+            echo '```'
+            echo ""
+            echo "---"
+            echo "**الرابط الدائم لآخر إصدار:** https://github.com/tarikchouika/moroccan-association-system/releases/latest/download/mamp.apk"
+            echo ""
+            echo "الشهادة باسم CN=TARIK CHOUIKA بصلاحية 30 سنة. أي ملف لا يحمل هذا التوقيع ليس إصداراً رسمياً."
+          } > release-notes.md
+          cat release-notes.md
+
+      - name: حفظ نسخة كأثر عمل
+        uses: actions/upload-artifact@v4
+        with:
+          name: mamp-apk
+          path: mamp.apk
+          retention-days: 90
+
+      - name: حذف إصدار سابق بنفس الوسم (إن وجد)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="app-v1.0.${GITHUB_RUN_NUMBER}"
+          gh release delete "$TAG" --yes --cleanup-tag 2>/dev/null || true
+
+      - name: نشر إصدار GitHub
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: app-v1.0.${{ github.run_number }}
+          name: "تطبيق مامب لأندرويد — v1.0.${{ github.run_number }}"
+          body_path: release-notes.md
+          files: |
+            mamp.apk
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

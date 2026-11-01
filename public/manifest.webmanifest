@@ -1,0 +1,52 @@
+{
+  "name": "منصة مامب — إدارة الجمعيات المغربية",
+  "short_name": "منصة مامب",
+  "description": "منصة رقمية احترافية لإدارة الجمعيات المغربية: الانخراطات، المحاسبة، التبرعات، الفعاليات والوثائق الرسمية.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "dir": "rtl",
+  "lang": "ar",
+  "background_color": "#faf9f5",
+  "theme_color": "#0d6b4f",
+  "categories": ["government", "productivity", "business"],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "دليل الجمعيات",
+      "url": "/associations/",
+      "description": "استكشاف الجمعيات المغربية الموثقة"
+    },
+    {
+      "name": "المساعد الجمعوي",
+      "url": "/assistant/",
+      "description": "مساعد ذكي بقاعدة معارف موثقة"
+    },
+    {
+      "name": "تطبيق أندرويد",
+      "url": "/app/",
+      "description": "تحميل التطبيق الرسمي"
+    }
+  ]
+}

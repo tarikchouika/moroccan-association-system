@@ -30,6 +30,9 @@ restore() {
 trap restore EXIT
 
 echo "==> [2/5] توليد البيانات العمومية من قاعدة SQLite المحلية"
+# مسار قاعدة بيانات مطلق محسوب عند البناء — يعمل محلياً وعلى Vercel/CI
+export DATABASE_URL="file:$(pwd)/db/custom.db"
+bunx prisma generate --schema prisma/schema.prisma
 bun run demo:generate
 
 echo "==> [3/5] بناء النسخة الثابتة (next build + output=export)"
@@ -44,10 +47,10 @@ fi
 PAGES=$(find "$OUT_DIR" -name "*.html" | wc -l)
 echo "    عدد الصفحات المولدة: $PAGES"
 
-# صفحات مطلوبة يجب أن تتوفر
-for p in index.html associations/index.html legal/index.html assistant/index.html login/index.html register/index.html; do
+# صفحات وملفات مطلوبة يجب أن تتوفر
+for p in index.html associations/index.html legal/index.html legal/terms/index.html legal/privacy/index.html legal/cookies/index.html assistant/index.html app/index.html login/index.html register/index.html sitemap.xml robots.txt manifest.webmanifest; do
   if [ ! -f "$OUT_DIR/$p" ]; then
-    echo "❌ صفحة مفقودة: $p" >&2
+    echo "❌ ملف مفقود: $p" >&2
     exit 1
   fi
 done

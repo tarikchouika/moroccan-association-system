@@ -12,6 +12,22 @@
 |---|---|
 | النسخة العمومية (ثابتة) | https://mamp.pages.dev |
 | النسخة الكاملة (خادم محلي) | `bun run dev` → http://localhost:3000 |
+| تطبيق أندرويد — رابط دائم لآخر إصدار موقّع | https://github.com/tarikchouika/moroccan-association-system/releases/latest/download/mamp.apk |
+| صفحة تحميل التطبيق ودليل التثبيت | https://mamp.pages.dev/app/ |
+| الوثائق القانونية | `/legal/terms` · `/legal/privacy` · `/legal/cookies` |
+
+## تطبيق أندرويد الرسمي
+
+- **المشروع**: `app-android/` — غلاف ويب رسمي (WebView) للمنصة مع شاشة بداية،
+  أيقونات تكيفية، صفحة انقطاع اتصال عربية وروابط عميقة. متطلباته Android 7.0+.
+- **البناء الألي**: سير عمل GitHub Actions (`.github/workflows/build-apk.yml`)
+  يبني APK موقّعاً عند كل تعديل على ملفات التطبيق وينشره في إصدارات GitHub
+  باسم ثابت `mamp.apk` — ما يوفر **رابطاً دائماً** لآخر إصدار.
+- **التوقيع الرقمي**: شهادة `CN=TARIK CHOUIKA` (RSA 2048 / SHA-256) بصلاحية
+  **30 سنة** (2026–2056). المخزن وكلمة سره محفوظان كأسرار GitHub، ولا يظهران
+  في المستودع أبداً. بصمة الشهادة والملف (SHA-256) تُنشران مع كل إصدار.
+- **التوليد المحلي للمفاتيح** (عند الحاجة): `bash scripts/generate-signing-key.sh`
+  ثم `python3 scripts/set-gh-secrets.py`.
 
 ## المزايا الرئيسية
 

@@ -148,8 +148,15 @@ export function RegisterForm() {
             <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border bg-muted/40 p-3.5 text-[12px] leading-6">
               <Checkbox checked={consent} onCheckedChange={(v) => setConsent(v === true)} className="mt-0.5" />
               <span className="text-muted-foreground">
-                أوافق على معالجة معطياتي الشخصية لأغراض استعمال المنصة، وفق القانون 09.08
-                المتعلق بحماية المعطيات ذات الطابع الشخصي. يمكنني سحب موافقتي في أي وقت.
+                أوافق على{" "}
+                <Link href="/legal/privacy" className="font-bold text-primary underline underline-offset-4 hover:text-primary/80">
+                  سياسة الخصوصية
+                </Link>{" "}
+                ومعالجة معطياتي الشخصية لأغراض استعمال المنصة، وفق القانون 09.08
+                المتعلق بحماية المعطيات ذات الطابع الشخصي، وعلى{" "}
+                <Link href="/legal/terms" className="font-bold text-primary underline underline-offset-4 hover:text-primary/80">
+                  شروط الاستخدام
+                </Link>. يمكنني سحب موافقتي في أي وقت.
               </span>
             </label>
 

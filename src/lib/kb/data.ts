@@ -32,6 +32,9 @@ export const OFFICIAL_LINKS: Record<string, KBLink> = {
   interieur: { url: "https://www.interieur.gov.ma", label: "وزارة الداخلية", source: "interieur.gov.ma" },
   mcrpsc: { url: "https://www.mcrpsc.gov.ma", label: "وزارة الشباب والثقافة والتواصل", source: "mcrpsc.gov.ma" },
   mamp: { url: "https://mamp.pages.dev", label: "منصة مامب — إدارة الجمعيات المغربية", source: "mamp.pages.dev" },
+  mampApp: { url: "https://mamp.pages.dev/app/", label: "صفحة تطبيق أندرويد — منصة مامب", source: "mamp.pages.dev" },
+  mampApk: { url: "https://github.com/tarikchouika/moroccan-association-system/releases/latest/download/mamp.apk", label: "تحميل تطبيق مامب لأندرويد (آخر إصدار موقّع)", source: "github.com" },
+  mampReleases: { url: "https://github.com/tarikchouika/moroccan-association-system/releases", label: "إصدارات تطبيق مامب — المستودع الرسمي", source: "github.com" },
 };
 
 export const KB_ENTRIES: KBEntry[] = [
@@ -361,6 +364,15 @@ export const KB_ENTRIES: KBEntry[] = [
     answer:
       "الإدارات الأساسية المعنية بالعمل الجمعوي: السلطة الإدارية المحلية (قيادة/باشوية مقر الجمعية) لاستقبال التصريحات والتغييرات؛ الأمانة العامة للحكومة للنشر بالجريدة الرسمية وصفة المنفعة العامة ومساطر جمع التبرعات؛ المديرية العامة للضرائب للجوانب الجبائية وICE؛ CNDP لتصريحات معالجة المعطيات. استعملوا دائماً البوابات الرسمية الموثقة أعلاه للتواصل، واحتفظوا بنسخ من كل مراسلة ووصل.",
     links: [OFFICIAL_LINKS.sggAssociations, OFFICIAL_LINKS.interieur, OFFICIAL_LINKS.tax, OFFICIAL_LINKS.cndp],
+  },
+  {
+    id: "app-download",
+    title: "تطبيق منصة مامب لأندرويد — التحميل والتثبيت",
+    category: "المنصة",
+    keywords: ["تطبيق", "أندرويد", "اندرويد", "apk", "تحميل", "تنزيل", "تثبيت", "هاتف", "جوال", "موبايل", "إصدار", "إصدارات", "توقيع"],
+    answer:
+      "يتوفر لتطبيق منصة مامب إصدار رسمي لأندرويد يُبنى ويُوقّع آلياً من المستودع الرسمي. للتحميل: زوروا صفحة التطبيق في المنصة ثم اضغطوا «تحميل ملف APK»، أو امسحوا رمز QR الموجود في نفس الصفحة. بعد التحميل: 1) افتحوا الملف من الإشعارات أو مجلد التحميلات. 2) فعّلوا «السماح من هذا المصدر» عندما يطلبها أندرويد (رسالة قياسية لكل تطبيق خارج المتجر). 3) اضغطوا «تثبيت» ثم افتحوا التطبيق. التطبيق موقّع رقمياً بشهادة CN=TARIK CHOUIKA بصلاحية 30 سنة، وبصمة الشهادة تُنشر في ملاحظات كل إصدار — أي ملف لا يحمل هذا التوقيع ليس إصداراً رسمياً. المتطلبات: أندرويد 7.0 أو أحدث مع اتصال بالإنترنت. الرابط الدائم للتحميل يوجه دائماً لآخر إصدار.",
+    links: [OFFICIAL_LINKS.mampApp, OFFICIAL_LINKS.mampApk, OFFICIAL_LINKS.mampReleases],
   },
 ];
 

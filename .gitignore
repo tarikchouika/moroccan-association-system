@@ -56,3 +56,18 @@ server.log
 .secrets/
 *.token
 *.key
+
+# مخازن مفاتيح التوقيع — لا تُرفع أبداً
+*.p12
+*.keystore
+*.jks
+*.pem
+
+# مخرجات بناء أندرويد
+app-android/.gradle/
+app-android/app/build/
+app-android/build/
+app-android/local.properties
+
+# مجلد تسليمات البيئة المحلية
+/download/

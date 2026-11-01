@@ -5,7 +5,48 @@
 
 ---
 
-## الدورة الحالية — 2026-11-01 (UTC+1، الدار البيضاء)
+## الدورة الثانية — 2026-11-01 (UTC+1، الدار البيضاء)
+
+### المهمة 8: إصلاح النشر الألي على Vercel ✅
+| البند | التفصيل |
+|---|---|
+| السبب الجذري | لا وجود لـ `vercel.json` في النسخة الجديدة → Vercel يكشف Next.js تلقائياً ويشغّل `next build` مع Prisma/SQLite ومسار قاعدة مطلق خاص بالبيئة المحلية → فشل/خلل |
+| الإصلاح | `vercel.json`: `framework: null` + `installCommand: bun install` + `buildCommand: bash scripts/build-static.sh` + `outputDirectory: out` |
+| تقوية البناء | `prisma generate` صريح في السكربت + `DATABASE_URL` محسوب ديناميكياً (`file:$(pwd)/db/custom.db`) + `postinstall` في package.json |
+| النتيجة | Vercel يبني الآن النسخة الثابتة العمومية نفسها (متطابقة مع Cloudflare Pages) |
+
+### المهمة 9: الصفحات القانونية ✅
+- قالب موحد `src/components/site/legal-page.tsx` بهوية بصرية متناسقة.
+- `/legal/terms` (شروط الاستخدام — 9 أقسام) · `/legal/privacy` (سياسة الخصوصية وفق 09.08 — 9 أقسام) · `/legal/cookies` (سياسة الكوكيز — 5 أقسام).
+- روابط في التذييل (عمود «الوثائق القانونية» + شريط سفلي) ونص الموافقة في نموذج التسجيل صار يربط بالسياسة والشروط.
+
+### المهمة 10: تحسين SEO والخريطة ✅
+- `src/app/sitemap.ts` (10 صفحات ثابتة + صفحات الجمعيات ديناميكياً) و`src/app/robots.ts` (منع dashboard/api + Sitemap) — حُذف `public/robots.txt` الثابت.
+- metadataBase + canonical لكل صفحة + OG/Twitter cards + `manifest.webmanifest` (PWA كامل مع maskable) + robots directives (login غير مفهرس).
+- JSON-LD: Organization/WebSite/WebApplication (الرئيسية) + MobileApplication/FAQPage (صفحة التطبيق).
+- صورة OG عربية مولدة بـ PIL+raqm (تشكيل سليم) + رمز QR + أيقونات 192/512/maskable — سكربتات: `generate-brand-assets.ts` و`generate-og-qr.py`.
+
+### المهمة 11: تطبيق أندرويد + سير العمل الألي + التوقيع ✅
+1. **المشروع** `app-android/`: Gradle 8.9 + AGP 8.5.2 + Java 17، minSdk 24 / targetSdk 34، WebView رسمي (روابط خارجية → متصفح، سحب للتحديث، صفحة انقطاع عربية، روابط عميقة)، أيقونات تكيفية + شاشة بداية من الشعار.
+2. **سير العمل** `.github/workflows/build-apk.yml`: عند الدفع لـ main (ملفات التطبيق) أو يدوياً → بناء موقّع → ملاحظات إصدار ببصمات SHA-256 → أثر عمل + إصدار GitHub باسم ملف ثابت `mamp.apk`.
+3. **الرابط الدائم**: `…/releases/latest/download/mamp.apk`.
+4. **الشهادة**: `keytool` PKCS12 — `CN=TARIK CHOUIKA, OU=MAMP Mobile, O=MAMP, L=Casablanca, C=MA` — RSA 2048 / SHA256withRSA — صلاحية 10958 يوماً (2026-11-01 → 2056-11-01). المخزن في `.secrets/` (chmod 600، غير متتبع) وكلمة السر عشوائية 32 محرفاً.
+5. **الأسرار**: رُفعت 4 أسرار إلى GitHub Actions عبر API بتشفير libsodium (`scripts/set-gh-secrets.py`) — HTTP 201 للجميع.
+6. **صفحة `/app`**: 4 خطوات تثبيت + بطاقة إصدار حية (تجلب من GitHub API: الإصدار/الحجم/التاريخ/بصمة الشهادة مع تدهور رشيق) + QR + بطاقة أمان + FAQ.
+
+### المهمة 12: المساعد الجمعوي — مدخل التطبيق ✅
+- مدخل معرفة `app-download` (35 مدخلاً الآن) + 3 روابط جديدة في اللائحة البيضاء (صفحة التطبيق، APK الدائم، الإصدارات).
+- اقتراح «كيف أنزّل تطبيق الأندرويد؟» في النافذة العائمة والصفحة الكاملة.
+
+### المهمة 13: البناء والتحقق والنشر ✅
+- بناء ثابت محلي: التحقق من كل الصفحات والملفات الجديدة (بما فيها sitemap.xml وrobots.txt وmanifest.webmanifest).
+- الدفع إلى GitHub يشغّل تلقائياً: إصلاح Vercel + سير عمل APK.
+- مراقبة سير عمل APK حتى الإصدار والتحقق من الرابط الدائم (200).
+- إعادة النشر على Cloudflare Pages والتحقق النهائي الحي.
+
+---
+
+## الدورة الأولى — 2026-11-01 (UTC+1، الدار البيضاء)
 
 ### المهمة 1: تدقيق الكود الموجود والتحقق من سلامة النظام ✅
 | البند | النتيجة |

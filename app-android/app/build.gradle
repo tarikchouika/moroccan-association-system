@@ -1,0 +1,61 @@
+// وحدة التطبيق — منصة مامب لأندرويد
+// التوقيع: شهادة CN=TARIK CHOUIKA (صلاحية 30 سنة) عبر أسرار البيئة في CI
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'ma.mamp.app'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "ma.mamp.app"
+        minSdk 24          // Android 7.0+
+        targetSdk 34
+        versionCode Integer.parseInt(System.getenv("GITHUB_RUN_NUMBER") ?: "1")
+        versionName "1.0." + (System.getenv("GITHUB_RUN_NUMBER") ?: "1")
+    }
+
+    // إعدادات التوقيع الرقمي — تُقرأ من متغيرات البيئة (GitHub Secrets في CI)
+    signingConfigs {
+        release {
+            def ksPath = System.getenv("KEYSTORE_FILE")
+            if (ksPath != null && file(ksPath).exists()) {
+                storeFile file(ksPath)
+                storeType "PKCS12"
+                storePassword System.getenv("KEYSTORE_PASSWORD")
+                keyAlias System.getenv("KEY_ALIAS")
+                keyPassword System.getenv("KEY_PASSWORD")
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            shrinkResources false
+            def ksPath = System.getenv("KEYSTORE_FILE")
+            if (ksPath != null && file(ksPath).exists()) {
+                signingConfig signingConfigs.release
+            }
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            applicationIdSuffix ".debug"
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    lint {
+        abortOnError false
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+}

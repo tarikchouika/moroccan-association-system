@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Landmark, Scale, ShieldCheck, Bot, ExternalLink, Mail } from "lucide-react";
+import { Landmark, Scale, ShieldCheck, Bot, ExternalLink, Mail, Smartphone, FileText } from "lucide-react";
 import { Logo } from "@/components/site/logo";
 import { OFFICIAL_LINKS } from "@/lib/kb/data";
 
@@ -45,7 +45,7 @@ export function Footer() {
           </div>
 
           {/* روابط المنصة */}
-          <div className="md:col-span-3">
+          <div className="md:col-span-2">
             <h3 className="mb-4 text-sm font-extrabold text-gold">المنصة</h3>
             <ul className="space-y-2.5 text-sm text-white/70">
               <li><Link className="hover:text-white transition-colors" href="/associations">دليل الجمعيات</Link></li>
@@ -54,11 +54,30 @@ export function Footer() {
               <li><Link className="hover:text-white transition-colors" href="/login">دخول الأعضاء</Link></li>
               <li><Link className="hover:text-white transition-colors" href="/register">إنشاء حساب</Link></li>
               <li><Link className="hover:text-white transition-colors" href="/dashboard">لوحة التحكم</Link></li>
+              <li>
+                <Link className="group inline-flex items-center gap-1.5 hover:text-white transition-colors" href="/app">
+                  <Smartphone className="size-3.5 text-gold" />
+                  تطبيق أندرويد
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* الوثائق القانونية */}
+          <div className="md:col-span-2">
+            <h3 className="mb-4 flex items-center gap-2 text-sm font-extrabold text-gold">
+              <FileText className="size-4" />
+              الوثائق القانونية
+            </h3>
+            <ul className="space-y-2.5 text-sm text-white/70">
+              <li><Link className="hover:text-white transition-colors" href="/legal/terms">شروط الاستخدام</Link></li>
+              <li><Link className="hover:text-white transition-colors" href="/legal/privacy">سياسة الخصوصية</Link></li>
+              <li><Link className="hover:text-white transition-colors" href="/legal/cookies">سياسة الكوكيز</Link></li>
             </ul>
           </div>
 
           {/* بوابات رسمية */}
-          <div className="md:col-span-4">
+          <div className="md:col-span-3">
             <h3 className="mb-4 flex items-center gap-2 text-sm font-extrabold text-gold">
               <Landmark className="size-4" />
               بوابات رسمية موثقة
@@ -82,11 +101,15 @@ export function Footer() {
         </div>
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 text-[12px] text-white/50 sm:flex-row">
-          <p>© 2026 منصة مامب — جميع الحقوق محفوظة.</p>
-          <p className="flex items-center gap-1.5 text-center">
-            <Mail className="size-3.5" />
-            المعلومة القانونية إرشادية؛ الرجوع دائماً للنصوص الرسمية والمختصين.
-          </p>
+          <p>© 2026 منصة مامب — TARIK CHOUIKA. جميع الحقوق محفوظة.</p>
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <Link className="hover:text-white/80 transition-colors" href="/legal/terms">شروط الاستخدام</Link>
+            <Link className="hover:text-white/80 transition-colors" href="/legal/privacy">الخصوصية</Link>
+            <p className="flex items-center gap-1.5 text-center">
+              <Mail className="size-3.5" />
+              المعلومة القانونية إرشادية؛ الرجوع دائماً للنصوص الرسمية.
+            </p>
+          </div>
         </div>
       </div>
     </footer>
