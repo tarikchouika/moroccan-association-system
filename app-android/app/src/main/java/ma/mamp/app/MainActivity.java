@@ -1,53 +1,54 @@
 package ma.mamp.app;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.View;
+import android.view.Gravity;
+import android.view.MotionEvent;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import android.widget.FrameLayout;
+import android.widget.Toast;
 
 /**
- * النشاط الرئيسي لتطبيق منصة مامب
- * — غلاف ويب رسمي للمنصة مع:
+ * النشاط الرئيسي لتطبيق منصة مامب — بدون أي اعتماديات خارجية (صفر مكتبات)
+ * غلاف ويب رسمي للمنصة مع:
  *   • فتح الروابط الخارجية في المتصفح
- *   • السحب للتحديث
+ *   • السحب للأسفل من أعلى الصفحة = تحديث
  *   • صفحة عدم الاتصال بالشبكة (عربية)
  *   • دعم زر الرجوع وتدوير الشاشة دون فقدان الحالة
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     private static final String HOME_URL = "https://mamp.pages.dev/";
     private static final String OFFLINE_URL = "file:///android_asset/offline.html";
     private static final String ALLOWED_HOST = "mamp.pages.dev";
+    private static final int REFRESH_SWIPE_PX = 260;
 
     private WebView webView;
-    private SwipeRefreshLayout refreshLayout;
+    private float touchDownY = -1f;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        refreshLayout = new SwipeRefreshLayout(this);
-        refreshLayout.setColorSchemeColors(Color.parseColor("#0d6b4f"), Color.parseColor("#c9a227"));
-
         webView = new WebView(this);
-        refreshLayout.addView(webView,
-                new SwipeRefreshLayout.LayoutParams(
-                        SwipeRefreshLayout.LayoutParams.MATCH_PARENT,
-                        SwipeRefreshLayout.LayoutParams.MATCH_PARENT));
+        FrameLayout root = new FrameLayout(this);
+        root.addView(webView, new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT));
+        setContentView(root);
 
-        setContentView(refreshLayout);
         getWindow().setStatusBarColor(Color.parseColor("#0b1410"));
+        getWindow().setNavigationBarColor(Color.parseColor("#0b1410"));
 
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
@@ -59,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
         settings.setCacheMode(WebSettings.LOAD_DEFAULT);
 
         webView.setBackgroundColor(Color.parseColor("#faf9f5"));
+        webView.setVerticalScrollBarEnabled(false);
 
         webView.setWebViewClient(new WebViewClient() {
             @Override
@@ -75,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onPageFinished(WebView view, String url) {
-                refreshLayout.setRefreshing(false);
+                // لا شيء إضافي بعد اكتمال التحميل
             }
 
             @SuppressWarnings("deprecation")
@@ -100,23 +102,41 @@ public class MainActivity extends AppCompatActivity {
         webView.setDownloadListener((url, userAgent, contentDisposition, mimeType, contentLength) ->
                 openExternally(Uri.parse(url)));
 
-        refreshLayout.setOnRefreshListener(() -> {
-            String current = webView.getUrl();
-            if (current != null && current.startsWith("file://")) {
-                webView.loadUrl(HOME_URL);
-            } else {
-                webView.reload();
-            }
-        });
-
         if (savedInstanceState != null) {
             webView.restoreState(savedInstanceState);
         } else {
             webView.loadUrl(HOME_URL);
         }
+    }
 
-        // إخفاء شريط التمرير عند عدم الحاجة
-        webView.setVerticalScrollBarEnabled(false);
+    /** السحب للأسفل من أعلى الصفحة = تحديث (بديل خفيف عن SwipeRefreshLayout) */
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (webView != null) {
+            switch (ev.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN:
+                    touchDownY = ev.getY();
+                    break;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    if (touchDownY >= 0
+                            && webView.getScrollY() == 0
+                            && ev.getY() - touchDownY > REFRESH_SWIPE_PX) {
+                        Toast t = Toast.makeText(this, "جارٍ التحديث…", Toast.LENGTH_SHORT);
+                        t.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, 48);
+                        t.show();
+                        String current = webView.getUrl();
+                        if (current != null && current.startsWith("file://")) {
+                            webView.loadUrl(HOME_URL);
+                        } else {
+                            webView.reload();
+                        }
+                    }
+                    touchDownY = -1f;
+                    break;
+            }
+        }
+        return super.dispatchTouchEvent(ev);
     }
 
     private boolean isMainFrameError(int errorCode) {

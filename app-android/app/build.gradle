@@ -56,6 +56,6 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.7.0'
-    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+    // صفر اعتماديات خارجية — التطبيق يستعمل واجهات النظام مباشرة
+    // (بناء أسرع وأخف وأبعد عن تعارضات المكتبات)
 }
