@@ -99,8 +99,13 @@ public class MainActivity extends Activity {
         webView.setWebChromeClient(new WebChromeClient());
 
         // تحميل الملفات (مثل APK) يفتح في المتصفح النظامي
-        webView.setDownloadListener((url, userAgent, contentDisposition, mimeType, contentLength) ->
-                openExternally(Uri.parse(url)));
+        webView.setDownloadListener(new android.webkit.DownloadListener() {
+            @Override
+            public void onDownloadStart(String url, String userAgent, String contentDisposition,
+                                        String mimeType, long contentLength) {
+                openExternally(Uri.parse(url));
+            }
+        });
 
         if (savedInstanceState != null) {
             webView.restoreState(savedInstanceState);
@@ -140,10 +145,11 @@ public class MainActivity extends Activity {
     }
 
     private boolean isMainFrameError(int errorCode) {
-        return errorCode == ERROR_HOST_LOOKUP
-                || errorCode == ERROR_CONNECT
-                || errorCode == ERROR_TIMEOUT
-                || errorCode == ERROR_NETWORK;
+        return errorCode == WebViewClient.ERROR_HOST_LOOKUP
+                || errorCode == WebViewClient.ERROR_CONNECT
+                || errorCode == WebViewClient.ERROR_TIMEOUT
+                || errorCode == WebViewClient.ERROR_IO
+                || errorCode == WebViewClient.ERROR_UNKNOWN;
     }
 
     private void openExternally(Uri url) {
