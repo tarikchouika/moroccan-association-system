@@ -1,0 +1,389 @@
+// ============================================================================
+// MAMP — منصة إدارة الجمعيات المغربية
+// Moroccan Associations Management Platform — Prisma Schema (SQLite)
+// متوافق مع: ظهير 1.58.376 (15 نونبر 1958) كما غُيّر بالقانون 75.00،
+// والقانون 09.08 المتعلق بحماية المعطيات الشخصية (CNDP)
+// ملاحظة: SQLite لا يدعم enum، لذلك تُستخدم حقول String مع تدقيق على مستوى التطبيق
+// ============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// المستخدمون والصلاحيات
+// ============================================================================
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  fullName     String
+  phone        String?
+  nationalId   String? // رقم البطاقة الوطنية (اختياري، بموافقة CNDP)
+  nationality  String    @default("MA") // MA للمواطنين، ورموز أخرى للأجانب
+  // دور المستخدم على مستوى المنصة:
+  // SUPER_ADMIN (مالك المنصة) | ASSOCIATION_ADMIN (أدمين جمعية)
+  // CO_ADMIN (منخرط/متطوع بصلاحيات) | PARTNER (جهة حكومية أو خاصة)
+  // CITIZEN (مواطن/أجنبي عادي)
+  role         String    @default("CITIZEN")
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  memberships      Membership[]
+  donations        Donation[]
+  eventRegistrations EventRegistration[]
+  documents        Document[]   @relation("UploadedDocs")
+  auditLogs        AuditLog[]
+  notifications    Notification[]
+  chatMessages     ChatMessage[]
+  createdEvents    Event[]      @relation("EventCreator")
+  approvedTx       Transaction[] @relation("TxApprover")
+
+  @@index([role])
+  @@index([email])
+}
+
+// ============================================================================
+// الجمعيات (التعددية — كل جمعية نطاق مستقل)
+// ============================================================================
+
+model Association {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  name        String
+  acronym     String?
+  description String
+  mission     String?
+  // نوع الجمعية: تنموية | ثقافية | رياضية | بيئية | اجتماعية | صحية | تعليمية
+  // حقوقية | إنسانية | شبابية | أخرى
+  category    String    @default("تنموية")
+  city        String
+  region      String
+  address     String?
+  website     String?
+  email       String?
+  phone       String?
+  logoUrl     String?
+  coverUrl    String?
+  foundedAt   DateTime?
+  // الحالة القانونية: DECLARED (مُصرّح بها وفق ظهير 1958) | PUBLIC_UTILITY (منفعة عامة)
+  legalStatus String    @default("DECLARED")
+  iceNumber   String? // المعرف الموحد للمقاولة/الجمعية
+  taxId       String? // التعريف الضريبي IF
+  bankRib     String? // الحساب البنكي
+  // حالة الجمعية على المنصة: PENDING | ACTIVE | SUSPENDED
+  status      String    @default("PENDING")
+  isVerified  Boolean   @default(false) // توثيق من السوبر أدمين
+  verifiedAt  DateTime?
+  viewCount   Int       @default(0)
+  createdBy   String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  memberships    Membership[]
+  transactions   Transaction[]
+  donations      Donation[]
+  events         Event[]
+  documents      Document[]
+  feePayments    FeePayment[]
+  budgets        Budget[]
+  notifications  Notification[]
+  chatMessages   ChatMessage[]
+
+  @@index([status])
+  @@index([category])
+  @@index([city])
+}
+
+// ============================================================================
+// الانخراط (عضوية المستخدمين في الجمعيات)
+// ============================================================================
+
+model Membership {
+  id    String @id @default(cuid())
+  // الدور داخل الجمعية: PRESIDENT | VICE_PRESIDENT | SECRETARY | TREASURER
+  // BOARD_MEMBER | CO_ADMIN | MEMBER | VOLUNTEER
+  roleInAssociation String  @default("MEMBER")
+  // نوع الانخراط: ACTIVE (عادي) | HONORARY (شرفي) | BENEFACTOR (فاعل خير) | STUDENT (طالب)
+  memberType        String  @default("ACTIVE")
+  membershipNumber  String  @unique
+  status            String  @default("PENDING") // PENDING | ACTIVE | SUSPENDED | RESIGNED
+  joinedAt          DateTime @default(now())
+  expiresAt         DateTime?
+  cndpConsent       Boolean @default(false) // موافقة معالجة المعطيات (قانون 09.08)
+  cndpConsentAt     DateTime?
+  profession        String?
+  notes             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  association Association @relation(fields: [associationId], references: [id], onDelete: Cascade)
+  associationId String
+
+  feePayments FeePayment[]
+  eventRegistrations EventRegistration[]
+
+  @@index([associationId])
+  @@index([userId])
+  @@index([status])
+}
+
+// ============================================================================
+// واجبات الانخراط السنوية
+// ============================================================================
+
+model FeePayment {
+  id            String   @id @default(cuid())
+  year          Int
+  amount        Float
+  paidAt        DateTime @default(now())
+  // طريقة الأداء: CASH | BANK_TRANSFER | CHECK | ONLINE
+  method        String   @default("CASH")
+  receiptNumber String   @unique
+  notes         String?
+
+  membership   Membership @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+  membershipId String
+  association  Association @relation(fields: [associationId], references: [id], onDelete: Cascade)
+  associationId String
+
+  @@unique([membershipId, year])
+  @@index([associationId])
+}
+
+// ============================================================================
+// المحاسبة — العمليات المالية
+// ============================================================================
+
+model Transaction {
+  id          String   @id @default(cuid())
+  date        DateTime @default(now())
+  description String
+  amount      Float
+  // INCOME (مدخول) | EXPENSE (مصروف)
+  type        String
+  // فئات: انخراطات | تبرعات | إعانات ومساعدات | أنشطة وفعاليات | كراء وتحملات
+  // أتعاب ومصاريف إدارية | تجهيزات ومعدات | تواصل وتكوين | أخرى
+  category    String   @default("أخرى")
+  // CASH | BANK_TRANSFER | CHECK | ONLINE
+  paymentMethod String @default("CASH")
+  reference   String?
+  receiptNumber String?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  association   Association @relation(fields: [associationId], references: [id], onDelete: Cascade)
+  associationId String
+  approvedBy    User?       @relation("TxApprover", fields: [approvedById], references: [id])
+  approvedById  String?
+
+  @@index([associationId])
+  @@index([type])
+  @@index([date])
+}
+
+// ============================================================================
+// الميزانية السنوية
+// ============================================================================
+
+model Budget {
+  id          String   @id @default(cuid())
+  name        String
+  fiscalYear  Int
+  plannedIncome  Float @default(0)
+  plannedExpense Float @default(0)
+  // DRAFT | APPROVED | ARCHIVED
+  status      String   @default("DRAFT")
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  association   Association @relation(fields: [associationId], references: [id], onDelete: Cascade)
+  associationId String
+
+  @@unique([associationId, fiscalYear])
+}
+
+// ============================================================================
+// التبرعات
+// ============================================================================
+
+model Donation {
+  id           String   @id @default(cuid())
+  donorName    String
+  donorEmail   String?
+  donorPhone   String?
+  isAnonymous  Boolean  @default(false)
+  amount       Float    @default(0)
+  // MONEY (نقدي) | IN_KIND (عيني)
+  type         String   @default("MONEY")
+  inKindDescription String?
+  date         DateTime @default(now())
+  message      String?
+  receiptNumber String?
+  receiptIssued Boolean @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  association   Association @relation(fields: [associationId], references: [id], onDelete: Cascade)
+  associationId String
+  donor         User?       @relation(fields: [donorUserId], references: [id])
+  donorUserId   String?
+
+  @@index([associationId])
+  @@index([date])
+}
+
+// ============================================================================
+// الفعاليات والأنشطة
+// ============================================================================
+
+model Event {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  // ثقافية | تكوينية | تحسيسية | خيرية | اجتماعية | رياضية | بيئية | أخرى
+  category    String   @default("ثقافية")
+  startDate   DateTime
+  endDate     DateTime?
+  location    String?
+  city        String?
+  maxParticipants Int?
+  isPublic    Boolean  @default(true)
+  coverUrl    String?
+  // DRAFT | PUBLISHED | CANCELLED | COMPLETED
+  status      String   @default("PUBLISHED")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  association   Association @relation(fields: [associationId], references: [id], onDelete: Cascade)
+  associationId String
+  createdBy     User?       @relation("EventCreator", fields: [createdById], references: [id])
+  createdById   String?
+
+  registrations EventRegistration[]
+
+  @@index([associationId])
+  @@index([startDate])
+  @@index([status])
+}
+
+model EventRegistration {
+  id         String   @id @default(cuid())
+  fullName   String
+  email      String?
+  phone      String?
+  // REGISTERED | ATTENDED | CANCELLED
+  status     String   @default("REGISTERED")
+  createdAt  DateTime @default(now())
+
+  event        Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  eventId      String
+  user         User?       @relation(fields: [userId], references: [id])
+  userId       String?
+  membership   Membership? @relation(fields: [membershipId], references: [id])
+  membershipId String?
+
+  @@unique([eventId, email])
+  @@index([eventId])
+}
+
+// ============================================================================
+// الوثائق الرسمية للجمعية
+// ============================================================================
+
+model Document {
+  id          String   @id @default(cuid())
+  title       String
+  // STATUTES (القانون الأساسي) | MINUTES (محاضر) | ANNUAL_REPORT (تقرير سنوي)
+  // FINANCIAL_REPORT (تقرير مالي) | RECEIPT (وصل) | AGREEMENT (اتفاقية شراكة) | OTHER
+  type        String   @default("OTHER")
+  description String?
+  url         String?
+  version     Int      @default(1)
+  isPublic    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  association   Association @relation(fields: [associationId], references: [id], onDelete: Cascade)
+  associationId String
+  uploadedBy    User?       @relation("UploadedDocs", fields: [uploadedById], references: [id])
+  uploadedById  String?
+
+  @@index([associationId])
+  @@index([type])
+}
+
+// ============================================================================
+// الإشعارات
+// ============================================================================
+
+model Notification {
+  id        String   @id @default(cuid())
+  title     String
+  body      String
+  // INFO | SUCCESS | WARNING | DONATION | EVENT | LEGAL | SYSTEM
+  type      String   @default("INFO")
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user         User?        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String?
+  association  Association? @relation(fields: [associationId], references: [id], onDelete: Cascade)
+  associationId String?
+
+  @@index([userId])
+}
+
+// ============================================================================
+// سجل التدقيق (الأمان والمساءلة)
+// ============================================================================
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  // CREATE | UPDATE | DELETE | LOGIN | LOGOUT | EXPORT | MODERATION | CHAT
+  action    String
+  entity    String
+  entityId  String?
+  details   String?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+  userId String?
+
+  @@index([userId])
+  @@index([entity])
+  @@index([createdAt])
+}
+
+// ============================================================================
+// المساعد الجمعوي — سجل المحادثات
+// ============================================================================
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  sessionId String
+  // user | assistant
+  role      String
+  content   String
+  createdAt DateTime @default(now())
+
+  user         User?        @relation(fields: [userId], references: [id])
+  userId       String?
+  association  Association? @relation(fields: [associationId], references: [id])
+  associationId String?
+
+  @@index([sessionId])
+}

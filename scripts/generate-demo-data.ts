@@ -1,0 +1,92 @@
+/**
+ * مولد البيانات العمومية — يقرأ من قاعدة SQLite ويولد src/generated/demo-data.ts
+ * تُستعمل في الصفحات العمومية (قابلة للتصدير الثابت) دون اتصال مباشر بقاعدة البيانات.
+ * التنفيذ: bun run demo:generate
+ */
+import { PrismaClient } from "@prisma/client";
+import { writeFileSync, mkdirSync } from "fs";
+
+const prisma = new PrismaClient();
+
+async function main() {
+  const associations = await prisma.association.findMany({
+    where: { status: "ACTIVE" },
+    orderBy: { viewCount: "desc" },
+    include: {
+      memberships: { where: { status: "ACTIVE" }, select: { id: true } },
+      events: {
+        where: { isPublic: true, status: "PUBLISHED" },
+        orderBy: { startDate: "asc" },
+        take: 6,
+      },
+      _count: { select: { donations: true, documents: true } },
+    },
+  });
+
+  const [userCount, assocTotal, memberTotal, txTotal, donationTotal] = await Promise.all([
+    prisma.user.count(),
+    prisma.association.count(),
+    prisma.membership.count({ where: { status: "ACTIVE" } }),
+    prisma.transaction.count(),
+    prisma.donation.count(),
+  ]);
+
+  const managed = await prisma.transaction.aggregate({ _sum: { amount: true } });
+  const donationsSum = await prisma.donation.aggregate({ _sum: { amount: true } });
+
+  const data = {
+    generatedAt: new Date().toISOString(),
+    stats: {
+      users: userCount,
+      associations: assocTotal,
+      activeMembers: memberTotal,
+      transactions: txTotal,
+      donations: donationTotal,
+      managedAmount: Math.round((managed._sum.amount ?? 0) + (donationsSum._sum.amount ?? 0)),
+    },
+    associations: associations.map((a) => ({
+      slug: a.slug,
+      name: a.name,
+      acronym: a.acronym ?? "",
+      category: a.category,
+      city: a.city,
+      region: a.region,
+      description: a.description,
+      mission: a.mission ?? "",
+      foundedAt: a.foundedAt?.toISOString() ?? null,
+      legalStatus: a.legalStatus,
+      isVerified: a.isVerified,
+      viewCount: a.viewCount,
+      memberCount: a.memberships.length,
+      donationCount: a._count.donations,
+      iceNumber: a.iceNumber,
+    })),
+    events: associations.flatMap((a) =>
+      a.events.map((e) => ({
+        id: e.id,
+        title: e.title,
+        category: e.category,
+        startDate: e.startDate.toISOString(),
+        location: e.location ?? "",
+        city: e.city ?? a.city,
+        maxParticipants: e.maxParticipants,
+        associationName: a.name,
+        associationSlug: a.slug,
+      }))
+    ),
+  };
+
+  mkdirSync("src/generated", { recursive: true });
+  writeFileSync(
+    "src/generated/demo-data.ts",
+    `// ⚠️ ملف مولّد آلياً بواسطة scripts/generate-demo-data.ts — لا تحرره يدوياً\n` +
+      `import type { DemoData } from "./types";\n\n` +
+      `export const DEMO_DATA: DemoData = ${JSON.stringify(data, null, 2)};\n`
+  );
+  console.log(`✅ تم توليد البيانات العمومية: ${associations.length} جمعية، ${data.events.length} فعالية`);
+}
+
+main().catch((e) => {
+  console.error("فشل التوليد:", e);
+  process.exit(1);
+}).finally(() => prisma.$disconnect());
