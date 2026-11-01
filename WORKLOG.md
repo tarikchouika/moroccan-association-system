@@ -44,6 +44,21 @@
 - مراقبة سير عمل APK حتى الإصدار والتحقق من الرابط الدائم (200).
 - إعادة النشر على Cloudflare Pages والتحقق النهائي الحي.
 
+### المهمة 11-تكميلية: تدقيق سير عمل APK (5 دورات حتى النجاح) ✅
+| الدورة | المشكلة | الإصلاح |
+|---|---|---|
+| 1 | `android-actions/setup-android@v3` يحاول تثبيت حزمة `tools` المحذوفة من مستودع SDK | حذف الإضافة كلياً — عدّاءات GitHub تحمل SDK مسبقاً؛ تثبيت المكونات مباشرة عبر sdkmanager مع كشف المسار |
+| 2 | تعارض مكتبات Kotlin (appcompat يسحب kotlin-stdlib 1.8.22 وjdk7/jdk8 1.6.21) + مرجع مورد خاطئ في splash.xml | **صفر اعتماديات**: إزالة appcompat وswiperefreshlayout، Activity النظام + Theme.Material، سحب-للتحديث يدوي، إصلاح `@drawable/ic_splash_logo` |
+| 3 | ثوابت `ERROR_*` غير مؤهلة (تخص WebViewClient وليس النشاط) + `ERROR_NETWORK` غير موجود | تأهيل `WebViewClient.ERROR_*` واستبدال غير الموجود بـ ERROR_IO/ERROR_UNKNOWN؛ تحويل DownloadListener من lambda إلى صنف مجهول |
+| 3-تحقق | لا يوجد JDK في البيئة المحلية للتحقق المسبق | تنزيل Temurin JDK 17 + android.jar (منصة 33) والترجمة محلياً بـ javac — **نجحت بدون أخطاء** قبل الدفع |
+| 4 | بناء APK نجح لكن قسم الشهادة في ملاحظات الإصدار فارغ (apksigner لم ينتج مخرجات) | استخراج الشهادة من مخزن التوقيع مباشرة عبر `keytool` (مضمون التوفر) + apksigner كتحقق أفضل-جهد لمخططات التوقيع |
+| 5 | ✅ نجاح كامل | الإصدار v1.0.5 يحمل: الشهادة CN=TARIK CHOUIKA + الصلاحية 30 سنة (2026→2056) + بصمة SHA-256 + بصمة الملف |
+
+**تحقق مستقل محلي من التوقيع**: نُزّل الـAPK المنشور وفُحص بـapksigner (build-tools 34):
+`Verifies ✓ — Verified using v2 scheme (APK Signature Scheme v2): true — Signer #1 certificate DN: CN=TARIK CHOUIKA, OU=MAMP Mobile, O=MAMP, L=Casablanca, C=MA` — البصمة مطابقة تماماً للمخزن المحلي.
+
+**ملاحظة**: قيمة الاسم المستعار للمفتاح قصيرة فتظهر مموهة (**) في سجلات CI — طبيعي وغير مؤثر.
+
 ---
 
 ## الدورة الأولى — 2026-11-01 (UTC+1، الدار البيضاء)
