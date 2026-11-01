@@ -7,6 +7,8 @@
  */
 import { useEffect, useState } from "react";
 import { Tag, CalendarDays, HardDrive, RefreshCw, Download, Cloud, Github } from "lucide-react";
+import { LANGUAGES, sizeUnits } from "@/lib/i18n/config";
+import { useI18n } from "@/lib/i18n/provider";
 
 /** رابط التحميل المباشر من كلاودفلير — يخدم دائماً آخر إصدار */
 const CF_LATEST_JSON = "https://mamp-dl.pages.dev/latest.json";
@@ -23,14 +25,18 @@ interface ReleaseInfo {
   sizeMB: string | null;
 }
 
-function formatSize(bytes: number): string {
-  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} ك.ب`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} م.ب`;
-}
-
 export function ReleaseInfoCard() {
+  const { d, lang } = useI18n();
   const [info, setInfo] = useState<ReleaseInfo | null>(null);
   const [failed, setFailed] = useState(false);
+
+  const units = sizeUnits(lang);
+  const dateLocale = LANGUAGES[lang].dateLocale;
+
+  function formatSize(bytes: number): string {
+    if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} ${units.kb}`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} ${units.mb}`;
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -43,7 +49,7 @@ export function ReleaseInfoCard() {
       return {
         tag: String(d.tag).replace(/^app-/, ""),
         name: d.name ?? "",
-        date: d.date ? new Date(d.date).toLocaleDateString("ar-MA") : "",
+        date: d.date ? new Date(d.date).toLocaleDateString(dateLocale) : "",
         sizeMB: d.size ? formatSize(Number(d.size)) : null,
       };
     }
@@ -58,7 +64,7 @@ export function ReleaseInfoCard() {
       return {
         tag: (data.tag_name ?? "").replace(/^app-/, ""),
         name: data.name ?? "",
-        date: data.published_at ? new Date(data.published_at).toLocaleDateString("ar-MA") : "",
+        date: data.published_at ? new Date(data.published_at).toLocaleDateString(dateLocale) : "",
         sizeMB: apk ? formatSize(apk.size) : null,
       };
     }
@@ -82,25 +88,25 @@ export function ReleaseInfoCard() {
     return () => {
       cancelled = true;
     };
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
 
   const rows: Array<{ icon: typeof Tag; label: string; value: string }> = [
-    { icon: Tag, label: "الإصدار", value: info?.tag ?? "—" },
-    { icon: CalendarDays, label: "تاريخ النشر", value: info?.date ?? "—" },
-    { icon: HardDrive, label: "حجم الملف", value: info?.sizeMB ?? "—" },
+    { icon: Tag, label: d.release.versionLabel, value: info?.tag ?? "—" },
+    { icon: CalendarDays, label: d.release.dateLabel, value: info?.date ?? "—" },
+    { icon: HardDrive, label: d.release.sizeLabel, value: info?.sizeMB ?? "—" },
   ];
 
   return (
     <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
       <h3 className="mb-4 flex items-center gap-2 text-sm font-extrabold">
         <RefreshCw className="size-4 text-primary" />
-        معلومات أحدث إصدار
+        {d.release.title}
       </h3>
 
       {failed && !info ? (
         <p className="text-[13px] leading-7 text-muted-foreground">
-          تعذر جلب تفاصيل الإصدار حالياً — رابط التحميل بالأسفل يوجهكم دائماً
-          لآخر نسخة رسمية.
+          {d.release.failedText}
         </p>
       ) : (
         <dl className="grid grid-cols-3 gap-3">
@@ -123,10 +129,10 @@ export function ReleaseInfoCard() {
         className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-extrabold text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:opacity-95 active:scale-[0.98]"
       >
         <Cloud className="size-4.5" />
-        تحميل مباشر — كلاودفلير
+        {d.release.downloadBtn}
       </a>
       <p className="mt-2 text-center text-[11px] leading-5 text-muted-foreground">
-        رابط دائم من شبكة كلاودفلير يخدم دائماً آخر إصدار رسمي بأسرع سرعة.
+        {d.release.downloadNote}
       </p>
 
       {/* رابط احتياطي: GitHub */}
@@ -136,8 +142,13 @@ export function ReleaseInfoCard() {
         className="mt-2.5 flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 py-2.5 text-[13px] font-bold text-foreground transition-all hover:border-primary/40 hover:text-primary"
       >
         <Github className="size-4" />
-        رابط احتياطي — GitHub Releases
+        {d.release.backupBtn}
       </a>
+
+      <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-[10px] text-muted-foreground">
+        <Download className="size-3" />
+        mamp-dl.pages.dev/mamp.apk
+      </p>
     </div>
   );
 }

@@ -1,11 +1,15 @@
+"use client";
+
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n/provider";
 
 /**
  * شعار منصة مامب — اللوغو الرسمي (درع MAMP)
  * • الوضع الفاتح: اللوغو الأصلي
  * • الوضع القاتم: نسخة مرتفعة الظلال كي تبقى التفاصيل مرئية على الكحلي
  * • light=true: للأقسام الكحلية الداكنة دائماً (الفوتر، الشريط الجانبي…)
+ * • السطر الصغير تحت الاسم مترجم حسب لغة الواجهة
  */
 export function Logo({
   className,
@@ -16,13 +20,14 @@ export function Logo({
   light?: boolean;
   compact?: boolean;
 }) {
+  const { d, lang } = useI18n();
   return (
     <span className={cn("inline-flex items-center gap-2.5 select-none", className)}>
       <span className="relative grid h-10 w-11 place-items-center">
         {light ? (
           <Image
             src="/logo-dark.png"
-            alt="شعار منصة مامب"
+            alt="MAMP"
             width={44}
             height={38}
             priority
@@ -32,7 +37,7 @@ export function Logo({
           <>
             <Image
               src="/logo.png"
-              alt="شعار منصة مامب"
+              alt="MAMP"
               width={44}
               height={38}
               priority
@@ -40,7 +45,7 @@ export function Logo({
             />
             <Image
               src="/logo-dark.png"
-              alt="شعار منصة مامب"
+              alt="MAMP"
               width={44}
               height={38}
               priority
@@ -57,7 +62,7 @@ export function Logo({
               light ? "text-white" : "text-foreground"
             )}
           >
-            مـامـب
+            {lang === "ar" ? "مـامـب" : "MAMP"}
           </span>
           <span
             className={cn(
@@ -65,7 +70,7 @@ export function Logo({
               light ? "text-[#8fc7ff]" : "text-primary"
             )}
           >
-            MAMP · إدارة الجمعيات
+            {d.common.brandTagline}
           </span>
         </span>
       )}
@@ -86,7 +91,7 @@ export function LogoMark({
   return (
     <Image
       src={light ? "/logo-dark.png" : "/logo.png"}
-      alt="شعار منصة مامب"
+      alt="MAMP"
       width={size}
       height={size}
       priority

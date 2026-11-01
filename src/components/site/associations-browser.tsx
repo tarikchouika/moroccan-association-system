@@ -9,8 +9,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { DemoAssociation } from "@/generated/types";
+import { useI18n, useDemoI18n } from "@/lib/i18n/provider";
 
 export function AssociationsBrowser({ associations }: { associations: DemoAssociation[] }) {
+  const { d, dir } = useI18n();
+  const demo = useDemoI18n();
   const [q, setQ] = useState("");
   const [city, setCity] = useState("all");
   const [category, setCategory] = useState("all");
@@ -36,11 +39,10 @@ export function AssociationsBrowser({ associations }: { associations: DemoAssoci
       {/* الرأس */}
       <div className="mb-8">
         <h1 className="text-3xl font-black tracking-tight sm:text-4xl">
-          دليل <span className="text-primary">الجمعيات الموثقة</span>
+          {d.associations.titleA} <span className="text-primary">{d.associations.titleB}</span>
         </h1>
         <p className="mt-3 max-w-2xl text-base leading-7 text-muted-foreground">
-          استكشفوا الجمعيات المسجلة على المنصة وفق مجالاتها ومدنها. كل جمعية موثقة
-          تظهر هنا بعد التحقق من مرجعها القانوني — لتبرعوا أو تنخرطوا بثقة.
+          {d.associations.subtitle}
         </p>
       </div>
 
@@ -51,32 +53,32 @@ export function AssociationsBrowser({ associations }: { associations: DemoAssoci
           <Input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="ابحثوا بالاسم أو المجال..."
+            placeholder={d.associations.searchPlaceholder}
             className="ps-9 bg-background"
-            aria-label="البحث في الجمعيات"
+            aria-label={d.associations.searchAria}
           />
         </div>
-        <Select value={city} onValueChange={setCity} dir="rtl">
-          <SelectTrigger className="bg-background" aria-label="المدينة">
+        <Select value={city} onValueChange={setCity} dir={dir}>
+          <SelectTrigger className="bg-background" aria-label={d.associations.cityAria}>
             <MapPin className="size-4 text-muted-foreground" />
-            <SelectValue placeholder="كل المدن" />
+            <SelectValue placeholder={d.associations.allCities} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">كل المدن</SelectItem>
+            <SelectItem value="all">{d.associations.allCities}</SelectItem>
             {cities.map((c) => (
-              <SelectItem key={c} value={c}>{c}</SelectItem>
+              <SelectItem key={c} value={c}>{demo.city(c)}</SelectItem>
             ))}
           </SelectContent>
         </Select>
-        <Select value={category} onValueChange={setCategory} dir="rtl">
-          <SelectTrigger className="bg-background" aria-label="المجال">
+        <Select value={category} onValueChange={setCategory} dir={dir}>
+          <SelectTrigger className="bg-background" aria-label={d.associations.categoryAria}>
             <Filter className="size-4 text-muted-foreground" />
-            <SelectValue placeholder="كل المجالات" />
+            <SelectValue placeholder={d.associations.allCategories} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">كل المجالات</SelectItem>
+            <SelectItem value="all">{d.associations.allCategories}</SelectItem>
             {categories.map((c) => (
-              <SelectItem key={c} value={c}>{c}</SelectItem>
+              <SelectItem key={c} value={c}>{demo.category(c)}</SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -84,15 +86,15 @@ export function AssociationsBrowser({ associations }: { associations: DemoAssoci
 
       {/* النتائج */}
       <p className="mb-4 text-sm font-bold text-muted-foreground">
-        <span className="num">{filtered.length}</span> جمعية
+        <span className="num">{filtered.length}</span> {d.associations.resultsCount}
       </p>
 
       {filtered.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center gap-3 py-16 text-center">
             <Building2 className="size-10 text-muted-foreground/50" />
-            <p className="font-bold">لا توجد نتائج مطابقة</p>
-            <p className="text-sm text-muted-foreground">جربوا تغيير كلمات البحث أو إزالة المرشحات.</p>
+            <p className="font-bold">{d.associations.noResultsTitle}</p>
+            <p className="text-sm text-muted-foreground">{d.associations.noResultsDesc}</p>
             <Button
               variant="outline"
               onClick={() => {
@@ -101,7 +103,7 @@ export function AssociationsBrowser({ associations }: { associations: DemoAssoci
                 setCategory("all");
               }}
             >
-              إزالة المرشحات
+              {d.associations.resetFilters}
             </Button>
           </CardContent>
         </Card>
@@ -113,32 +115,32 @@ export function AssociationsBrowser({ associations }: { associations: DemoAssoci
                 <CardContent className="flex h-full flex-col p-6">
                   <div className="mb-4 flex items-start justify-between">
                     <span className="grid size-12 place-items-center rounded-xl bg-secondary text-lg font-black text-primary">
-                      {a.acronym?.slice(0, 2) || a.name.slice(0, 2)}
+                      {demo.assocAcronym(a)?.slice(0, 2) || a.name.slice(0, 2)}
                     </span>
                     <div className="flex flex-col items-end gap-1.5">
                       {a.isVerified && (
                         <Badge className="gap-1 border-primary/25 bg-secondary px-2 py-0.5 text-[10px] font-bold text-primary">
-                          <BadgeCheck className="size-3" /> موثقة
+                          <BadgeCheck className="size-3" /> {d.common.verified}
                         </Badge>
                       )}
                       {a.legalStatus === "PUBLIC_UTILITY" && (
                         <Badge variant="outline" className="border-gold/50 bg-gold-soft px-2 py-0.5 text-[10px] font-bold text-yellow-800">
-                          منفعة عامة
+                          {d.common.publicUtility}
                         </Badge>
                       )}
                     </div>
                   </div>
                   <h3 className="mb-1.5 text-lg font-extrabold leading-snug group-hover:text-primary transition-colors">
-                    {a.name}
+                    {demo.assocName(a)}
                   </h3>
-                  <p className="mb-4 line-clamp-3 flex-1 text-[13px] leading-6 text-muted-foreground">{a.description}</p>
+                  <p className="mb-4 line-clamp-3 flex-1 text-[13px] leading-6 text-muted-foreground">{demo.assocDescription(a)}</p>
                   <div className="flex items-center justify-between border-t border-border pt-4 text-[12px] font-bold text-muted-foreground">
-                    <span className="flex items-center gap-1"><MapPin className="size-3.5" />{a.city}</span>
+                    <span className="flex items-center gap-1"><MapPin className="size-3.5" />{demo.city(a.city)}</span>
                     <span className="flex items-center gap-1">
                       <Users className="size-3.5" />
-                      <span className="num">{a.memberCount}</span> عضو
+                      <span className="num">{a.memberCount}</span> {d.common.memberWord}
                     </span>
-                    <Badge variant="secondary" className="text-[10px]">{a.category}</Badge>
+                    <Badge variant="secondary" className="text-[10px]">{demo.category(a.category)}</Badge>
                   </div>
                 </CardContent>
               </Card>

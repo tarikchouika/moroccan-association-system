@@ -9,8 +9,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/site/logo";
+import { useI18n } from "@/lib/i18n/provider";
 
 export function LoginForm() {
+  const { d } = useI18n();
+  const t = d.auth.login;
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -32,7 +35,7 @@ export function LoginForm() {
       }
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setError(data.error || "تعذر تسجيل الدخول");
+        setError(data.error || t.errorNetwork);
         return;
       }
       router.push("/dashboard");
@@ -40,8 +43,8 @@ export function LoginForm() {
     } catch (e) {
       setError(
         e instanceof Error && e.message === "api-unavailable"
-          ? "خدمة الدخول تعمل على الخادم المحلي للمنصة. هذه هي النسخة العمومية الثابتة — استعملوها للتصفح والمساعد الجمعوي والتبرع."
-          : "تعذر الاتصال بالخادم. تحققوا من الشبكة."
+          ? t.errorApiUnavailable
+          : t.errorNetwork
       );
     } finally {
       setBusy(false);
@@ -54,8 +57,8 @@ export function LoginForm() {
         <div className="mb-6 flex justify-center">
           <Logo />
         </div>
-        <h1 className="text-2xl font-black">مرحباً بعودتكم</h1>
-        <p className="mt-2 text-sm text-muted-foreground">سجلوا الدخول للوصول إلى لوحة التحكم الخاصة بكم</p>
+        <h1 className="text-2xl font-black">{t.title}</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{t.subtitle}</p>
       </div>
 
       <Card className="shadow-xl border-border/80">
@@ -69,7 +72,7 @@ export function LoginForm() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="email">البريد الإلكتروني</Label>
+              <Label htmlFor="email">{t.email}</Label>
               <div className="relative">
                 <Mail className="absolute start-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
@@ -87,7 +90,7 @@ export function LoginForm() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">كلمة السر</Label>
+              <Label htmlFor="password">{t.password}</Label>
               <div className="relative">
                 <Lock className="absolute start-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
@@ -105,19 +108,19 @@ export function LoginForm() {
             </div>
 
             <Button type="submit" className="w-full gap-2 font-extrabold" size="lg" disabled={busy}>
-              {busy ? "جارٍ التحقق..." : (
+              {busy ? t.busy : (
                 <>
                   <LogIn className="size-4" />
-                  تسجيل الدخول
+                  {t.submit}
                 </>
               )}
             </Button>
           </form>
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
-            ليست لديكم حساب؟{" "}
+            {t.noAccount}{" "}
             <Link href="/register" className="font-bold text-primary hover:underline">
-              أنشئوا حساباً مجانياً
+              {t.createAccount}
             </Link>
           </p>
         </CardContent>
@@ -127,16 +130,15 @@ export function LoginForm() {
       <div className="mt-6 rounded-xl border border-dashed border-primary/30 bg-secondary/50 p-4 text-[12px] leading-6">
         <p className="mb-2 flex items-center gap-1.5 font-extrabold text-primary">
           <Info className="size-4" />
-          حسابات تجريبية للنسخة المحلية (كلمة السر: <span className="num">Mamp@2026</span>)
+          {t.demoTitle}
         </p>
         <ul className="grid grid-cols-1 gap-1 text-muted-foreground sm:grid-cols-2" dir="ltr">
-          <li>admin@mamp.ma — سوبر أدمين</li>
-          <li>user1@mamp.ma — رئيسة جمعية</li>
-          <li>user2@mamp.ma — أمين مال</li>
-          <li>partenaire@mamp.ma — جهة شريكة</li>
+          {t.demoAccounts.map((a) => (
+            <li key={a.email}>{a.email} — {a.role}</li>
+          ))}
         </ul>
         <p className="mt-2 text-[11px] text-muted-foreground/80">
-          على النسخة المنشورة (mamp.pages.dev) تعمل لوحات العرض ببيانات تجريبية دون تسجيل دخول.
+          {t.demoNote}
         </p>
       </div>
     </div>

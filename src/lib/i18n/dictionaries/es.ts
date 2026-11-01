@@ -1,0 +1,628 @@
+import type { Dict } from "../types";
+
+/**
+ * Diccionario español — traducido del árabe (fuente de referencia).
+ * Registro institucional, tratamiento de ustedes.
+ */
+export const es: Dict = {
+  common: {
+    brandTagline: "MAMP · Gestión de asociaciones",
+    verified: "Verificada",
+    publicUtility: "Utilidad pública",
+    memberWord: "miembro",
+    membersWord: "miembros",
+    currency: "MAD",
+    loading: "Cargando...",
+    notFoundTitle: "Asociación no encontrada",
+    close: "Cerrar",
+    learnMore: "Más información",
+    themeDark: "Cambiar al modo oscuro",
+    themeLight: "Cambiar al modo claro",
+  },
+
+  nav: {
+    home: "Inicio",
+    associations: "Directorio de asociaciones",
+    legal: "Referencia legal",
+    assistant: "Asistente Asociativo",
+    login: "Iniciar sesión",
+    register: "Crear cuenta",
+    openMenu: "Abrir menú",
+    closeMenu: "Cerrar menú",
+    mainNavAria: "Navegación principal",
+    homeAria: "Plataforma MAMP — Inicio",
+    language: "Idioma",
+  },
+
+  footer: {
+    about:
+      "Plataforma digital marroquí para la gestión y administración de asociaciones: adhesiones, contabilidad, donaciones, eventos y documentos oficiales — de conformidad con el Dáhir 1.58.376, modificado por la Ley 75.00, y con respeto de la Ley 09.08 de protección de datos personales.",
+    badgeLaw: "Conforme a la Ley 75.00",
+    badgePrivacy: "Protección de datos (CNDP)",
+    badgeAssistant: "Asistente sin alucinaciones",
+    platformTitle: "La plataforma",
+    membersLogin: "Acceso de miembros",
+    dashboard: "Panel de control",
+    androidApp: "Aplicación Android",
+    legalDocsTitle: "Documentos legales",
+    terms: "Términos de uso",
+    privacy: "Política de privacidad",
+    cookies: "Política de cookies",
+    officialPortalsTitle: "Portales oficiales verificados",
+    copyright: "© 2026 Plataforma MAMP — TARIK CHOUIKA. Todos los derechos reservados.",
+    legalNotice: "La información legal es orientativa; consulten siempre los textos oficiales.",
+  },
+
+  home: {
+    hero: {
+      badge: "La primera plataforma marroquí integral para la digitalización del trabajo asociativo",
+      titleA: "La digitalización de la gestión y la contabilidad",
+      titleB: "de las asociaciones marroquíes",
+      titleC: "con profesionalidad y seguridad",
+      subtitle:
+        "De la constitución al informe anual: adhesiones, contabilidad, donaciones con recibos oficiales, eventos, documentos legales — y un asistente asociativo inteligente que les guía paso a paso, conforme a la Ley 75.00 y al Dáhir de 15 de noviembre de 1958.",
+      ctaPrimary: "Comiencen gratis ahora",
+      ctaSecondary: "Directorio de asociaciones",
+      trustDahir: "Dáhir 1.58.376",
+      trustLaw: "Ley 75.00",
+      trustData: "Ley 09.08 (CNDP)",
+      cardVerified: "Verificada ✓",
+      cardActiveMember: "Socio activo",
+      cardIncome: "Ingresos 2026",
+      cardDonations: "Donaciones registradas",
+      cardTreasury: "Saldo de tesorería",
+      cardAssistant: "Asistente Asociativo",
+      cardUserMsg: "¿Cómo depositamos el expediente de constitución de la asociación?",
+      cardBotMsg:
+        "La declaración se deposita en la sede de la autoridad local junto con 4 copias de los estatutos y el acta de constitución…",
+      statAssociations: "asociaciones en la plataforma",
+      statMembers: "socios y voluntarios",
+      statTransactions: "operaciones financieras registradas",
+      statManaged: "dírhams gestionados digitalmente",
+    },
+    features: {
+      badge: "Funcionalidades integrales",
+      titleA: "Todo lo que su asociación necesita en",
+      titleB: "una sola plataforma",
+      subtitle:
+        "Hemos diseñado cada módulo para servir el trabajo asociativo diario tal como lo exigen las leyes marroquíes, con una sencillez apta para todos los niveles de competencia digital.",
+      items: [
+        { title: "Gestión de adhesiones", desc: "Expedientes de miembros, solicitudes, cuotas de adhesión anuales con recibos numerados y avisos de renovación." },
+        { title: "Contabilidad profesional", desc: "Ingresos y gastos clasificados, presupuesto previsional, validación dual e informe financiero anual listo para imprimir." },
+        { title: "Donaciones y recibos", desc: "Registro de donaciones en efectivo y en especie, emisión de recibos oficiales y seguimiento del cumplimiento (ayuda extranjera)." },
+        { title: "Eventos y actividades", desc: "Programación de cursos, encuentros y caravanas, inscripción pública de participantes y seguimiento de la asistencia." },
+        { title: "Documentos oficiales", desc: "Archivo verificado: estatutos, actas, informes anuales — con versiones, clasificación y niveles de confidencialidad." },
+        { title: "Identidad digital de la asociación", desc: "Tarjeta digital que reúne el ICE, la identificación fiscal y las referencias legales — compartible y verificable." },
+        { title: "Informes y paneles de indicadores", desc: "Indicadores en tiempo real y gráficos del desempeño de la asociación, aptos para presentarlos ante la asamblea general y los socios." },
+        { title: "Asistente Asociativo", desc: "Asistente inteligente que responde sobre trámites y leyes — con una base de conocimientos oficial verificada, sin alucinaciones." },
+        { title: "Seguridad y permisos granulares", desc: "Cifrado de contraseñas, sesiones firmadas, permisos por rol y registro de auditoría de todas las operaciones sensibles." },
+      ],
+    },
+    roles: {
+      badge: "Sistema de permisos de cinco niveles",
+      titleA: "Cada actor asociativo",
+      titleB: "tiene su lugar adecuado",
+      subtitle:
+        "Del propietario de la plataforma al ciudadano: permisos granulares verificados en el servidor, que garantizan la separación de roles y la protección de los datos sensibles.",
+      items: [
+        {
+          title: "El superadministrador",
+          subtitle: "Propietario de la plataforma",
+          desc: "Supervisión total: verificación de las nuevas asociaciones y suspensión de las que incumplen, seguimiento de las estadísticas de la plataforma, gestión de usuarios y registro de auditoría que documenta cada operación sensible.",
+          points: ["Verificación y suspensión de asociaciones", "Estadísticas globales de la plataforma", "Registro de auditoría completo", "Gestión de cuentas y permisos"],
+        },
+        {
+          title: "El administrador de la asociación",
+          subtitle: "Miembros de la junta directiva",
+          desc: "Gestión de su asociación con total comodidad: aceptación de adhesiones, registro de operaciones financieras, carga de documentos, organización de eventos y emisión de informes para la asamblea general.",
+          points: ["Aceptar/rechazar solicitudes de adhesión", "Contabilidad y presupuesto", "Documentos e informes oficiales", "Organización de eventos"],
+        },
+        {
+          title: "El coadministrador",
+          subtitle: "Socios y voluntarios",
+          desc: "Permisos específicos concedidos por la junta: organización de eventos, seguimiento de las inscripciones de participantes, gestión de la comunicación — con clara separación de los datos financieros.",
+          points: ["Organización de eventos delegados", "Recepción de inscripciones de participantes", "Panel dedicado a las tareas", "Sin acceso a las finanzas"],
+        },
+        {
+          title: "Las entidades gubernamentales y privadas",
+          subtitle: "Administraciones y socios competentes",
+          desc: "Cuentas asociadas verificadas que permiten a las entidades competentes consultar los datos declarados de las asociaciones (estado legal, ICE, informes públicos).",
+          points: ["Presentación verificada de asociaciones", "Verificación de la identidad digital", "Informes públicos", "Canal de comunicación oficial"],
+        },
+        {
+          title: "Los ciudadanos y extranjeros",
+          subtitle: "Público general",
+          desc: "Cuenta gratuita: exploración de asociaciones verificadas, donación con emisión de recibo, inscripción en eventos públicos y formulación de preguntas al Asistente Asociativo.",
+          points: ["Directorio de asociaciones verificadas", "Donar con recibo oficial", "Inscripción en eventos", "Asistente Asociativo"],
+        },
+      ],
+    },
+    howItWorks: {
+      titleA: "De cero a una asociación",
+      titleB: "totalmente digital",
+      subtitle: "Solo cuatro pasos los separan de una gestión asociativa moderna.",
+      steps: [
+        { title: "Creen la cuenta", desc: "Registro gratuito en un minuto: ciudadano, voluntario o miembro de la junta de una asociación." },
+        { title: "Registren su asociación", desc: "Una ficha de identificación completa a la espera de verificación por el equipo de la plataforma — después se abren todos los módulos." },
+        { title: "Gestionen y publiquen", desc: "Adhesiones, contabilidad, eventos, documentos — todo verificado y con seguimiento." },
+        { title: "Midan y convenzan a los socios", desc: "Informes oficiales y tarjeta de identidad digital que convencen a financiadores y administraciones." },
+      ],
+    },
+    preview: {
+      titleA: "Asociaciones",
+      titleB: "verificadas",
+      subtitle:
+        "Cada asociación pasa por un proceso de verificación que comprueba su identidad y su referencia legal antes de aparecer en el directorio público.",
+      viewAll: "Todas las asociaciones",
+    },
+    assistantCta: {
+      titleA: "El «Asistente Asociativo» —",
+      titleB: "su guía de confianza",
+      subtitle:
+        "Pregúntenle por los pasos para fundar una asociación, los documentos de la declaración, la condición de utilidad pública, el número ICE, la deducción fiscal de las donaciones… Les responde desde una base de conocimientos oficial verificada:",
+      subtitleBold: " sin alucinaciones y sin enlaces falsos",
+      subtitleEnd: " — y si no sabe, lo dice con franqueza y les dirige a la fuente oficial.",
+      cta: "Conversen con el Asistente",
+      secondary: "Referencia legal",
+    },
+    faq: {
+      title: "Preguntas frecuentes",
+      items: [
+        {
+          q: "¿La plataforma es gratuita?",
+          a: "La creación de la cuenta, el directorio de asociaciones, la inscripción en eventos públicos y el Asistente Asociativo — son gratuitos para todos los usuarios. La plataforma se reserva el derecho de ofrecer más adelante servicios avanzados para asociaciones grandes, con notificación previa.",
+        },
+        {
+          q: "¿Están seguros los datos de nuestra asociación?",
+          a: "Sí: las contraseñas están cifradas, las sesiones firmadas digitalmente, los permisos verificados en cada solicitud en el servidor, y el registro de auditoría documenta cada operación. El tratamiento de datos personales se realiza con consentimiento expreso conforme a la Ley 09.08 (CNDP).",
+        },
+        {
+          q: "¿La plataforma sustituye a las administraciones oficiales?",
+          a: "No. MAMP es una herramienta digital de gestión para asociaciones: organiza sus expedientes, contabilidad y documentos, y los prepara para los procedimientos oficiales. La declaración ante la autoridad local, la publicación en el Boletín Oficial y las solicitudes a las administraciones se realizan por sus canales oficiales acreditados.",
+        },
+        {
+          q: "¿Cómo se realiza el proceso de verificación de las asociaciones?",
+          a: "Al registrarse una asociación nueva, el equipo de la plataforma revisa sus datos (referencia legal, junta, ámbito de actuación) antes de concederle la marca «verificada» y su aparición en el directorio público. Las asociaciones no verificadas permanecen en estado de aprobación pendiente.",
+        },
+        {
+          q: "¿Pueden los extranjeros utilizar la plataforma?",
+          a: "Sí, la plataforma está abierta por igual a ciudadanos y extranjeros: navegación por el directorio de asociaciones, donación, inscripción en eventos públicos — y la interfaz está disponible en ocho idiomas con soporte completo de la dirección RTL.",
+        },
+        {
+          q: "¿Y si nuestra asociación necesita un informe oficial?",
+          a: "El módulo de informes genera el informe moral y financiero anual, la lista de adhesiones y el registro de donaciones — todos en formato imprimible y aptos para presentarlos ante la asamblea general o ante los socios y entidades financiadoras.",
+        },
+      ],
+    },
+  },
+
+  associations: {
+    titleA: "Directorio",
+    titleB: "de asociaciones verificadas",
+    subtitle:
+      "Exploren las asociaciones registradas en la plataforma según su ámbito y su ciudad. Cada asociación verificada aparece aquí tras comprobarse su referencia legal — para que donen o se adhieran con confianza.",
+    searchPlaceholder: "Busquen por nombre o ámbito...",
+    searchAria: "Búsqueda de asociaciones",
+    cityAria: "Ciudad",
+    allCities: "Todas las ciudades",
+    categoryAria: "Ámbito",
+    allCategories: "Todos los ámbitos",
+    resultsCount: "asociaciones",
+    noResultsTitle: "No hay resultados coincidentes",
+    noResultsDesc: "Intenten cambiar las palabras de búsqueda o quitar los filtros.",
+    resetFilters: "Quitar filtros",
+  },
+
+  associationDetail: {
+    verifiedBadge: "Asociación verificada",
+    publicUtilityBadge: "Condición de utilidad pública",
+    foundedIn: "Fundada en",
+    donateBtn: "Donar a la asociación",
+    joinBtn: "Solicitar la adhesión",
+    aboutTitle: "Acerca de la asociación",
+    missionTitle: "Misión y objetivos",
+    upcomingEvents: "Próximos eventos",
+    joinCardTitle: "Adhiéranse a",
+    joinCardDesc:
+      "Contribuyan a las actividades de la asociación y a sus miembros. La solicitud se remite a la junta de la asociación para su aprobación, y sus datos se tratan con su consentimiento expreso conforme a la Ley 09.08.",
+    identityTitle: "Tarjeta de identidad digital",
+    fieldCategory: "Ámbito",
+    fieldCity: "Ciudad",
+    fieldRegion: "Región",
+    fieldFoundedYear: "Año de fundación",
+    fieldIce: "Número ICE",
+    fieldLegalStatus: "Estado legal",
+    statusPublicUtility: "Utilidad pública",
+    statusDeclared: "Declarada",
+    activeMembers: "miembros activos",
+    registeredDonations: "donaciones registradas",
+    donateCardTitle: "Donen con confianza",
+    donateCardDesc:
+      "Cada donación se registra con un recibo oficial numerado. Las donaciones en efectivo y en especie están documentadas, y la ayuda extranjera se declara conforme a la ley.",
+    donateCardNote:
+      "Nota: en la versión completa de la plataforma, la donación se realiza directamente desde esta tarjeta con registro inmediato en la contabilidad de la asociación.",
+    heroImageAlt:
+      "Interfaz de la aplicación de la plataforma MAMP en un teléfono Android — directorio, Asistente Asociativo y eventos",
+  },
+
+  assistant: {
+    titleA: "El Asistente",
+    titleB: "Asociativo",
+    subtitle:
+      "Pregunten por las leyes, los procedimientos oficiales y los usos de la plataforma — cada respuesta se basa en una base de conocimientos oficial verificada, y cada enlace pasa por un filtrado estricto.",
+    chat: {
+      welcome:
+        "¡Hola! 👋 Soy el **Asistente Asociativo**.\n\nPuedo ayudarles en:\n• **Trámites oficiales**: fundación de asociaciones, declaración, publicación en el Boletín Oficial, condición de utilidad pública...\n• **Uso de la plataforma**: adhesión, contabilidad, donaciones, eventos, documentos.\n• **Orientación verificada**: hacia los portales oficiales de las administraciones marroquíes.\n\nMi compromiso estricto: respondo únicamente desde una base de conocimientos oficial verificada — **sin alucinaciones, sin enlaces falsos**. Si no conozco la respuesta, lo digo con franqueza.",
+      quickQuestions: [
+        "¿Cuáles son los pasos para fundar una asociación?",
+        "¿Qué es el recibo provisional?",
+        "¿Cómo obtengo el ICE para mi asociación?",
+        "¿Cómo descargo la aplicación de Android?",
+        "¿Cómo protejo los datos de los socios (CNDP)?",
+        "¿Cuáles son los permisos de cada rol en la plataforma?",
+      ],
+      headerSub: "Base de conocimientos oficial · filtrado estricto de enlaces",
+      newChat: "Nueva conversación",
+      inputPlaceholder: "Escriban su pregunta aquí con detalle...",
+      inputAria: "Su pregunta",
+      sendAria: "Enviar",
+      errorFallback: "No se pudo obtener una respuesta.",
+      offlineNote: "_(Respuesta de la base de conocimientos verificada — modo sin conexión al servidor)_",
+      kbSourcesTitle: "Fuentes de conocimiento",
+      kbSourcesDesc: "Los temas oficiales en los que se basa el Asistente — enlaces verificados manualmente.",
+      charterTitle: "Carta de fiabilidad",
+      charterItems: [
+        "Ningún enlace fuera de la lista blanca oficial.",
+        "Ningún número de artículo, porcentaje ni fecha inventados.",
+        "«No lo sé» es una respuesta permitida y legítima.",
+        "Filtrado automático de cada enlace antes de mostrarlo.",
+      ],
+    },
+  },
+
+  chatbot: {
+    openAria: "Abrir el Asistente Asociativo",
+    title: "Asistente Asociativo",
+    headerSub: "Respuestas verificadas — sin enlaces falsos",
+    fullVersionAria: "Versión completa",
+    closeAria: "Cerrar",
+    welcome:
+      "¡Hola! 👋 Soy el **Asistente Asociativo**, su guía dentro de la plataforma MAMP.\n\nRespondo a sus preguntas sobre:\n• fundación de asociaciones y trámites oficiales\n• adhesión, contabilidad y donaciones\n• portales oficiales e identidad digital\n\nTrabajo con una base de conocimientos oficial verificada — no ofrezco enlaces ni información no verificada. ¿En qué puedo servirles?",
+    suggestions: [
+      "¿Cómo fundamos una asociación en Marruecos?",
+      "¿Cuáles son los documentos del expediente de constitución?",
+      "¿Cómo me adhiero a una asociación?",
+      "¿Qué es el número ICE?",
+      "¿Cómo descargo la aplicación de Android?",
+      "¿Cuáles son los pasos de publicación en el Boletín Oficial?",
+    ],
+    inputPlaceholder: "Escriban su pregunta aquí...",
+    inputAria: "Su pregunta para el Asistente",
+    sendAria: "Enviar",
+    errorFallback: "No se pudo conectar con el Asistente, inténtenlo de nuevo.",
+    offlineNote: "_(Respuesta de la base de conocimientos verificada — modo sin conexión al servidor)_",
+  },
+
+  auth: {
+    login: {
+      title: "Bienvenidos de nuevo",
+      subtitle: "Inicien sesión para acceder a su panel de control",
+      email: "Correo electrónico",
+      password: "Contraseña",
+      submit: "Iniciar sesión",
+      busy: "Verificando...",
+      errorApiUnavailable:
+        "El servicio de inicio de sesión funciona en el servidor local de la plataforma. Esta es la versión pública estable — utilícenla para la navegación, el Asistente Asociativo y las donaciones.",
+      errorNetwork: "No se pudo conectar con el servidor. Comprueben la red.",
+      noAccount: "¿No tienen cuenta?",
+      createAccount: "Creen una cuenta gratuita",
+      demoTitle: "Cuentas de demostración de la versión local (contraseña: Mamp@2026)",
+      demoAccounts: [
+        { email: "admin@mamp.ma", role: "Superadministrador" },
+        { email: "user1@mamp.ma", role: "Presidenta de asociación" },
+        { email: "user2@mamp.ma", role: "Tesorero" },
+        { email: "partenaire@mamp.ma", role: "Entidad asociada" },
+      ],
+      demoNote:
+        "En la versión publicada (mamp.pages.dev), los paneles de demostración funcionan con datos de prueba sin necesidad de iniciar sesión.",
+    },
+    register: {
+      title: "Crear una cuenta nueva",
+      subtitle: "Gratuito para todos: ciudadanos, socios, voluntarios y miembros de asociaciones",
+      fullName: "Nombre completo",
+      fullNamePlaceholder: "Ejemplo: Mohamed Alaoui",
+      email: "Correo electrónico",
+      phone: "Teléfono (opcional)",
+      phonePlaceholder: "+212 6XX XXX XXX",
+      password: "Contraseña",
+      passwordHint: "Mínimo 8 caracteres, con cifras",
+      consentPrefix: "Acepto la",
+      consentPrivacy: "Política de privacidad",
+      consentMiddle:
+        "y el tratamiento de mis datos personales para los fines de uso de la plataforma, conforme a la Ley 09.08 relativa a la protección de datos de carácter personal, así como los",
+      consentTerms: "Términos de uso",
+      consentSuffix: ". Puedo retirar mi consentimiento en cualquier momento.",
+      consentError: "Debe aceptarse el tratamiento de datos conforme a la Ley 09.08 para completar el registro",
+      submit: "Crear la cuenta",
+      busy: "Creando...",
+      errorApiUnavailable:
+        "El servicio de registro funciona en el servidor local de la plataforma. Esta es la versión pública estable — pueden navegar por el directorio de asociaciones y utilizar el Asistente Asociativo.",
+      errorNetwork: "No se pudo conectar con el servidor. Comprueben la red.",
+      haveAccount: "¿Ya tienen cuenta?",
+      loginLink: "Inicien sesión",
+      securityNote: "Las contraseñas se cifran con el estándar scrypt y nunca se almacenan como texto plano.",
+    },
+  },
+
+  app: {
+    badge: "Aplicación oficial — Android",
+    titleA: "La plataforma MAMP en su bolsillo",
+    titleB: "con una sola aplicación",
+    subtitle:
+      "La aplicación Android oficial de la plataforma: naveguen por el directorio de asociaciones, conversen con el Asistente Asociativo e inscríbanse en los eventos — con un solo toque y descarga directa desde Cloudflare.",
+    heroImageAlt:
+      "Interfaz de la aplicación de la plataforma MAMP en un teléfono Android — directorio, Asistente Asociativo y eventos",
+    downloadTitle: "Cómo descargar e instalar",
+    steps: [
+      {
+        title: "Paso 1 — Descargar el archivo",
+        desc: "Pulsen el botón «Descarga directa — Cloudflare» de esta página, o escaneen el código QR con la cámara del teléfono. Se descargará el archivo mamp.apk a la máxima velocidad desde la red global de Cloudflare.",
+      },
+      {
+        title: "Paso 2 — Pasar el mensaje de Play Protect",
+        desc: "Puede aparecer el mensaje «Esta aplicación no se ha analizado» — un mensaje estándar para toda aplicación externa a la tienda. Pulsen «Más detalles» y luego «Instalar de todos modos», como muestran las imágenes de abajo.",
+      },
+      {
+        title: "Paso 3 — Instalar la aplicación",
+        desc: "Vuelvan a la pantalla de instalación y pulsen «Instalar». Esperen unos segundos hasta que se complete el proceso — no se necesita ninguna configuración adicional.",
+      },
+      {
+        title: "Paso 4 — Abrir y usar",
+        desc: "Abran la aplicación «Plataforma MAMP» desde el menú de aplicaciones: directorio de asociaciones, Asistente Asociativo y eventos — todo al alcance de su mano, con deslizamiento hacia abajo para actualizar.",
+      },
+    ],
+    noteTitle: "💡 Nota importante sobre el mensaje de Android",
+    noteBody:
+      "La aparición del mensaje «origen desconocido» o «esta aplicación no se ha analizado» es normal y previsible: la aplicación se distribuye directamente desde el sitio oficial de la plataforma y no desde una tienda de aplicaciones. Una vez que se permita el origen una sola vez, las próximas instalaciones se realizarán con total fluidez.",
+    playProtectTitle: "Pasar el mensaje de Play Protect — paso a paso con imágenes",
+    playProtectIntro:
+      "Este mensaje aparece en los teléfonos Android modernos al instalar cualquier aplicación externa a la tienda Play. Sigan las tres imágenes siguientes en orden:",
+    playProtectSteps: [
+      {
+        title: "Mensaje de Play Protect durante la instalación",
+        desc: "Al abrir el archivo APK puede aparecer el mensaje «esta aplicación no se ha analizado». Pulsen el botón azul «Más detalles» de abajo — y no elijan «Cancelar».",
+        alt: "Paso 1 para pasar el mensaje de Play Protect: mensaje de Play Protect durante la instalación",
+      },
+      {
+        title: "Detalles de la advertencia",
+        desc: "Android explica que la aplicación está fuera de la tienda Play — algo normal para todas las aplicaciones distribuidas directamente. Pulsen «Instalar de todos modos» para continuar.",
+        alt: "Paso 2 para pasar el mensaje de Play Protect: detalles de la advertencia",
+      },
+      {
+        title: "Instalación completada",
+        desc: "En cuestión de segundos se completa la instalación y aparece el botón «Abrir aplicación». Estos pasos se solicitan una sola vez — las próximas actualizaciones se realizan con fluidez.",
+        alt: "Paso 3 para pasar el mensaje de Play Protect: instalación completada",
+      },
+    ],
+    qrTitle: "Escaneo rápido con la cámara",
+    qrDesc: "Apunten la cámara del teléfono hacia el código para acceder directamente a esta página",
+    qrAlt: "Código QR de la página de descarga de la aplicación de la plataforma MAMP",
+    featuresTitle: "Ventajas de la aplicación",
+    features: [
+      "La única versión oficial acreditada de la plataforma",
+      "Solo conexión cifrada HTTPS — sin contenido mixto",
+      "Página clara cuando se pierde la conexión",
+      "Actualización automática: el mismo enlace sirve siempre la última versión",
+      "Se adapta a teléfonos y tabletas — pantalla completa",
+    ],
+    webVersionTitle: "Versión web completa",
+    webVersionDesc:
+      "La última versión completa del sitio de la plataforma en un único archivo comprimido — enlace directo de Cloudflare que se actualiza automáticamente con cada publicación oficial nueva.",
+    webVersionBtn: "Descargar el sitio — ZIP directo",
+    requirementsTitle: "Requisitos",
+    requirementsText: "Android 7.0 (Nougat) o posterior · conexión a Internet · unos 3 MB de espacio",
+    faqTitle: "Preguntas frecuentes sobre la aplicación",
+    faq: [
+      {
+        q: "¿Por qué Android pide permitir la instalación desde «orígenes desconocidos»?",
+        a: "Porque la aplicación se distribuye directamente a través del sitio oficial de la plataforma en lugar de la tienda Google Play. Este mensaje es una advertencia estándar que aparece para toda aplicación externa a la tienda; una vez concedido el permiso una sola vez, la aplicación se instalará con total normalidad.",
+      },
+      {
+        q: "¿Cuáles son los requisitos de funcionamiento?",
+        a: "Un teléfono o tableta Android con Android 7.0 (Nougat) o posterior, con conexión a Internet. La aplicación es una envoltura oficial de la plataforma que funciona a través de mamp.pages.dev y ocupa muy poco espacio en el dispositivo.",
+      },
+      {
+        q: "¿Está disponible la aplicación para iOS?",
+        a: "Actualmente la versión oficial es para Android. Los usuarios de iPhone y iPad pueden utilizar la versión web completa directamente desde el navegador (Safari o Chrome) a través de mamp.pages.dev, con los mismos servicios y contenido.",
+      },
+      {
+        q: "¿Cómo obtengo una copia del propio sitio de la plataforma?",
+        a: "La versión web completa de la plataforma está disponible como archivo comprimido ZIP mediante un enlace directo de Cloudflare en esta página (sección «Versión web completa»), y el archivo se actualiza automáticamente con cada publicación oficial nueva.",
+      },
+    ],
+    relatedPrefix: "¿Prefieren usar la plataforma desde el navegador? La versión completa está siempre disponible a través de",
+    relatedHomeLink: "la página de inicio",
+    relatedMiddle: "— y los documentos legales de la aplicación se encuentran en",
+    relatedTermsLink: "los Términos de uso",
+    relatedSuffix: ".",
+  },
+
+  release: {
+    title: "Información de la última versión",
+    versionLabel: "Versión",
+    dateLabel: "Fecha de publicación",
+    sizeLabel: "Tamaño del archivo",
+    failedText:
+      "No se han podido recuperar los detalles de la versión en este momento — el enlace de descarga de abajo les dirige siempre a la última versión oficial.",
+    downloadBtn: "Descarga directa — Cloudflare",
+    downloadNote: "Enlace permanente de la red de Cloudflare que sirve siempre la última versión oficial a la máxima velocidad.",
+    backupBtn: "Enlace de respaldo — GitHub Releases",
+  },
+
+  legal: {
+    hub: {
+      badge: "Referencia verificada y actualizada",
+      titleA: "La referencia legal",
+      titleB: "del trabajo asociativo marroquí",
+      subtitle:
+        "Todo lo que necesitan para comprender el marco legal de las asociaciones: los textos fundamentales, el procedimiento de constitución paso a paso y los portales oficiales verificados — con enlaces comprobados en sus fuentes.",
+      lawsTitle: "Textos marco",
+      laws: [
+        {
+          title: "Dáhir n.º 1.58.376",
+          date: "15 de noviembre de 1958",
+          desc: "La referencia fundacional del derecho a fundar asociaciones en Marruecos, tal como ha sido modificada y completada. Un régimen declarativo que garantiza la libertad de fundación sin autorización previa.",
+          ref: "Boletín Oficial n.º 2404 bis (27 de noviembre de 1958)",
+        },
+        {
+          title: "Ley n.º 75.00",
+          date: "23 de julio de 2002",
+          desc: "Promulgada en virtud del Dáhir n.º 1.02.206. Aclaró el procedimiento de declaración y de entrega del recibo, y reguló las relaciones de las asociaciones con la administración.",
+          ref: "Dáhir n.º 1.02.206",
+        },
+        {
+          title: "Ley n.º 07.09",
+          date: "Modificación del artículo 5",
+          desc: "Modificó el artículo 5 del Dáhir de 1958, que regula el procedimiento de declaración de la asociación ante la autoridad administrativa local y la entrega del recibo.",
+          ref: "Modifica el artículo 5 del Dáhir de 1958",
+        },
+        {
+          title: "Ley n.º 09.08",
+          date: "18 de febrero de 2009",
+          desc: "Protección de las personas físicas frente al tratamiento de datos de carácter personal. Obliga a las asociaciones a declarar ante la CNDP cuando tratan datos de sus miembros.",
+          ref: "Supervisión: Comisión Nacional CNDP",
+        },
+        {
+          title: "Constitución del Reino de 2011",
+          date: "Artículos 12 y 29",
+          desc: "Consagra la democracia participativa y el papel de las asociaciones en la elaboración de las decisiones, y garantiza la libertad de fundar asociaciones y de adherirse a ellas.",
+          ref: "Portal oficial maroc.ma",
+        },
+        {
+          title: "Artículo 10 — Código General de Impuestos",
+          date: "Régimen fiscal",
+          desc: "Determina las condiciones de deducción de las donaciones y liberalidades en efectivo o en especie concedidas a las entidades cualificadas, de la base imponible de los donantes.",
+          ref: "Dirección General de Impuestos",
+        },
+      ],
+      stepsTitle: "Procedimiento de constitución de una asociación — paso a paso",
+      stepsIntro:
+        "Conforme al régimen declarativo consagrado por el Dáhir de 15 de noviembre de 1958, modificado por la Ley 75.00 y la Ley 07.09.",
+      steps: [
+        { title: "Asamblea general constitutiva", desc: "Aprobación de los estatutos y elección de la junta directiva." },
+        { title: "Preparación del expediente", desc: "Copias firmadas de los estatutos, acta de constitución, lista de miembros y copias de los documentos de identidad." },
+        { title: "Depósito de la declaración", desc: "Ante la autoridad administrativa local de la sede de la asociación, directamente o por medio de un oficial de justicia." },
+        { title: "Entrega del recibo", desc: "Un recibo provisional sellado y fechado se entrega de inmediato (artículo 5 del Dáhir de 1958)." },
+        { title: "Publicación en el Boletín Oficial", desc: "Solicitud a la Secretaría General del Gobierno para adquirir la personalidad jurídica." },
+      ],
+      portalsTitle: "Portales oficiales verificados",
+      portalsIntro:
+        "Exclusivamente enlaces oficiales verificados — la misma lista que utiliza el Asistente Asociativo, de modo que no se ofrece a los usuarios ningún enlace ajeno a ella.",
+      portals: [
+        { key: "maroc", desc: "El portal oficial del Reino y los servicios digitales públicos." },
+        { key: "sggAssociations", desc: "Textos legales, modelos oficiales, procedimiento de utilidad pública y recaudación de donaciones." },
+        { key: "interieur", desc: "El ministerio competente sobre la administración territorial que recibe las declaraciones." },
+        { key: "tax", desc: "El régimen fiscal de las asociaciones, los recibos y las consultas tributarias." },
+        { key: "ice", desc: "Solicitud del Identificador Único de la Empresa (ICE) para las asociaciones." },
+        { key: "cnss", desc: "Declaración de los asalariados de la asociación y cotizaciones sociales." },
+        { key: "cndp", desc: "Declaración del tratamiento de datos personales (Ley 09.08)." },
+        { key: "asd", desc: "El portal de Ayuda Social Directa." },
+        { key: "mcrpsc", desc: "Textos marco de la vida asociativa y programas sectoriales de apoyo." },
+      ],
+      formsTitle: "Modelos oficiales listos para usar",
+      formsDesc:
+        "El modelo de declaración de constitución de una asociación, las disposiciones que deben incluirse en los estatutos, la solicitud de la condición de utilidad pública, la declaración de ayuda extranjera y la solicitud de autorización para recaudar donaciones — todos disponibles oficialmente en la página de asociaciones de la Secretaría General del Gobierno.",
+      formsBtn: "Acceder a los modelos",
+      assistantTitle: "¿Tienen una pregunta legal?",
+      assistantDesc:
+        "Pregunten al «Asistente Asociativo» — responde desde la base de conocimientos oficial anterior, sin alucinaciones y sin inventar enlaces.",
+      assistantBtn: "Conversen con el Asistente",
+      disclaimer:
+        "Advertencia: la información legal de esta página es orientativa y resumida; la referencia válida sigue siendo el texto oficial de los dáhires y las leyes tal como se publicó en el Boletín Oficial; para consultas precisas, diríjanse a los especialistas y a las administraciones competentes.",
+    },
+    docBadge: "Documento legal oficial — Plataforma MAMP",
+    lastUpdated: "Última actualización:",
+    docFooter:
+      "Este documento es orientativo y no sustituye a los textos oficiales ni a la consulta con especialistas. Para cualquier consulta legal sobre el uso de la plataforma, contáctennos a través del correo electrónico indicado en la página «Referencia legal».",
+  },
+
+  kb: {
+    sourcesNote: "Fuentes",
+    notFound:
+      "Lo siento, actualmente no dispongo de una respuesta verificada para esta pregunta.\n\nLes recomiendo contactar con la administración competente o visitar el portal oficial correspondiente (encuentran los principales portales en la página «Referencia legal»).\n\nNota: esta versión responde directamente desde la base de conocimientos verificada de la plataforma; la versión completa del Asistente está disponible en el servidor local de la plataforma.",
+    linksHeader: "Enlaces oficiales verificados:",
+    relatedHeader: "Temas relacionados:",
+  },
+
+  demo: {
+    cities: {
+      "الدار البيضاء": "Casablanca",
+      "فاس": "Fez",
+      "أكادير": "Agadir",
+      "الرباط": "Rabat",
+      "مراكش": "Marrakech",
+      "طنجة": "Tánger",
+      "وجدة": "Oujda",
+      "مكناس": "Mequinez",
+    },
+    regions: {
+      "الدار البيضاء - سطات": "Casablanca-Settat",
+      "فاس - مكناس": "Fez-Mequinez",
+      "سوس - ماسة": "Souss-Massa",
+      "الرباط - سلا - القنيطرة": "Rabat-Salé-Kenitra",
+      "مراكش - آسفي": "Marrakech-Safi",
+    },
+    categories: {
+      "تنموية": "desarrollo",
+      "ثقافية": "cultural",
+      "بيئية": "ambiental",
+      "اجتماعية": "social",
+      "رياضية": "deportiva",
+      "تعليمية": "educativa",
+      "صحية": "salud",
+    },
+    eventCategories: {
+      "تكوينية": "formación",
+      "تحسيسة": "sensibilización",
+      "ثقافية": "cultural",
+      "رياضية": "deportiva",
+      "خيرية": "benéfica",
+    },
+    associations: {
+      "association-nadwa-tanmiya": {
+        name: "Asociación Nadwa para el Desarrollo y el Empleo",
+        acronym: "Nadwa",
+        description:
+          "Asociación de desarrollo que trabaja en la capacitación de los jóvenes, el apoyo a la microempresarialidad y la promoción del autoempleo en la región de Casablanca-Settat, mediante programas formativos y acompañamiento de proyectos.",
+        mission:
+          "Dotar a los jóvenes de competencias profesionales y digitales, acompañar los proyectos empresariales emergentes y contribuir al desarrollo local sostenible.",
+      },
+      "association-al-mashriq-thaqafiya": {
+        name: "Asociación Al-Machriq para la Cultura y las Artes",
+        acronym: "Al-Machriq",
+        description:
+          "Espacio cultural y artístico en la ciudad de Fez que organiza encuentros y festivales de música, teatro y artes plásticas, y preserva el rico patrimonio cultural de la ciudad.",
+        mission:
+          "Difundir la cultura y las artes, realzar el patrimonio marroquí auténtico y acercarlo a los jóvenes.",
+      },
+      "association-mido-biya": {
+        name: "Asociación Mido para la Protección del Medio Ambiente",
+        acronym: "Mido",
+        description:
+          "Asociación ambiental de la ciudad de Agadir que trabaja en la educación ambiental, las campañas de arbolado del litoral y la limpieza de playas, con la participación de voluntarios y escuelas.",
+        mission:
+          "Proteger el medio ambiente local y difundir la cultura del desarrollo sostenible entre los jóvenes.",
+      },
+    },
+    events: {
+      "الدورة التكوينية السابعة في تطوير الويب": {
+        title: "Séptimo curso de formación en desarrollo web",
+        location: "Sede de la asociación, Casablanca",
+      },
+      "ملتقى المقاولاتية الشابة": {
+        title: "Encuentro de emprendimiento juvenil",
+        location: "Sala de conferencias, Casablanca",
+      },
+    },
+  },
+};

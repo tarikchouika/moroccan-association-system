@@ -2,14 +2,15 @@
 
 /**
  * صفحة الهبوط — منصة مامب
- * واجهة عصرية RTL بهوية مغربية (أخضر عميق + ذهب + نقشة زليج)
+ * واجهة عصرية بهوية مغربية (أزرق سماوي + كحلي + ذهب + نقشة زليج)
+ * متعددة اللغات: كل النصوص من القاموس، والاتجاه RTL/LTR حسب اللغة.
  */
 import { motion, useInView } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   Users, Wallet, HeartHandshake, CalendarDays, FileCheck2, Landmark,
-  ShieldCheck, BarChart3, Bot, ArrowLeft, CheckCircle2, Sparkles,
+  ShieldCheck, BarChart3, Bot, CheckCircle2, Sparkles,
   Building2, HandCoins, ScrollText, UserCog, Globe2, BadgeCheck,
   FileSignature, Coins, Megaphone, Lock, TrendingUp, Handshake,
 } from "lucide-react";
@@ -21,6 +22,7 @@ import {
 } from "@/components/ui/accordion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { DemoData } from "@/generated/types";
+import { useI18n, useDemoI18n } from "@/lib/i18n/provider";
 
 // -------------------------------------------------------------------
 // عداد متحرك
@@ -29,6 +31,7 @@ function Counter({ to, suffix = "", duration = 1600 }: { to: number; suffix?: st
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: "-40px" });
   const [val, setVal] = useState(0);
+  const { fmtNum } = useDemoI18n();
 
   useEffect(() => {
     if (!inView) return;
@@ -45,7 +48,7 @@ function Counter({ to, suffix = "", duration = 1600 }: { to: number; suffix?: st
 
   return (
     <span ref={ref} className="num font-black">
-      {val.toLocaleString("en-US")}
+      {fmtNum(val)}
       {suffix}
     </span>
   );
@@ -61,7 +64,10 @@ const fadeUp = {
 // -------------------------------------------------------------------
 // البطل
 // -------------------------------------------------------------------
-function Hero({ stats }: { stats: DemoData["stats"] }) {
+function Hero({ stats, featured }: { stats: DemoData["stats"]; featured?: DemoData["associations"][number] }) {
+  const { d } = useI18n();
+  const { assocName, fmtMAD } = useDemoI18n();
+
   return (
     <section className="gradient-hero zellige-light relative overflow-hidden">
       <div className="mx-auto grid max-w-7xl gap-12 px-4 pb-16 pt-14 sm:px-6 lg:grid-cols-2 lg:pb-24 lg:pt-20">
@@ -69,7 +75,7 @@ function Hero({ stats }: { stats: DemoData["stats"] }) {
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             <Badge className="mb-5 gap-1.5 border-gold/40 bg-gold-soft px-3 py-1.5 text-[12px] font-bold text-yellow-800">
               <BadgeCheck className="size-3.5" />
-              أول منصة مغربية شاملة لرقمنة العمل الجمعوي
+              {d.home.hero.badge}
             </Badge>
           </motion.div>
 
@@ -79,11 +85,11 @@ function Hero({ stats }: { stats: DemoData["stats"] }) {
             transition={{ duration: 0.6, delay: 0.08 }}
             className="text-4xl font-black leading-[1.25] tracking-tight sm:text-5xl lg:text-[3.4rem]"
           >
-            رقمنة إدارة ومحاسبة
+            {d.home.hero.titleA}
             <br />
-            <span className="text-gradient-gold">الجمعيات المغربية</span>
+            <span className="text-gradient-gold">{d.home.hero.titleB}</span>
             <br />
-            باحترافية وأمان
+            {d.home.hero.titleC}
           </motion.h1>
 
           <motion.p
@@ -92,9 +98,7 @@ function Hero({ stats }: { stats: DemoData["stats"] }) {
             transition={{ duration: 0.6, delay: 0.16 }}
             className="mt-5 max-w-xl text-base leading-8 text-muted-foreground sm:text-lg"
           >
-            من التأسيس إلى التقرير السنوي: انخراطات، محاسبة، تبرعات بوصولات رسمية،
-            فعاليات، وثائق قانونية — ومساعد جمعوي ذكي يرشدكم خطوة بخطوة،
-            وفق القانون 75.00 وظهير 15 نونبر 1958.
+            {d.home.hero.subtitle}
           </motion.p>
 
           <motion.div
@@ -105,14 +109,14 @@ function Hero({ stats }: { stats: DemoData["stats"] }) {
           >
             <Button asChild size="lg" className="h-12 gap-2 px-7 text-base font-extrabold shadow-lg shadow-primary/25">
               <Link href="/register">
-                ابدأوا مجاناً الآن
-                <ArrowLeft className="size-4" />
+                {d.home.hero.ctaPrimary}
+                <span className="inline-block rtl:rotate-0 ltr:rotate-180">←</span>
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="h-12 gap-2 px-7 text-base font-extrabold">
               <Link href="/associations">
                 <Building2 className="size-4" />
-                دليل الجمعيات
+                {d.home.hero.ctaSecondary}
               </Link>
             </Button>
           </motion.div>
@@ -124,9 +128,9 @@ function Hero({ stats }: { stats: DemoData["stats"] }) {
             transition={{ delay: 0.4 }}
             className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] font-bold text-muted-foreground"
           >
-            <span className="flex items-center gap-1.5"><ScrollText className="size-4 text-primary" /> ظهير 1.58.376</span>
-            <span className="flex items-center gap-1.5"><ScaleIcon /> القانون 75.00</span>
-            <span className="flex items-center gap-1.5"><ShieldCheck className="size-4 text-primary" /> القانون 09.08 (CNDP)</span>
+            <span className="flex items-center gap-1.5"><ScrollText className="size-4 text-primary" /> {d.home.hero.trustDahir}</span>
+            <span className="flex items-center gap-1.5"><ScrollText className="size-4 text-primary" /> {d.home.hero.trustLaw}</span>
+            <span className="flex items-center gap-1.5"><ShieldCheck className="size-4 text-primary" /> {d.home.hero.trustData}</span>
           </motion.div>
         </div>
 
@@ -143,16 +147,16 @@ function Hero({ stats }: { stats: DemoData["stats"] }) {
             <div className="gradient-dark zellige-pattern flex items-center justify-between px-5 py-4 text-white">
               <div className="flex items-center gap-2 text-sm font-extrabold">
                 <Building2 className="size-4 text-gold" />
-                جمعية ندوة للتنمية والتشغيل
+                {featured ? assocName(featured) : ""}
               </div>
-              <Badge className="border-gold/40 bg-gold/20 text-[10px] font-bold text-gold">موثقة ✓</Badge>
+              <Badge className="border-gold/40 bg-gold/20 text-[10px] font-bold text-gold">{d.home.hero.cardVerified}</Badge>
             </div>
             <CardContent className="grid grid-cols-2 gap-3 p-5">
               {[
-                { icon: Users, label: "منخرط نشط", value: "13", tint: "text-primary bg-secondary" },
-                { icon: TrendingUp, label: "مدخول 2026", value: "132,620 د.م", tint: "text-emerald-700 bg-emerald-50" },
-                { icon: HandCoins, label: "تبرعات مسجلة", value: "70,100 د.م", tint: "text-yellow-800 bg-gold-soft" },
-                { icon: Wallet, label: "رصيد الخزينة", value: "84,420 د.م", tint: "text-terra bg-orange-50" },
+                { icon: Users, label: d.home.hero.cardActiveMember, value: "13", tint: "text-primary bg-secondary" },
+                { icon: TrendingUp, label: d.home.hero.cardIncome, value: fmtMAD(132620), tint: "text-emerald-700 bg-emerald-50" },
+                { icon: HandCoins, label: d.home.hero.cardDonations, value: fmtMAD(70100), tint: "text-yellow-800 bg-gold-soft" },
+                { icon: Wallet, label: d.home.hero.cardTreasury, value: fmtMAD(84420), tint: "text-terra bg-orange-50" },
               ].map((s) => (
                 <div key={s.label} className="rounded-xl border border-border bg-background p-3.5">
                   <span className={`mb-2 inline-flex size-8 items-center justify-center rounded-lg ${s.tint}`}>
@@ -165,14 +169,14 @@ function Hero({ stats }: { stats: DemoData["stats"] }) {
               {/* شريط محادثة مصغرة */}
               <div className="col-span-2 rounded-xl border border-border bg-muted/50 p-3">
                 <p className="mb-2 flex items-center gap-1.5 text-[11px] font-extrabold text-primary">
-                  <Bot className="size-3.5" /> المساعد الجمعوي
+                  <Bot className="size-3.5" /> {d.home.hero.cardAssistant}
                 </p>
                 <div className="space-y-1.5 text-[11px] leading-5">
                   <p className="w-fit max-w-[85%] rounded-lg rounded-ss-sm bg-card border border-border px-2.5 py-1.5">
-                    كيف نودع ملف تأسيس الجمعية؟
+                    {d.home.hero.cardUserMsg}
                   </p>
                   <p className="w-fit max-w-[90%] rounded-lg rounded-se-sm bg-primary px-2.5 py-1.5 text-primary-foreground">
-                    التصريح يودع بمقر السلطة المحلية مع 4 نسخ من القانون الأساسي ومحضر التأسيس… <span className="underline decoration-gold decoration-2">المزيد</span>
+                    {d.home.hero.cardBotMsg} <span className="underline decoration-gold decoration-2">{d.common.learnMore}</span>
                   </p>
                 </div>
               </div>
@@ -183,12 +187,12 @@ function Hero({ stats }: { stats: DemoData["stats"] }) {
 
       {/* شريط الإحصائيات */}
       <div className="border-t border-border/70 bg-card/60 backdrop-blur">
-        <div className="mx-auto grid max-w-7xl grid-cols-2 divide-x divide-x-reverse divide-border/60 px-4 py-6 text-center sm:px-6 lg:grid-cols-4">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 divide-x divide-border/60 px-4 py-6 text-center sm:px-6 rtl:divide-x-reverse lg:grid-cols-4">
           {[
-            { label: "جمعية على المنصة", value: stats.associations, suffix: "" },
-            { label: "منخرط ومتطوع", value: stats.activeMembers, suffix: "+" },
-            { label: "عمليات مالية مسجلة", value: stats.transactions, suffix: "" },
-            { label: "درهم مُدار رقمياً", value: stats.managedAmount, suffix: "" },
+            { label: d.home.hero.statAssociations, value: stats.associations, suffix: "" },
+            { label: d.home.hero.statMembers, value: stats.activeMembers, suffix: "+" },
+            { label: d.home.hero.statTransactions, value: stats.transactions, suffix: "" },
+            { label: d.home.hero.statManaged, value: stats.managedAmount, suffix: "" },
           ].map((s) => (
             <div key={s.label} className="px-2 py-2">
               <p className="text-2xl font-black text-primary sm:text-3xl">
@@ -203,62 +207,51 @@ function Hero({ stats }: { stats: DemoData["stats"] }) {
   );
 }
 
-function ScaleIcon() {
-  return <ScrollText className="size-4 text-primary" />;
-}
-
 // -------------------------------------------------------------------
 // الخصائص
 // -------------------------------------------------------------------
-const FEATURES = [
-  { icon: Users, title: "إدارة الانخراطات", desc: "ملفات الأعضاء، الطلبات، واجبات الانخراط السنوية بوصولات مرقمة، وتنبيهات التجديد." },
-  { icon: Wallet, title: "محاسبة احترافية", desc: "مدخولات ومصروفات مصنفة، ميزانية تقديرية، اعتماد ثنائي، وتقرير مالي سنوي جاهز للطبع." },
-  { icon: HandCoins, title: "التبرعات والوصولات", desc: "تسجيل التبرعات النقدية والعينية، توليد وصولات رسمية، وتتبع الامتثال (المساعدات الأجنبية)." },
-  { icon: CalendarDays, title: "الفعاليات والأنشطة", desc: "برمجة الدورات والملتقيات والقوافل، تسجيل المشاركين عمومياً، ومتابعة الحضور." },
-  { icon: FileCheck2, title: "الوثائق الرسمية", desc: "أرشيف موثق: القانون الأساسي، المحاضر، التقارير السنوية — بنسخ وتصنيف وحساسية." },
-  { icon: Landmark, title: "الهوية الرقمية للجمعية", desc: "بطاقة رقمية تجمع ICE والتعريف الجبائي والمراجع القانونية — قابلة للمشاركة والتحقق." },
-  { icon: BarChart3, title: "تقارير ولوحات قيادة", desc: "مؤشرات فورية ورسوم بيانية لأداء الجمعية، تصلح للعرض على الجمع العام والشركاء." },
-  { icon: Bot, title: "المساعد الجمعوي", desc: "مساعد ذكي يجيب عن الإجراءات والقوانين — بقاعدة معارف رسمية مُتحقق منها، بلا هلوسة." },
-  { icon: ShieldCheck, title: "أمان وصلاحيات دقيقة", desc: "تشفير كلمات السر، جلسات موقعة، صلاحيات لكل دور، وسجل تدقيق لكل العمليات الحساسة." },
-];
-
 function Features() {
+  const { d } = useI18n();
+  const icons = [Users, Wallet, HandCoins, CalendarDays, FileCheck2, Landmark, BarChart3, Bot, ShieldCheck];
+
   return (
     <section id="features" className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
       <motion.div {...fadeUp} className="mx-auto mb-12 max-w-2xl text-center">
         <Badge variant="outline" className="mb-4 gap-1.5 border-primary/30 px-3 py-1 text-[12px] font-bold text-primary">
           <Sparkles className="size-3.5" />
-          خصائص شاملة
+          {d.home.features.badge}
         </Badge>
         <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
-          كل ما تحتاجه جمعيتكم في <span className="text-primary">منصة واحدة</span>
+          {d.home.features.titleA} <span className="text-primary">{d.home.features.titleB}</span>
         </h2>
         <p className="mt-4 text-base leading-7 text-muted-foreground">
-          صممنا كل وحدة لتخدم العمل الجمعوي اليومي كما تمليه القوانين المغربية،
-          مع بساطة تصلح لكل مستويات الخبرة الرقمية.
+          {d.home.features.subtitle}
         </p>
       </motion.div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {FEATURES.map((f, i) => (
-          <motion.div
-            key={f.title}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-40px" }}
-            transition={{ duration: 0.45, delay: (i % 3) * 0.08 }}
-          >
-            <Card className="group h-full border-border/80 transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5">
-              <CardContent className="p-6">
-                <span className="mb-4 inline-flex size-12 items-center justify-center rounded-xl bg-secondary text-primary transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
-                  <f.icon className="size-6" />
-                </span>
-                <h3 className="mb-2 text-lg font-extrabold">{f.title}</h3>
-                <p className="text-sm leading-7 text-muted-foreground">{f.desc}</p>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
+        {d.home.features.items.map((f, i) => {
+          const Icon = icons[i % icons.length];
+          return (
+            <motion.div
+              key={f.title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.45, delay: (i % 3) * 0.08 }}
+            >
+              <Card className="group h-full border-border/80 transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5">
+                <CardContent className="p-6">
+                  <span className="mb-4 inline-flex size-12 items-center justify-center rounded-xl bg-secondary text-primary transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
+                    <Icon className="size-6" />
+                  </span>
+                  <h3 className="mb-2 text-lg font-extrabold">{f.title}</h3>
+                  <p className="text-sm leading-7 text-muted-foreground">{f.desc}</p>
+                </CardContent>
+              </Card>
+            </motion.div>
+          );
+        })}
       </div>
     </section>
   );
@@ -267,82 +260,41 @@ function Features() {
 // -------------------------------------------------------------------
 // الأدوار الخمسة
 // -------------------------------------------------------------------
-const ROLES = [
-  {
-    value: "super",
-    icon: Lock,
-    title: "السوبر أدمين",
-    subtitle: "مالك المنصة",
-    desc: "إشراف كامل: توثيق الجمعيات الجديدة وتعليق المخالفة منها، متابعة إحصائيات المنصة، إدارة المستخدمين، وسجل تدقيق يوثق كل عملية حساسة.",
-    points: ["توثيق وتعليق الجمعيات", "إحصائيات المنصة الشاملة", "سجل التدقيق الكامل", "إدارة الحسابات والصلاحيات"],
-  },
-  {
-    value: "admin",
-    icon: UserCog,
-    title: "أدمين الجمعية",
-    subtitle: "أعضاء المكتب المسير",
-    desc: "تسيير جمعيتهم بكل أريحية: قبول الانخراطات، تسجيل العمليات المالية، رفع الوثائق، تنظيم الفعاليات، وإصدار التقارير للجمع العام.",
-    points: ["قبول/رفض طلبات الانخراط", "المحاسبة والميزانية", "الوثائق والتقارير الرسمية", "تنظيم الفعاليات"],
-  },
-  {
-    value: "coadmin",
-    icon: Handshake,
-    title: "الكوأدمين",
-    subtitle: "المنخرطون والمتطوعون",
-    desc: "صلاحيات محددة يمنحها المكتب: تنظيم فعاليات، متابعة تسجيلات المشاركين، إدارة التواصل — مع فصل واضح عن المعطيات المالية.",
-    points: ["تنظيم فعاليات موكلة", "استقبال تسجيلات المشاركين", "لوحة مخصصة للمهام", "بلا اطلاع على المالية"],
-  },
-  {
-    value: "partner",
-    icon: Landmark,
-    title: "الجهات الحكومية والخاصة",
-    subtitle: "الإدارات والشركاء المختصون",
-    desc: "حسابات شريكة موثقة تمكن الجهات المختصة من الاطلاع على المعطيات المصرح بها للجمعيات (الحالة القانونية، ICE، التقارير العمومية).",
-    points: ["عرض موثق للجمعيات", "التحقق من الهوية الرقمية", "التقارير العمومية", "قناة تواصل رسمية"],
-  },
-  {
-    value: "citizen",
-    icon: Globe2,
-    title: "المواطنون والأجانب",
-    subtitle: "العموم",
-    desc: "حساب مجاني: استكشاف الجمعيات الموثقة، التبرع مع الحصول على وصل، التسجيل في الفعاليات العمومية، وطرح الأسئلة على المساعد الجمعوي.",
-    points: ["دليل الجمعيات الموثقة", "التبرع بوصل رسمي", "التسجيل في الفعاليات", "المساعد الجمعوي"],
-  },
-];
-
 function Roles() {
+  const { d } = useI18n();
+  const icons = [Lock, UserCog, Handshake, Landmark, Globe2];
+
   return (
     <section className="gradient-dark zellige-pattern py-20 text-white">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <motion.div {...fadeUp} className="mx-auto mb-12 max-w-2xl text-center">
           <Badge className="mb-4 gap-1.5 border-gold/40 bg-gold/15 px-3 py-1 text-[12px] font-bold text-gold">
             <Users className="size-3.5" />
-            نظام صلاحيات من خمسة مستويات
+            {d.home.roles.badge}
           </Badge>
           <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
-            لكل فاعلٍ جمعوي <span className="text-gradient-gold">مكانه المناسب</span>
+            {d.home.roles.titleA} <span className="text-gradient-gold">{d.home.roles.titleB}</span>
           </h2>
           <p className="mt-4 text-base leading-7 text-white/70">
-            من مالك المنصة إلى المواطن: صلاحيات دقيقة مفحوصة على الخادم،
-            تضمن الفصل بين الأدوار وحماية المعطيات الحساسة.
+            {d.home.roles.subtitle}
           </p>
         </motion.div>
 
-        <Tabs defaultValue="super" dir="rtl" className="w-full">
+        <Tabs defaultValue="super" className="w-full">
           <TabsList className="mx-auto mb-8 flex h-auto w-full max-w-3xl flex-wrap justify-center gap-1 rounded-2xl border border-white/10 bg-white/5 p-1.5">
-            {ROLES.map((r) => (
+            {d.home.roles.items.map((r, i) => (
               <TabsTrigger
-                key={r.value}
-                value={r.value}
+                key={r.title}
+                value={["super", "admin", "coadmin", "partner", "citizen"][i]}
                 className="rounded-xl px-4 py-2.5 text-[13px] font-bold data-[state=active]:bg-gold data-[state=active]:text-[#061229]"
               >
-                <r.icon className="me-1.5 inline size-4" />
+                {(() => { const Icon = icons[i]; return <Icon className="me-1.5 inline size-4" />; })()}
                 {r.title}
               </TabsTrigger>
             ))}
           </TabsList>
-          {ROLES.map((r) => (
-            <TabsContent key={r.value} value={r.value} className="mt-0">
+          {d.home.roles.items.map((r, i) => (
+            <TabsContent key={r.title} value={["super", "admin", "coadmin", "partner", "citizen"][i]} className="mt-0">
               <div className="grid items-center gap-6 rounded-2xl border border-white/10 bg-white/[0.04] p-6 sm:p-8 lg:grid-cols-[1.2fr_1fr]">
                 <div>
                   <p className="mb-1 text-[12px] font-bold uppercase tracking-wide text-gold">{r.subtitle}</p>
@@ -369,44 +321,43 @@ function Roles() {
 // -------------------------------------------------------------------
 // كيف تعمل المنصة
 // -------------------------------------------------------------------
-const STEPS = [
-  { icon: FileSignature, title: "أنشئوا الحساب", desc: "تسجيل مجاني في دقيقة: مواطن، متطوع، أو عضو مكتب جمعية." },
-  { icon: Building2, title: "سجلوا جمعيتكم", desc: "بطاقة تعريف كاملة تنتظر توثيق فريق المنصة — ثم تنفتح كل الوحدات." },
-  { icon: Megaphone, title: "سيروا ونشروا", desc: "انخراطات، محاسبة، فعاليات، وثائق — كل شيء موثق ومتتبع." },
-  { icon: Coins, title: "قيسوا وقروا الشركاء", desc: "تقارير رسمية وبطاقة هوية رقمية تقنع الممولين والإدارات." },
-];
-
 function HowItWorks() {
+  const { d } = useI18n();
+  const icons = [FileSignature, Building2, Megaphone, Coins];
+
   return (
     <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
       <motion.div {...fadeUp} className="mx-auto mb-14 max-w-2xl text-center">
         <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
-          من الصفر إلى جمعية <span className="text-primary">رقمية بالكامل</span>
+          {d.home.howItWorks.titleA} <span className="text-primary">{d.home.howItWorks.titleB}</span>
         </h2>
-        <p className="mt-4 text-base leading-7 text-muted-foreground">أربع خطوات فقط تفصلكم عن تسيير جمعوي عصري.</p>
+        <p className="mt-4 text-base leading-7 text-muted-foreground">{d.home.howItWorks.subtitle}</p>
       </motion.div>
 
       <div className="relative grid gap-8 md:grid-cols-4">
         <div className="absolute top-7 right-[12%] left-[12%] hidden h-0.5 bg-gradient-to-l from-primary/10 via-primary/30 to-primary/10 md:block" aria-hidden="true" />
-        {STEPS.map((s, i) => (
-          <motion.div
-            key={s.title}
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-40px" }}
-            transition={{ duration: 0.5, delay: i * 0.12 }}
-            className="relative text-center"
-          >
-            <div className="relative z-10 mx-auto mb-4 grid size-14 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/25">
-              <s.icon className="size-6" />
-              <span className="num absolute -top-2 -start-2 grid size-6 place-items-center rounded-full bg-gold text-[11px] font-black text-[#061229]">
-                {i + 1}
-              </span>
-            </div>
-            <h3 className="mb-2 text-base font-extrabold">{s.title}</h3>
-            <p className="mx-auto max-w-[240px] text-[13px] leading-6 text-muted-foreground">{s.desc}</p>
-          </motion.div>
-        ))}
+        {d.home.howItWorks.steps.map((s, i) => {
+          const Icon = icons[i % icons.length];
+          return (
+            <motion.div
+              key={s.title}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.5, delay: i * 0.12 }}
+              className="relative text-center"
+            >
+              <div className="relative z-10 mx-auto mb-4 grid size-14 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/25">
+                <Icon className="size-6" />
+                <span className="num absolute -top-2 -start-2 grid size-6 place-items-center rounded-full bg-gold text-[11px] font-black text-[#061229]">
+                  {i + 1}
+                </span>
+              </div>
+              <h3 className="mb-2 text-base font-extrabold">{s.title}</h3>
+              <p className="mx-auto max-w-[240px] text-[13px] leading-6 text-muted-foreground">{s.desc}</p>
+            </motion.div>
+          );
+        })}
       </div>
     </section>
   );
@@ -416,6 +367,9 @@ function HowItWorks() {
 // معاينة الجمعيات
 // -------------------------------------------------------------------
 function AssociationsPreview({ associations }: { associations: DemoData["associations"] }) {
+  const { d } = useI18n();
+  const demo = useDemoI18n();
+
   if (!associations.length) return null;
   return (
     <section className="bg-muted/50 py-20">
@@ -423,16 +377,16 @@ function AssociationsPreview({ associations }: { associations: DemoData["associa
         <motion.div {...fadeUp} className="mb-12 flex flex-wrap items-end justify-between gap-4">
           <div>
             <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
-              جمعيات <span className="text-primary">موثقة</span> على المنصة
+              {d.home.preview.titleA} <span className="text-primary">{d.home.preview.titleB}</span>
             </h2>
             <p className="mt-3 max-w-xl text-base leading-7 text-muted-foreground">
-              كل جمعية تمر عبر مسار توثيق يتحقق من هويتها ومرجعها القانوني قبل الظهور في الدليل العمومي.
+              {d.home.preview.subtitle}
             </p>
           </div>
           <Button asChild variant="outline" className="font-bold">
             <Link href="/associations">
-              كل الجمعيات
-              <ArrowLeft className="size-4" />
+              {d.home.preview.viewAll}
+              <span className="inline-block rtl:rotate-0 ltr:rotate-180">←</span>
             </Link>
           </Button>
         </motion.div>
@@ -451,28 +405,28 @@ function AssociationsPreview({ associations }: { associations: DemoData["associa
                   <CardContent className="p-6">
                     <div className="mb-4 flex items-start justify-between">
                       <span className="grid size-12 place-items-center rounded-xl bg-secondary text-lg font-black text-primary">
-                        {a.acronym?.slice(0, 2) || a.name.slice(0, 2)}
+                        {demo.assocAcronym(a)?.slice(0, 2) || a.name.slice(0, 2)}
                       </span>
                       <div className="flex flex-col items-end gap-1.5">
                         {a.isVerified && (
                           <Badge className="gap-1 border-primary/25 bg-secondary px-2 py-0.5 text-[10px] font-bold text-primary">
-                            <BadgeCheck className="size-3" /> موثقة
+                            <BadgeCheck className="size-3" /> {d.common.verified}
                           </Badge>
                         )}
                         {a.legalStatus === "PUBLIC_UTILITY" && (
                           <Badge variant="outline" className="border-gold/50 bg-gold-soft px-2 py-0.5 text-[10px] font-bold text-yellow-800">
-                            منفعة عامة
+                            {d.common.publicUtility}
                           </Badge>
                         )}
                       </div>
                     </div>
-                    <h3 className="mb-1.5 text-lg font-extrabold leading-snug group-hover:text-primary transition-colors">{a.name}</h3>
-                    <p className="mb-4 line-clamp-2 text-[13px] leading-6 text-muted-foreground">{a.description}</p>
+                    <h3 className="mb-1.5 text-lg font-extrabold leading-snug group-hover:text-primary transition-colors">{demo.assocName(a)}</h3>
+                    <p className="mb-4 line-clamp-2 text-[13px] leading-6 text-muted-foreground">{demo.assocDescription(a)}</p>
                     <div className="flex items-center justify-between border-t border-border pt-4 text-[12px] font-bold text-muted-foreground">
-                      <span>{a.category} · {a.city}</span>
+                      <span>{demo.category(a.category)} · {demo.city(a.city)}</span>
                       <span className="flex items-center gap-1">
                         <Users className="size-3.5" />
-                        <span className="num">{a.memberCount}</span> عضو
+                        <span className="num">{a.memberCount}</span> {d.common.memberWord}
                       </span>
                     </div>
                   </CardContent>
@@ -490,6 +444,8 @@ function AssociationsPreview({ associations }: { associations: DemoData["associa
 // نداء المساعد
 // -------------------------------------------------------------------
 function AssistantCTA() {
+  const { d } = useI18n();
+
   return (
     <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
       <motion.div
@@ -504,23 +460,22 @@ function AssistantCTA() {
           <Bot className="size-8 text-gold" />
         </span>
         <h2 className="mx-auto max-w-2xl text-3xl font-black tracking-tight sm:text-4xl">
-          «المساعد الجمعوي» — <span className="text-gradient-gold">مرشدكم الموثوق</span>
+          {d.home.assistantCta.titleA} <span className="text-gradient-gold">{d.home.assistantCta.titleB}</span>
         </h2>
         <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-white/75">
-          اسألوه عن خطوات تأسيس جمعية، وثائق التصريح، صفة المنفعة العامة، رقم ICE،
-          الخصم الضريبي للتبرعات… يجيبكم من قاعدة معارف رسمية مُتحقق منها:
-          <span className="font-bold text-gold"> بدون هلوسة وبدون روابط وهمية</span> —
-          وإن لم يعرف، يقولها بصراحة ويوجهكم للمصدر الرسمي.
+          {d.home.assistantCta.subtitle}
+          <span className="font-bold text-gold">{d.home.assistantCta.subtitleBold}</span>
+          {d.home.assistantCta.subtitleEnd}
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Button asChild size="lg" className="h-12 gap-2 bg-gold px-7 text-base font-extrabold text-[#061229] hover:bg-gold/90">
             <Link href="/assistant">
               <Bot className="size-5" />
-              تحدثوا مع المساعد
+              {d.home.assistantCta.cta}
             </Link>
           </Button>
           <Button asChild size="lg" variant="outline" className="h-12 gap-2 border-white/25 bg-transparent px-7 text-base font-extrabold text-white hover:bg-white/10 hover:text-white">
-            <Link href="/legal">المرجع القانوني</Link>
+            <Link href="/legal">{d.home.assistantCta.secondary}</Link>
           </Button>
         </div>
       </motion.div>
@@ -531,41 +486,16 @@ function AssistantCTA() {
 // -------------------------------------------------------------------
 // الأسئلة الشائعة
 // -------------------------------------------------------------------
-const FAQS = [
-  {
-    q: "هل المنصة مجانية؟",
-    a: "إنشاء الحساب، دليل الجمعيات، التسجيل في الفعاليات العمومية، والمساعد الجمعوي — مجانية لكل المستخدمين. تحتفظ المنصة بحق تقديم خدمات متقدمة للجمعيات الكبيرة لاحقاً مع إشعار مسبق.",
-  },
-  {
-    q: "هل بيانات جمعيتنا آمنة؟",
-    a: "نعم: كلمات السر مشفرة، الجلسات موقعة رقمياً، الصلاحيات مفحوصة في كل طلب على الخادم، وسجل التدقيق يوثق كل عملية. معالجة المعطيات الشخصية تتم بموافقة صريحة وفق القانون 09.08 (CNDP).",
-  },
-  {
-    q: "هل المنصة بديلة عن الإدارات الرسمية؟",
-    a: "لا. مامب أداة تسيير رقمية للجمعيات: تنظم ملفاتكم ومحاسبتكم ووثائقكم وتجهزها للمساطر الرسمية. التصريح لدى السلطة المحلية، النشر بالجريدة الرسمية، وطلبات الإدارات تتم عبر قنواتها الرسمية المعتمدة.",
-  },
-  {
-    q: "كيف تتم عملية توثيق الجمعيات؟",
-    a: "عند تسجيل جمعية جديدة يراجع فريق المنصة معطياتها (المرجع القانوني، المكتب، مجال العمل) قبل منحها علامة «موثقة» وظهورها في الدليل العمومي. الجمعيات غير الموثقة تبقى في وضع قيد المصادقة.",
-  },
-  {
-    q: "هل يمكن للأجانب استعمال المنصة؟",
-    a: "نعم، المنصة مفتوحة للمواطنين والأجانب على السواء: تصفح دليل الجمعيات، التبرع، التسجيل في الفعاليات العمومية — والواجهة متوفرة بالعربية مع دعم كامل لاتجاه RTL.",
-  },
-  {
-    q: "ماذا لو احتاجت جمعيتنا تقريراً رسمياً؟",
-    a: "وحدة التقارير تولد التقرير الأدبي والمالي السنوي وقائمة الانخراطات وسجل التبرعات — كلها بصيغة قابلة للطبع والعرض على الجمع العام أو الشركاء والجهات المانحة.",
-  },
-];
-
 function FAQ() {
+  const { d } = useI18n();
+
   return (
     <section className="mx-auto max-w-3xl px-4 pb-20 sm:px-6">
       <motion.div {...fadeUp} className="mb-10 text-center">
-        <h2 className="text-3xl font-black tracking-tight sm:text-4xl">أسئلة شائعة</h2>
+        <h2 className="text-3xl font-black tracking-tight sm:text-4xl">{d.home.faq.title}</h2>
       </motion.div>
       <Accordion type="single" collapsible className="space-y-3">
-        {FAQS.map((f, i) => (
+        {d.home.faq.items.map((f, i) => (
           <AccordionItem key={i} value={`q${i}`} className="rounded-xl border border-border bg-card px-5 shadow-sm data-[state=open]:border-primary/30">
             <AccordionTrigger className="py-4 text-start text-[15px] font-extrabold hover:no-underline">
               {f.q}
@@ -586,7 +516,7 @@ function FAQ() {
 export function LandingPage({ data }: { data: DemoData }) {
   return (
     <>
-      <Hero stats={data.stats} />
+      <Hero stats={data.stats} featured={data.associations[0]} />
       <Features />
       <Roles />
       <HowItWorks />

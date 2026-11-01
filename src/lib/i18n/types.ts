@@ -1,0 +1,345 @@
+/**
+ * عقد قاموس الترجمة (Dict) — البنية الملزمة لكل اللغات الثماني.
+ * أي ملف لغة لا يطابق هذه البنية حرفياً يفشل في فحص TypeScript،
+ * وهذا هو الضابط الأول ضد التسربات والمفاتيح الناقصة.
+ */
+
+export interface Dict {
+  common: {
+    /** الشعار — السطر الصغير تحت الاسم */
+    brandTagline: string;
+    verified: string;
+    publicUtility: string;
+    memberWord: string;
+    membersWord: string;
+    currency: string;
+    loading: string;
+    notFoundTitle: string;
+    close: string;
+    learnMore: string;
+    themeDark: string;
+    themeLight: string;
+  };
+
+  nav: {
+    home: string;
+    associations: string;
+    legal: string;
+    assistant: string;
+    login: string;
+    register: string;
+    openMenu: string;
+    closeMenu: string;
+    mainNavAria: string;
+    homeAria: string;
+    language: string;
+  };
+
+  footer: {
+    about: string;
+    badgeLaw: string;
+    badgePrivacy: string;
+    badgeAssistant: string;
+    platformTitle: string;
+    membersLogin: string;
+    dashboard: string;
+    androidApp: string;
+    legalDocsTitle: string;
+    terms: string;
+    privacy: string;
+    cookies: string;
+    officialPortalsTitle: string;
+    copyright: string;
+    legalNotice: string;
+  };
+
+  home: {
+    hero: {
+      badge: string;
+      titleA: string;
+      titleB: string;
+      titleC: string;
+      subtitle: string;
+      ctaPrimary: string;
+      ctaSecondary: string;
+      trustDahir: string;
+      trustLaw: string;
+      trustData: string;
+      cardVerified: string;
+      cardActiveMember: string;
+      cardIncome: string;
+      cardDonations: string;
+      cardTreasury: string;
+      cardAssistant: string;
+      cardUserMsg: string;
+      cardBotMsg: string;
+      statAssociations: string;
+      statMembers: string;
+      statTransactions: string;
+      statManaged: string;
+    };
+    features: {
+      badge: string;
+      titleA: string;
+      titleB: string;
+      subtitle: string;
+      items: Array<{ title: string; desc: string }>;
+    };
+    roles: {
+      badge: string;
+      titleA: string;
+      titleB: string;
+      subtitle: string;
+      items: Array<{
+        title: string;
+        subtitle: string;
+        desc: string;
+        points: string[];
+      }>;
+    };
+    howItWorks: {
+      titleA: string;
+      titleB: string;
+      subtitle: string;
+      steps: Array<{ title: string; desc: string }>;
+    };
+    preview: {
+      titleA: string;
+      titleB: string;
+      subtitle: string;
+      viewAll: string;
+    };
+    assistantCta: {
+      titleA: string;
+      titleB: string;
+      subtitle: string;
+      subtitleBold: string;
+      subtitleEnd: string;
+      cta: string;
+      secondary: string;
+    };
+    faq: {
+      title: string;
+      items: Array<{ q: string; a: string }>;
+    };
+  };
+
+  associations: {
+    titleA: string;
+    titleB: string;
+    subtitle: string;
+    searchPlaceholder: string;
+    searchAria: string;
+    cityAria: string;
+    allCities: string;
+    categoryAria: string;
+    allCategories: string;
+    resultsCount: string;
+    noResultsTitle: string;
+    noResultsDesc: string;
+    resetFilters: string;
+  };
+
+  associationDetail: {
+    verifiedBadge: string;
+    publicUtilityBadge: string;
+    foundedIn: string;
+    donateBtn: string;
+    joinBtn: string;
+    aboutTitle: string;
+    missionTitle: string;
+    upcomingEvents: string;
+    joinCardTitle: string;
+    joinCardDesc: string;
+    identityTitle: string;
+    fieldCategory: string;
+    fieldCity: string;
+    fieldRegion: string;
+    fieldFoundedYear: string;
+    fieldIce: string;
+    fieldLegalStatus: string;
+    statusPublicUtility: string;
+    statusDeclared: string;
+    activeMembers: string;
+    registeredDonations: string;
+    donateCardTitle: string;
+    donateCardDesc: string;
+    donateCardNote: string;
+    heroImageAlt: string;
+  };
+
+  assistant: {
+    titleA: string;
+    titleB: string;
+    subtitle: string;
+    chat: {
+      welcome: string;
+      quickQuestions: string[];
+      headerSub: string;
+      newChat: string;
+      inputPlaceholder: string;
+      inputAria: string;
+      sendAria: string;
+      errorFallback: string;
+      offlineNote: string;
+      kbSourcesTitle: string;
+      kbSourcesDesc: string;
+      charterTitle: string;
+      charterItems: string[];
+    };
+  };
+
+  chatbot: {
+    openAria: string;
+    title: string;
+    headerSub: string;
+    fullVersionAria: string;
+    closeAria: string;
+    welcome: string;
+    suggestions: string[];
+    inputPlaceholder: string;
+    inputAria: string;
+    sendAria: string;
+    errorFallback: string;
+    offlineNote: string;
+  };
+
+  auth: {
+    login: {
+      title: string;
+      subtitle: string;
+      email: string;
+      password: string;
+      submit: string;
+      busy: string;
+      errorApiUnavailable: string;
+      errorNetwork: string;
+      noAccount: string;
+      createAccount: string;
+      demoTitle: string;
+      demoAccounts: Array<{ email: string; role: string }>;
+      demoNote: string;
+    };
+    register: {
+      title: string;
+      subtitle: string;
+      fullName: string;
+      fullNamePlaceholder: string;
+      email: string;
+      phone: string;
+      phonePlaceholder: string;
+      password: string;
+      passwordHint: string;
+      consentPrefix: string;
+      consentPrivacy: string;
+      consentMiddle: string;
+      consentTerms: string;
+      consentSuffix: string;
+      consentError: string;
+      submit: string;
+      busy: string;
+      errorApiUnavailable: string;
+      errorNetwork: string;
+      haveAccount: string;
+      loginLink: string;
+      securityNote: string;
+    };
+  };
+
+  app: {
+    badge: string;
+    titleA: string;
+    titleB: string;
+    subtitle: string;
+    heroImageAlt: string;
+    downloadTitle: string;
+    steps: Array<{ title: string; desc: string }>;
+    noteTitle: string;
+    noteBody: string;
+    playProtectTitle: string;
+    playProtectIntro: string;
+    playProtectSteps: Array<{ title: string; desc: string; alt: string }>;
+    qrTitle: string;
+    qrDesc: string;
+    qrAlt: string;
+    featuresTitle: string;
+    features: string[];
+    webVersionTitle: string;
+    webVersionDesc: string;
+    webVersionBtn: string;
+    requirementsTitle: string;
+    requirementsText: string;
+    faqTitle: string;
+    faq: Array<{ q: string; a: string }>;
+    relatedPrefix: string;
+    relatedHomeLink: string;
+    relatedMiddle: string;
+    relatedTermsLink: string;
+    relatedSuffix: string;
+  };
+
+  release: {
+    title: string;
+    versionLabel: string;
+    dateLabel: string;
+    sizeLabel: string;
+    failedText: string;
+    downloadBtn: string;
+    downloadNote: string;
+    backupBtn: string;
+  };
+
+  legal: {
+    hub: {
+      badge: string;
+      titleA: string;
+      titleB: string;
+      subtitle: string;
+      lawsTitle: string;
+      laws: Array<{ title: string; date: string; desc: string; ref: string }>;
+      stepsTitle: string;
+      stepsIntro: string;
+      steps: Array<{ title: string; desc: string }>;
+      portalsTitle: string;
+      portalsIntro: string;
+      portals: Array<{ key: string; desc: string }>;
+      formsTitle: string;
+      formsDesc: string;
+      formsBtn: string;
+      assistantTitle: string;
+      assistantDesc: string;
+      assistantBtn: string;
+      disclaimer: string;
+    };
+    docBadge: string;
+    lastUpdated: string;
+    docFooter: string;
+  };
+
+  kb: {
+    /** عنوان قسم المصادر في صفحة المساعد */
+    sourcesNote: string;
+    /** رسالة «لا أعرف» الصادقة من المساعد */
+    notFound: string;
+    /** ترويسة قائمة الروابط الرسمية في الجواب */
+    linksHeader: string;
+    /** ترويسة المواضيع ذات الصلة */
+    relatedHeader: string;
+  };
+
+  demo: {
+    /** مدن (مفتاح = الاسم العربي في البيانات) */
+    cities: Record<string, string>;
+    regions: Record<string, string>;
+    /** مجالات الجمعيات */
+    categories: Record<string, string>;
+    eventCategories: Record<string, string>;
+    /** جمعيات العرض (مفتاح = slug) */
+    associations: Record<string, { name: string; acronym: string; description: string; mission: string }>;
+    /** فعاليات العرض (مفتاح = العنوان العربي) */
+    events: Record<string, { title: string; location: string }>;
+  };
+}
+
+/** نوع مسارات مفاتيح القاموس — t("home.hero.title") */
+export type DictPath = {};

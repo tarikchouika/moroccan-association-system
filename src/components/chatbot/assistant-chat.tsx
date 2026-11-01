@@ -7,28 +7,15 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { KB_ENTRIES, KB_CATEGORIES } from "@/lib/kb/data";
+import { KB_ENTRIES, KB_CATEGORIES, OFFICIAL_LINKS } from "@/lib/kb/data";
 import { localKBAnswer } from "@/lib/kb/client-answer";
+import { getKBSet } from "@/lib/kb/translations";
+import { useI18n } from "@/lib/i18n/provider";
 
 interface Msg {
   role: "user" | "assistant";
   content: string;
 }
-
-const WELCOME: Msg = {
-  role: "assistant",
-  content:
-    "السلام عليكم 👋 أنا **المساعد الجمعوي**.\n\nأستطيع مساعدتكم في:\n• **الإجراءات الرسمية**: تأسيس الجمعيات، التصريح، النشر بالجريدة الرسمية، صفة المنفعة العامة...\n• **استعمال المنصة**: الانخراط، المحاسبة، التبرعات، الفعاليات، الوثائق.\n• **التوجيه الموثق**: نحو البوابات الرسمية للإدارات المغربية.\n\nالتزامي الصارم: أجيب فقط من قاعدة معارف رسمية مُتحقق منها — **لا هلوسة، لا روابط وهمية**. إن لم أعرف الجواب قلتها بصراحة.",
-};
-
-const QUICK = [
-  "ما هي خطوات تأسيس جمعية؟",
-  "ما هو الوصل المؤقت؟",
-  "كيف أحصل على ICE لجمعيتي؟",
-  "كيف أنزّل تطبيق الأندرويد؟",
-  "كيف أحمي معطيات المنخرطين (CNDP)؟",
-  "ما هي صلاحيات كل دور في المنصة؟",
-];
 
 function renderContent(text: string) {
   const lines = text.split("\n");
@@ -49,11 +36,17 @@ function renderContent(text: string) {
 }
 
 export function AssistantChat() {
-  const [msgs, setMsgs] = useState<Msg[]>([WELCOME]);
+  const { d, lang, kb } = useI18n();
+  const [msgs, setMsgs] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [sessionId] = useState(() => `p-${Date.now().toString(36)}`);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const c = d.assistant.chat;
+
+  useEffect(() => {
+    setMsgs([{ role: "assistant", content: c.welcome }]);
+  }, [c.welcome]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -66,6 +59,22 @@ export function AssistantChat() {
       setInput("");
       setMsgs((m) => [...m, { role: "user", content: question }]);
       setBusy(true);
+
+      // لغة غير العربية → جواب محلي موثق مترجم مباشرة (بدون خادم)
+      if (lang !== "ar") {
+        const fallback = localKBAnswer(question, lang);
+        setMsgs((m) => [
+          ...m,
+          {
+            role: "assistant",
+            content:
+              fallback.content + (fallback.found ? `\n\n${c.offlineNote}` : ""),
+          },
+        ]);
+        setBusy(false);
+        return;
+      }
+
       try {
         const res = await fetch("/api/chat", {
           method: "POST",
@@ -80,26 +89,29 @@ export function AssistantChat() {
         const data = await res.json();
         setMsgs((m) => [
           ...m,
-          { role: "assistant", content: data.answer || data.error || "تعذر الحصول على جواب." },
+          { role: "assistant", content: data.answer || data.error || c.errorFallback },
         ]);
       } catch {
         // نسخة احتياطية موثقة: جواب مباشر من قاعدة المعارف داخل المتصفح (بدون هلوسة)
-        const fallback = localKBAnswer(question);
+        const fallback = localKBAnswer(question, "ar");
         setMsgs((m) => [
           ...m,
           {
             role: "assistant",
             content:
-              fallback.content +
-              (fallback.found ? "\n\n_(جواب من قاعدة المعارف الموثقة — الوضع دون اتصال بالخادم)_" : ""),
+              fallback.content + (fallback.found ? `\n\n${c.offlineNote}` : ""),
           },
         ]);
       } finally {
         setBusy(false);
       }
     },
-    [busy, msgs, sessionId]
+    [busy, msgs, sessionId, lang, c.offlineNote, c.errorFallback]
   );
+
+  // الفئات وعناوين المداخيل بلغة الواجهة
+  const set = getKBSet(lang);
+  const localizedTitle = (id: string) => set.entries[id as keyof typeof set.entries]?.title ?? "";
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
@@ -110,18 +122,18 @@ export function AssistantChat() {
             <LogoMark size={34} />
           </span>
           <div className="flex-1">
-            <h2 className="text-sm font-extrabold">المساعد الجمعوي</h2>
+            <h2 className="text-sm font-extrabold">{d.chatbot.title}</h2>
             <p className="flex items-center gap-1 text-[11px] text-white/70">
-              <ShieldCheck className="size-3" /> قاعدة معارف رسمية · فلترة صارمة للروابط
+              <ShieldCheck className="size-3" /> {c.headerSub}
             </p>
           </div>
           <Button
             variant="ghost"
             size="icon"
             className="text-white hover:bg-white/10 hover:text-white"
-            onClick={() => setMsgs([WELCOME])}
-            aria-label="محادثة جديدة"
-            title="محادثة جديدة"
+            onClick={() => setMsgs([{ role: "assistant", content: c.welcome }])}
+            aria-label={c.newChat}
+            title={c.newChat}
           >
             <RotateCcw className="size-4" />
           </Button>
@@ -165,7 +177,7 @@ export function AssistantChat() {
         {/* أسئلة سريعة */}
         {msgs.length <= 1 && (
           <div className="flex gap-2 overflow-x-auto border-t border-border bg-card p-3 no-scrollbar">
-            {QUICK.map((s) => (
+            {c.quickQuestions.map((s) => (
               <button
                 key={s}
                 onClick={() => send(s)}
@@ -187,13 +199,13 @@ export function AssistantChat() {
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="اكتبوا سؤالكم هنا بالتفصيل..."
+            placeholder={c.inputPlaceholder}
             className="flex-1 min-w-0 rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-ring"
             disabled={busy}
-            aria-label="سؤالكم"
+            aria-label={c.inputAria}
           />
-          <Button type="submit" size="icon" className="size-12 shrink-0 rounded-xl" disabled={busy || !input.trim()} aria-label="إرسال">
-            <SendHorizonal className="size-5 -scale-x-100" />
+          <Button type="submit" size="icon" className="size-12 shrink-0 rounded-xl" disabled={busy || !input.trim()} aria-label={c.sendAria}>
+            <SendHorizonal className="size-5 rtl:-scale-x-100" />
           </Button>
         </form>
       </Card>
@@ -204,10 +216,10 @@ export function AssistantChat() {
           <div className="border-b border-border p-4">
             <h3 className="flex items-center gap-2 text-sm font-extrabold">
               <BookOpen className="size-4 text-primary" />
-              مصادر المعرفة ({KB_ENTRIES.length})
+              {c.kbSourcesTitle} ({KB_ENTRIES.length})
             </h3>
             <p className="mt-1 text-[11px] leading-5 text-muted-foreground">
-              المواضيع الرسمية التي يستند إليها المساعد — روابط مُتحقق منها يدوياً.
+              {c.kbSourcesDesc}
             </p>
           </div>
           <div className="max-h-[480px] overflow-y-auto p-3">
@@ -216,14 +228,16 @@ export function AssistantChat() {
               if (!entries.length) return null;
               return (
                 <div key={cat} className="mb-3">
-                  <p className="mb-1.5 px-2 text-[11px] font-black uppercase text-muted-foreground">{cat}</p>
+                  <p className="mb-1.5 px-2 text-[11px] font-black uppercase text-muted-foreground">
+                    {kb.categories[cat] ?? cat}
+                  </p>
                   {entries.map((e) => (
                     <button
                       key={e.id}
-                      onClick={() => send(e.title)}
+                      onClick={() => send(localizedTitle(e.id) || e.title)}
                       className="w-full rounded-lg px-2.5 py-2 text-start text-[12.5px] font-bold leading-5 text-foreground/80 transition-colors hover:bg-secondary hover:text-primary"
                     >
-                      {e.title}
+                      {localizedTitle(e.id) || e.title}
                     </button>
                   ))}
                 </div>
@@ -236,14 +250,36 @@ export function AssistantChat() {
           <div className="p-4 text-[12px] leading-6 text-foreground/75">
             <p className="mb-2 flex items-center gap-1.5 font-extrabold text-primary">
               <ShieldCheck className="size-4" />
-              ميثاق الموثوقية
+              {c.charterTitle}
             </p>
             <ul className="space-y-1.5 list-disc ps-4">
-              <li>لا روابط إلا من اللائحة البيضاء الرسمية.</li>
-              <li>لا أرقام مواد أو نسب أو تواريخ مختلقة.</li>
-              <li>«لا أعرف» جواب مسموح ومشروع.</li>
-              <li>فلترة آلية لكل رابط قبل عرضه.</li>
+              {c.charterItems.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
             </ul>
+          </div>
+        </Card>
+
+        {/* البوابات الرسمية — بأسماء مترجمة */}
+        <Card>
+          <div className="border-b border-border p-4">
+            <h3 className="flex items-center gap-2 text-sm font-extrabold">
+              <Bot className="size-4 text-primary" />
+              {d.footer.officialPortalsTitle}
+            </h3>
+          </div>
+          <div className="p-3">
+            {(["maroc", "sggAssociations", "interieur", "tax", "ice", "cnss", "cndp", "asd"] as const).map((key) => (
+              <a
+                key={key}
+                href={OFFICIAL_LINKS[key].url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block rounded-lg px-2.5 py-2 text-[12.5px] font-bold leading-5 text-foreground/80 transition-colors hover:bg-secondary hover:text-primary"
+              >
+                {kb.links[key]}
+              </a>
+            ))}
           </div>
         </Card>
       </div>

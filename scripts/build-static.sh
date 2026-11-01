@@ -35,6 +35,9 @@ export DATABASE_URL="file:$(pwd)/db/custom.db"
 bunx prisma generate --schema prisma/schema.prisma
 bun run demo:generate
 
+echo "==> [2b/5] فحص الترجمات الثماني (تطابق المفاتيح + حفظ الأرقام والروابط)"
+bun scripts/check-i18n.ts
+
 echo "==> [3/5] بناء النسخة الثابتة (next build + output=export)"
 rm -rf "$OUT_DIR"
 MAMP_EXPORT=1 bunx --bun next build

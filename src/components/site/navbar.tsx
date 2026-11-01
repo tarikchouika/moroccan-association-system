@@ -7,20 +7,23 @@ import { useEffect } from "react";
 import { Menu, X, LayoutDashboard, LogIn } from "lucide-react";
 import { Logo } from "@/components/site/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { LanguageSwitcher, LanguageChips } from "@/components/i18n/language-switcher";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
-const NAV_LINKS = [
-  { href: "/", label: "الرئيسية" },
-  { href: "/associations", label: "دليل الجمعيات" },
-  { href: "/legal", label: "المرجع القانوني" },
-  { href: "/assistant", label: "المساعد الجمعوي" },
-];
+import { useI18n } from "@/lib/i18n/provider";
 
 export function Navbar() {
+  const { d } = useI18n();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
+
+  const NAV_LINKS = [
+    { href: "/", label: d.nav.home },
+    { href: "/associations", label: d.nav.associations },
+    { href: "/legal", label: d.nav.legal },
+    { href: "/assistant", label: d.nav.assistant },
+  ];
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -39,12 +42,12 @@ export function Navbar() {
       )}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
-        <Link href="/" aria-label="منصة مامب — الرئيسية">
+        <Link href="/" aria-label={d.nav.homeAria}>
           <Logo />
         </Link>
 
         {/* روابط سطح المكتب */}
-        <nav className="hidden md:flex items-center gap-1" aria-label="التنقل الرئيسي">
+        <nav className="hidden md:flex items-center gap-1" aria-label={d.nav.mainNavAria}>
           {NAV_LINKS.map((l) => (
             <Link
               key={l.href}
@@ -63,16 +66,17 @@ export function Navbar() {
 
         <div className="hidden md:flex items-center gap-2">
           <ThemeToggle />
+          <LanguageSwitcher />
           <Button asChild variant="ghost" className="font-bold">
             <Link href="/login">
               <LogIn className="size-4" />
-              الدخول
+              {d.nav.login}
             </Link>
           </Button>
           <Button asChild className="font-bold bg-primary hover:bg-primary/90">
             <Link href="/register">
               <LayoutDashboard className="size-4" />
-              إنشاء حساب
+              {d.nav.register}
             </Link>
           </Button>
         </div>
@@ -83,7 +87,7 @@ export function Navbar() {
           <button
             className="rounded-lg p-2 hover:bg-muted"
             onClick={() => setOpen((o) => !o)}
-            aria-label={open ? "إغلاق القائمة" : "فتح القائمة"}
+            aria-label={open ? d.nav.closeMenu : d.nav.openMenu}
             aria-expanded={open}
           >
             {open ? <X className="size-6" /> : <Menu className="size-6" />}
@@ -94,7 +98,7 @@ export function Navbar() {
       {/* قائمة الجوال */}
       {open && (
         <div className="md:hidden msg-in border-t border-border bg-card px-4 pb-4 pt-2 shadow-lg">
-          <nav className="flex flex-col gap-1" aria-label="التنقل — جوال">
+          <nav className="flex flex-col gap-1" aria-label={d.nav.mainNavAria}>
             {NAV_LINKS.map((l) => (
               <Link
                 key={l.href}
@@ -109,12 +113,13 @@ export function Navbar() {
             ))}
             <div className="mt-2 grid grid-cols-2 gap-2">
               <Button asChild variant="outline" className="font-bold">
-                <Link href="/login">الدخول</Link>
+                <Link href="/login">{d.nav.login}</Link>
               </Button>
               <Button asChild className="font-bold">
-                <Link href="/register">إنشاء حساب</Link>
+                <Link href="/register">{d.nav.register}</Link>
               </Button>
             </div>
+            <LanguageChips />
           </nav>
         </div>
       )}

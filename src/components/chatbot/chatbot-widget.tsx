@@ -2,7 +2,9 @@
 
 /**
  * نافذة المساعد الجمعوي العائمة — تظهر في جميع الصفحات
- * متصلة بـ /api/chat (قاعدة معارف موثقة + فلترة صارمة للروابط)
+ * • العربية: تحاول /api/chat أولاً (الخادم المحلي) ثم الجواب المحلي الموثق.
+ * • اللغات الأخرى: جواب مباشر من قاعدة المعارف المترجمة داخل المتصفح
+ *   (استرجاع حرفي مدقق — بدون خادم وبدون توليد لغوي).
  */
 import { useState, useRef, useEffect, useCallback } from "react";
 import { X, SendHorizonal, Sparkles, ShieldCheck } from "lucide-react";
@@ -10,26 +12,12 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { localKBAnswer } from "@/lib/kb/client-answer";
 import { LogoMark } from "@/components/site/logo";
+import { useI18n } from "@/lib/i18n/provider";
 
 interface Msg {
   role: "user" | "assistant";
   content: string;
 }
-
-const SUGGESTIONS = [
-  "كيف نؤسس جمعية بالمغرب؟",
-  "ما هي وثائق ملف التأسيس؟",
-  "كيف أنخرط في جمعية؟",
-  "ما هو رقم ICE؟",
-  "كيف أنزّل تطبيق الأندرويد؟",
-  "ما هي خطوات النشر بالجريدة الرسمية؟",
-];
-
-const WELCOME: Msg = {
-  role: "assistant",
-  content:
-    "السلام عليكم 👋 أنا **المساعد الجمعوي**، دليلكم داخل منصة مامب.\n\nأجيب عن أسئلتكم حول:\n• تأسيس الجمعيات والإجراءات الرسمية\n• الانخراط والمحاسبة والتبرعات\n• البوابات الرسمية والهوية الرقمية\n\nأعمل بقاعدة معارف رسمية مُتحقق منها — لا أقدم روابط أو معلومات غير موثقة. كيف أخدمكم؟",
-};
 
 function renderContent(text: string) {
   // تحويل بسيط: **غامق** و • و أسطر مرقمة
@@ -53,12 +41,18 @@ function renderContent(text: string) {
 }
 
 export function ChatbotWidget() {
+  const { d, lang } = useI18n();
   const [open, setOpen] = useState(false);
-  const [msgs, setMsgs] = useState<Msg[]>([WELCOME]);
+  const [msgs, setMsgs] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [sessionId] = useState(() => `s-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // رسالة الترحيب تتبع لغة الواجهة
+  useEffect(() => {
+    setMsgs([{ role: "assistant", content: d.chatbot.welcome }]);
+  }, [d.chatbot.welcome]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -71,6 +65,23 @@ export function ChatbotWidget() {
       setInput("");
       setMsgs((m) => [...m, { role: "user", content: question }]);
       setBusy(true);
+
+      // لغة غير العربية → جواب محلي موثق مترجم مباشرة (بدون خادم)
+      if (lang !== "ar") {
+        const fallback = localKBAnswer(question, lang);
+        setMsgs((m) => [
+          ...m,
+          {
+            role: "assistant",
+            content:
+              fallback.content +
+              (fallback.found ? `\n\n${d.chatbot.offlineNote}` : ""),
+          },
+        ]);
+        setBusy(false);
+        return;
+      }
+
       try {
         const res = await fetch("/api/chat", {
           method: "POST",
@@ -87,26 +98,26 @@ export function ChatbotWidget() {
           ...m,
           {
             role: "assistant",
-            content: data.answer || data.error || "تعذر الاتصال بالمساعد، حاولوا من جديد.",
+            content: data.answer || data.error || d.chatbot.errorFallback,
           },
         ]);
       } catch {
         // نسخة احتياطية موثقة: جواب مباشر من قاعدة المعارف داخل المتصفح (بدون هلوسة)
-        const fallback = localKBAnswer(question);
+        const fallback = localKBAnswer(question, "ar");
         setMsgs((m) => [
           ...m,
           {
             role: "assistant",
             content:
               fallback.content +
-              (fallback.found ? "\n\n_(جواب من قاعدة المعارف الموثقة — الوضع دون اتصال بالخادم)_" : ""),
+              (fallback.found ? `\n\n${d.chatbot.offlineNote}` : ""),
           },
         ]);
       } finally {
         setBusy(false);
       }
     },
-    [busy, msgs, sessionId]
+    [busy, msgs, sessionId, lang, d.chatbot.offlineNote, d.chatbot.errorFallback]
   );
 
   return (
@@ -114,7 +125,7 @@ export function ChatbotWidget() {
       {/* زر التشغيل — أيقونة اللوغو الرسمي */}
       <button
         onClick={() => setOpen((o) => !o)}
-        aria-label="فتح المساعد الجمعوي"
+        aria-label={d.chatbot.openAria}
         className={cn(
           "no-print fixed bottom-5 start-5 z-50 flex items-center gap-2 rounded-full",
           "bg-primary text-primary-foreground shadow-lg shadow-primary/30",
@@ -126,7 +137,7 @@ export function ChatbotWidget() {
           <LogoMark size={30} />
           <span className="absolute -top-0.5 -end-0.5 size-2.5 rounded-full bg-gold animate-pulse" />
         </span>
-        <span className="hidden sm:inline text-sm">المساعد الجمعوي</span>
+        <span className="hidden sm:inline text-sm">{d.chatbot.title}</span>
       </button>
 
       {/* النافذة */}
@@ -139,7 +150,7 @@ export function ChatbotWidget() {
             "msg-in"
           )}
           role="dialog"
-          aria-label="المساعد الجمعوي"
+          aria-label={d.chatbot.title}
         >
           {/* الرأس — لوغو المنصة كأيقونة للمساعد */}
           <div className="gradient-dark zellige-pattern rounded-t-2xl p-4 text-white flex items-center gap-3">
@@ -147,24 +158,24 @@ export function ChatbotWidget() {
               <LogoMark size={34} />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-extrabold text-sm">المساعد الجمعوي</h3>
+              <h3 className="font-extrabold text-sm">{d.chatbot.title}</h3>
               <p className="text-[11px] text-white/70 flex items-center gap-1">
                 <ShieldCheck className="size-3" />
-                إجابات موثقة — بدون روابط وهمية
+                {d.chatbot.headerSub}
               </p>
             </div>
             <a
               href="/assistant"
               className="rounded-lg p-2 hover:bg-white/10 transition-colors"
-              aria-label="النسخة الكاملة"
-              title="النسخة الكاملة"
+              aria-label={d.chatbot.fullVersionAria}
+              title={d.chatbot.fullVersionAria}
             >
               <Sparkles className="size-4" />
             </a>
             <button
               onClick={() => setOpen(false)}
               className="rounded-lg p-2 hover:bg-white/10 transition-colors"
-              aria-label="إغلاق"
+              aria-label={d.chatbot.closeAria}
             >
               <X className="size-4" />
             </button>
@@ -215,7 +226,7 @@ export function ChatbotWidget() {
           {/* اقتراحات */}
           {msgs.length <= 1 && (
             <div className="px-3 pb-2 flex gap-2 overflow-x-auto no-scrollbar">
-              {SUGGESTIONS.map((s) => (
+              {d.chatbot.suggestions.map((s) => (
                 <button
                   key={s}
                   onClick={() => send(s)}
@@ -238,19 +249,19 @@ export function ChatbotWidget() {
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="اكتبوا سؤالكم هنا..."
+              placeholder={d.chatbot.inputPlaceholder}
               className="flex-1 min-w-0 rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
               disabled={busy}
-              aria-label="سؤالكم للمساعد"
+              aria-label={d.chatbot.inputAria}
             />
             <Button
               type="submit"
               size="icon"
               className="size-10 shrink-0 rounded-xl"
               disabled={busy || !input.trim()}
-              aria-label="إرسال"
+              aria-label={d.chatbot.sendAria}
             >
-              <SendHorizonal className="size-4 -scale-x-100" />
+              <SendHorizonal className="size-4 rtl:-scale-x-100" />
             </Button>
           </form>
         </div>

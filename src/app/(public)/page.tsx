@@ -16,7 +16,7 @@ const jsonLd = {
       description:
         "منصة رقمية مغربية لإدارة وتسيير الجمعيات: الانخراطات، المحاسبة، التبرعات، الفعاليات والوثائق الرسمية.",
       areaServed: { "@type": "Country", name: "Morocco" },
-      knowsLanguage: ["ar", "fr"],
+      knowsLanguage: ["ar", "fr", "en", "es", "it", "de", "nl", "ru"],
     },
     {
       "@type": "WebSite",

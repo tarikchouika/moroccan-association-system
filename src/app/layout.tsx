@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { ChatbotWidget } from "@/components/chatbot/chatbot-widget";
+import { LanguageProvider } from "@/lib/i18n/provider";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://mamp.pages.dev"),
@@ -99,6 +100,20 @@ const themeInitScript = `
 })();
 `;
 
+/** سكربت مبكر لتفادي وميض الاتجاه واللغة قبل الترطيب (RTL/LTR FOUC) */
+const langInitScript = `
+(function(){
+  try {
+    var l = localStorage.getItem("mamp-lang");
+    var RTL = { "ar": true };
+    if (l && l !== "ar") {
+      document.documentElement.lang = l;
+      document.documentElement.dir = "ltr";
+    }
+  } catch (e) {}
+})();
+`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -117,14 +132,21 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap"
           rel="stylesheet"
         />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet"
+        />
       </head>
       <body className="antialiased bg-background text-foreground min-h-screen flex flex-col">
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        <script dangerouslySetInnerHTML={{ __html: langInitScript }} />
         {/* العلامة المائية — لوغو المنصة في خلفية جميع الصفحات */}
         <div className="mamp-watermark" aria-hidden="true" />
-        {children}
-        <Toaster />
-        <ChatbotWidget />
+        <LanguageProvider>
+          {children}
+          <Toaster />
+          <ChatbotWidget />
+        </LanguageProvider>
       </body>
     </html>
   );

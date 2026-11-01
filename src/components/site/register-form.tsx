@@ -10,8 +10,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Logo } from "@/components/site/logo";
+import { useI18n } from "@/lib/i18n/provider";
 
 export function RegisterForm() {
+  const { d } = useI18n();
+  const t = d.auth.register;
   const router = useRouter();
   const [form, setForm] = useState({ fullName: "", email: "", password: "", phone: "" });
   const [consent, setConsent] = useState(false);
@@ -25,7 +28,7 @@ export function RegisterForm() {
     e.preventDefault();
     setError("");
     if (!consent) {
-      setError("يجب الموافقة على معالجة المعطيات وفق القانون 09.08 لإتمام التسجيل");
+      setError(t.consentError);
       return;
     }
     setBusy(true);
@@ -40,7 +43,7 @@ export function RegisterForm() {
       }
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setError(data.error || "تعذر إنشاء الحساب");
+        setError(data.error || t.errorNetwork);
         return;
       }
       router.push("/dashboard");
@@ -48,8 +51,8 @@ export function RegisterForm() {
     } catch (e) {
       setError(
         e instanceof Error && e.message === "api-unavailable"
-          ? "خدمة التسجيل تعمل على الخادم المحلي للمنصة. هذه هي النسخة العمومية الثابتة — يمكنكم تصفح دليل الجمعيات واستعمال المساعد الجمعوي."
-          : "تعذر الاتصال بالخادم. تحققوا من الشبكة."
+          ? t.errorApiUnavailable
+          : t.errorNetwork
       );
     } finally {
       setBusy(false);
@@ -62,9 +65,9 @@ export function RegisterForm() {
         <div className="mb-6 flex justify-center">
           <Logo />
         </div>
-        <h1 className="text-2xl font-black">إنشاء حساب جديد</h1>
+        <h1 className="text-2xl font-black">{t.title}</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          مجاني للجميع: المواطنون، المنخرطون، المتطوعون وأعضاء الجمعيات
+          {t.subtitle}
         </p>
       </div>
 
@@ -79,13 +82,13 @@ export function RegisterForm() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="fullName">الاسم الكامل</Label>
+              <Label htmlFor="fullName">{t.fullName}</Label>
               <div className="relative">
                 <User className="absolute start-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   id="fullName"
                   className="ps-9"
-                  placeholder="مثال: محمد العلوي"
+                  placeholder={t.fullNamePlaceholder}
                   value={form.fullName}
                   onChange={set("fullName")}
                   required
@@ -95,7 +98,7 @@ export function RegisterForm() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">البريد الإلكتروني</Label>
+              <Label htmlFor="email">{t.email}</Label>
               <div className="relative">
                 <Mail className="absolute start-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
@@ -112,7 +115,7 @@ export function RegisterForm() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phone">الهاتف (اختياري)</Label>
+              <Label htmlFor="phone">{t.phone}</Label>
               <div className="relative">
                 <Phone className="absolute start-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
@@ -120,7 +123,7 @@ export function RegisterForm() {
                   type="tel"
                   dir="ltr"
                   className="ps-9 text-start"
-                  placeholder="+212 6XX XXX XXX"
+                  placeholder={t.phonePlaceholder}
                   value={form.phone}
                   onChange={set("phone")}
                 />
@@ -128,7 +131,7 @@ export function RegisterForm() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">كلمة السر</Label>
+              <Label htmlFor="password">{t.password}</Label>
               <div className="relative">
                 <Lock className="absolute start-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
@@ -136,7 +139,7 @@ export function RegisterForm() {
                   type="password"
                   dir="ltr"
                   className="ps-9 text-start"
-                  placeholder="8 أحرف على الأقل مع أرقام"
+                  placeholder={t.passwordHint}
                   value={form.password}
                   onChange={set("password")}
                   required
@@ -148,32 +151,31 @@ export function RegisterForm() {
             <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border bg-muted/40 p-3.5 text-[12px] leading-6">
               <Checkbox checked={consent} onCheckedChange={(v) => setConsent(v === true)} className="mt-0.5" />
               <span className="text-muted-foreground">
-                أوافق على{" "}
+                {t.consentPrefix}{" "}
                 <Link href="/legal/privacy" className="font-bold text-primary underline underline-offset-4 hover:text-primary/80">
-                  سياسة الخصوصية
+                  {t.consentPrivacy}
                 </Link>{" "}
-                ومعالجة معطياتي الشخصية لأغراض استعمال المنصة، وفق القانون 09.08
-                المتعلق بحماية المعطيات ذات الطابع الشخصي، وعلى{" "}
+                {t.consentMiddle}{" "}
                 <Link href="/legal/terms" className="font-bold text-primary underline underline-offset-4 hover:text-primary/80">
-                  شروط الاستخدام
-                </Link>. يمكنني سحب موافقتي في أي وقت.
+                  {t.consentTerms}
+                </Link>{t.consentSuffix}
               </span>
             </label>
 
             <Button type="submit" className="w-full gap-2 font-extrabold" size="lg" disabled={busy}>
-              {busy ? "جارٍ الإنشاء..." : (
+              {busy ? t.busy : (
                 <>
                   <UserPlus className="size-4" />
-                  إنشاء الحساب
+                  {t.submit}
                 </>
               )}
             </Button>
           </form>
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
-            لديكم حساب؟{" "}
+            {t.haveAccount}{" "}
             <Link href="/login" className="font-bold text-primary hover:underline">
-              سجلوا الدخول
+              {t.loginLink}
             </Link>
           </p>
         </CardContent>
@@ -181,7 +183,7 @@ export function RegisterForm() {
 
       <p className="mt-6 flex items-center justify-center gap-1.5 text-center text-[12px] text-muted-foreground">
         <ShieldCheck className="size-4 text-primary" />
-        كلمات السر مشفرة بمعيار scrypt ولا تُخزن كنص صريح.
+        {t.securityNote}
       </p>
     </div>
   );
