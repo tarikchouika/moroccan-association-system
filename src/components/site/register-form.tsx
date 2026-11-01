@@ -35,15 +35,22 @@ export function RegisterForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-      const data = await res.json();
+      if (!res.ok && (res.status === 404 || res.status === 405)) {
+        throw new Error("api-unavailable");
+      }
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         setError(data.error || "تعذر إنشاء الحساب");
         return;
       }
       router.push("/dashboard");
       router.refresh();
-    } catch {
-      setError("تعذر الاتصال بالخادم. تحققوا من الشبكة.");
+    } catch (e) {
+      setError(
+        e instanceof Error && e.message === "api-unavailable"
+          ? "خدمة التسجيل تعمل على الخادم المحلي للمنصة. هذه هي النسخة العمومية الثابتة — يمكنكم تصفح دليل الجمعيات واستعمال المساعد الجمعوي."
+          : "تعذر الاتصال بالخادم. تحققوا من الشبكة."
+      );
     } finally {
       setBusy(false);
     }

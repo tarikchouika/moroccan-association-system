@@ -27,15 +27,22 @@ export function LoginForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-      const data = await res.json();
+      if (!res.ok && (res.status === 404 || res.status === 405)) {
+        throw new Error("api-unavailable");
+      }
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         setError(data.error || "تعذر تسجيل الدخول");
         return;
       }
       router.push("/dashboard");
       router.refresh();
-    } catch {
-      setError("تعذر الاتصال بالخادم. تحققوا من الشبكة.");
+    } catch (e) {
+      setError(
+        e instanceof Error && e.message === "api-unavailable"
+          ? "خدمة الدخول تعمل على الخادم المحلي للمنصة. هذه هي النسخة العمومية الثابتة — استعملوها للتصفح والمساعد الجمعوي والتبرع."
+          : "تعذر الاتصال بالخادم. تحققوا من الشبكة."
+      );
     } finally {
       setBusy(false);
     }

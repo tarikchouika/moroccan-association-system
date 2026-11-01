@@ -2,7 +2,7 @@
 import type { DemoData } from "./types";
 
 export const DEMO_DATA: DemoData = {
-  "generatedAt": "2026-11-01T05:33:49.359Z",
+  "generatedAt": "2026-11-01T06:00:41.412Z",
   "stats": {
     "users": 20,
     "associations": 4,

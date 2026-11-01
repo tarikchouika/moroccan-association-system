@@ -52,3 +52,7 @@ prompt
 server.log
 # Skills directory
 /skills/
+# الأسرار والمفاتيح — لا تُرفع أبداً إلى المستودع
+.secrets/
+*.token
+*.key

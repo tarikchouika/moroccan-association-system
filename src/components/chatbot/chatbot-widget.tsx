@@ -8,6 +8,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { Bot, X, SendHorizonal, Sparkles, ShieldCheck, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { localKBAnswer } from "@/lib/kb/client-answer";
 
 interface Msg {
   role: "user" | "assistant";
@@ -79,6 +80,7 @@ export function ChatbotWidget() {
             history: msgs.slice(-6).map((m) => ({ role: m.role, content: m.content })),
           }),
         });
+        if (!res.ok) throw new Error("api-unavailable");
         const data = await res.json();
         setMsgs((m) => [
           ...m,
@@ -88,11 +90,15 @@ export function ChatbotWidget() {
           },
         ]);
       } catch {
+        // نسخة احتياطية موثقة: جواب مباشر من قاعدة المعارف داخل المتصفح (بدون هلوسة)
+        const fallback = localKBAnswer(question);
         setMsgs((m) => [
           ...m,
           {
             role: "assistant",
-            content: "تعذر الاتصال بالمساعد حالياً. تحققوا من الشبكة وأعيدوا المحاولة.",
+            content:
+              fallback.content +
+              (fallback.found ? "\n\n_(جواب من قاعدة المعارف الموثقة — الوضع دون اتصال بالخادم)_" : ""),
           },
         ]);
       } finally {

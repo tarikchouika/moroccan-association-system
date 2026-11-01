@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+# ============================================================================
+# build-static.sh — بناء النسخة الثابتة العمومية للنشر على Cloudflare Pages
+# منصة مامب (MAMP) — إدارة الجمعيات المغربية
+#
+# المبدأ:
+#   • النسخة الكاملة (API + لوحة التحكم + SQLite) تعمل على الخادم المحلي.
+#   • هذه النسخة الثابتة تحمل الصفحات العمومية فقط + المساعد الجمعوي
+#     (بوضع قاعدة المعارف الموثقة داخل المتصفح — بدون هلوسة).
+# الاستعمال:
+#   bash scripts/build-static.sh [--serve]   # --serve لمعاينة محلية عبر npx serve
+# ============================================================================
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+EXCLUDE_DIR=".static-exclude"
+OUT_DIR="out"
+
+echo "==> [1/5] تحضير وضع التصدير الثابت (استثناء API ولوحة التحكم)"
+mkdir -p "$EXCLUDE_DIR"
+rm -rf "$EXCLUDE_DIR/api" "$EXCLUDE_DIR/dashboard"
+[ -d src/app/api ] && mv src/app/api "$EXCLUDE_DIR/api" || true
+[ -d src/app/dashboard ] && mv src/app/dashboard "$EXCLUDE_DIR/dashboard" || true
+
+restore() {
+  [ -d "$EXCLUDE_DIR/api" ] && rm -rf src/app/api && mv "$EXCLUDE_DIR/api" src/app/api || true
+  [ -d "$EXCLUDE_DIR/dashboard" ] && rm -rf src/app/dashboard && mv "$EXCLUDE_DIR/dashboard" src/app/dashboard || true
+  rmdir "$EXCLUDE_DIR" 2>/dev/null || true
+}
+trap restore EXIT
+
+echo "==> [2/5] توليد البيانات العمومية من قاعدة SQLite المحلية"
+bun run demo:generate
+
+echo "==> [3/5] بناء النسخة الثابتة (next build + output=export)"
+rm -rf "$OUT_DIR"
+MAMP_EXPORT=1 bunx --bun next build
+
+echo "==> [4/5] فحص المخرجات"
+if [ ! -f "$OUT_DIR/index.html" ]; then
+  echo "❌ فشل البناء: index.html غير موجود" >&2
+  exit 1
+fi
+PAGES=$(find "$OUT_DIR" -name "*.html" | wc -l)
+echo "    عدد الصفحات المولدة: $PAGES"
+
+# صفحات مطلوبة يجب أن تتوفر
+for p in index.html associations/index.html legal/index.html assistant/index.html login/index.html register/index.html; do
+  if [ ! -f "$OUT_DIR/$p" ]; then
+    echo "❌ صفحة مفقودة: $p" >&2
+    exit 1
+  fi
+done
+
+echo "==> [5/5] اكتمل البناء الثابت في: $OUT_DIR/"
+echo ""
+echo "للنشر على Cloudflare Pages:"
+echo "  npx wrangler pages deploy $OUT_DIR --project-name=mamp"
+echo "للمعاينة المحلية:"
+echo "  npx serve $OUT_DIR"
