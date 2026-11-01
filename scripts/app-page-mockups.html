@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<style>
+  @font-face {
+    font-family: "NotoAr";
+    src: url("file:///home/z/.fonts/NotoSansArabic-Regular.ttf");
+    font-weight: 400;
+  }
+  @font-face {
+    font-family: "NotoAr";
+    src: url("file:///home/z/.fonts/NotoSansArabic-Bold.ttf");
+    font-weight: 700 900;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: "NotoAr", "Noto Sans Arabic", sans-serif; }
+  body { background: #ffffff; }
+
+  /* ============ 1) موك أب التطبيق ============ */
+  #hero-shot {
+    width: 960px; height: 640px;
+    background:
+      radial-gradient(700px 400px at 85% -10%, rgba(237,168,29,.18), transparent 60%),
+      radial-gradient(800px 500px at 10% 110%, rgba(0,103,200,.22), transparent 60%),
+      linear-gradient(160deg, #f6fafe 0%, #e8f2fd 100%);
+    display: flex; align-items: center; justify-content: center; gap: 70px;
+    position: relative; overflow: hidden;
+  }
+  #hero-shot::before {
+    content: ""; position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='64' height='64' viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M32 4l7 7-7 7-7-7 7-7zM32 46l7 7-7 7-7-7 7-7zM4 32l7-7 7 7-7 7-7-7zM46 32l7-7 7 7-7 7-7-7z' fill='%230067c8' fill-opacity='0.05'/%3E%3C/svg%3E");
+  }
+  .hero-text { position: relative; z-index: 2; max-width: 380px; }
+  .hero-text .badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #ffffff; border: 1px solid #dce6f4; border-radius: 999px;
+    padding: 8px 16px; font-size: 14px; font-weight: 700; color: #0067c8;
+    box-shadow: 0 4px 14px rgba(0,103,200,.10);
+  }
+  .hero-text .badge .dot { width: 9px; height: 9px; border-radius: 50%; background: #00b368; }
+  .hero-text h1 { font-size: 40px; font-weight: 900; color: #0d1b33; line-height: 1.35; margin: 18px 0 10px; }
+  .hero-text h1 span { color: #0067c8; }
+  .hero-text p { font-size: 16px; color: #4e617e; line-height: 1.9; }
+
+  /* إطار الهاتف */
+  .phone {
+    position: relative; z-index: 2; width: 330px; height: 610px;
+    background: #071431; border-radius: 46px; padding: 10px;
+    box-shadow: 0 30px 70px rgba(7,20,49,.35), 0 8px 24px rgba(7,20,49,.25);
+  }
+  .phone .screen {
+    width: 100%; height: 100%; border-radius: 37px; overflow: hidden;
+    background: #f6fafe; display: flex; flex-direction: column; position: relative;
+  }
+  .statusbar {
+    height: 34px; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 20px; font-size: 12px; font-weight: 700; color: #fff;
+    background: linear-gradient(160deg, #0a1733 0%, #0c1f44 100%);
+  }
+  .statusbar .icons { display: flex; gap: 5px; align-items: center; }
+  .statusbar .batt { width: 20px; height: 10px; border: 1.5px solid #fff; border-radius: 3px; position: relative; }
+  .statusbar .batt::after { content: ""; position: absolute; inset: 1.5px; right: 1.5px; width: 60%; background: #fff; border-radius: 1px; }
+  .appbar {
+    background: linear-gradient(160deg, #0a1733 0%, #0c1f44 100%); color: #fff;
+    padding: 10px 16px 16px; display: flex; align-items: center; gap: 10px;
+  }
+  .appbar img { width: 34px; height: auto; }
+  .appbar .t { line-height: 1.2; }
+  .appbar .t b { font-size: 15px; font-weight: 900; display: block; }
+  .appbar .t small { font-size: 10px; color: #9fd0ff; font-weight: 700; }
+  .mini-hero {
+    margin: 12px; border-radius: 18px; padding: 16px;
+    background: radial-gradient(200px 120px at 90% -20%, rgba(56,166,255,.35), transparent 60%), linear-gradient(150deg, #0e2a5c 0%, #0a1733 100%);
+    color: #fff;
+  }
+  .mini-hero h3 { font-size: 15px; font-weight: 900; line-height: 1.6; }
+  .mini-hero h3 span { color: #8fc7ff; }
+  .mini-hero p { font-size: 10.5px; color: rgba(255,255,255,.65); margin-top: 3px; }
+  .search {
+    margin-top: 10px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.18);
+    border-radius: 10px; padding: 7px 12px; font-size: 11px; color: rgba(255,255,255,.55);
+  }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; padding: 2px 12px 10px; }
+  .tile {
+    background: #ffffff; border: 1px solid #dce6f4; border-radius: 14px; padding: 12px;
+    box-shadow: 0 2px 8px rgba(13,27,51,.05);
+  }
+  .tile .ic { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; margin-bottom: 8px; }
+  .tile b { font-size: 11.5px; font-weight: 900; color: #0d1b33; display: block; }
+  .tile small { font-size: 9.5px; color: #4e617e; }
+  .chat {
+    margin: 0 12px; background: #ffffff; border: 1px solid #dce6f4; border-radius: 14px;
+    padding: 10px 12px; display: flex; gap: 9px; align-items: center;
+    box-shadow: 0 2px 8px rgba(13,27,51,.05);
+  }
+  .chat img { width: 26px; height: auto; }
+  .chat p { font-size: 10.5px; color: #0d1b33; font-weight: 700; line-height: 1.7; }
+  .chat p small { display: block; color: #4e617e; font-weight: 400; }
+  .navbar {
+    margin-top: auto; height: 44px; background: #ffffff; border-top: 1px solid #dce6f4;
+    display: flex; align-items: center; justify-content: space-around;
+  }
+  .navbar .n { width: 44px; height: 4px; border-radius: 4px; background: #dce6f4; }
+  .navbar .n.on { background: #0067c8; width: 20px; }
+  .float-badge {
+    position: absolute; z-index: 3; background: #ffffff; border-radius: 14px;
+    padding: 10px 16px; display: flex; align-items: center; gap: 9px;
+    box-shadow: 0 10px 30px rgba(7,20,49,.16); border: 1px solid #dce6f4;
+    font-size: 13px; font-weight: 900; color: #0d1b33;
+  }
+  .float-badge svg { flex-shrink: 0; }
+  .fb1 { top: 70px; right: 60px; }
+  .fb2 { bottom: 66px; right: 40px; }
+  .float-badge small { display: block; font-size: 10.5px; color: #4e617e; font-weight: 400; }
+
+  /* ============ 2) حوارات Play Protect ============ */
+  .pp-scene {
+    width: 560px; padding: 42px 36px 30px;
+    background:
+      radial-gradient(400px 240px at 90% -10%, rgba(0,103,200,.14), transparent 60%),
+      linear-gradient(165deg, #f6fafe 0%, #eaf3fd 100%);
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .pp-caption {
+    display: flex; align-items: center; gap: 12px; width: 100%;
+    margin-bottom: 26px;
+  }
+  .pp-caption .num {
+    width: 40px; height: 40px; border-radius: 13px; flex-shrink: 0;
+    background: linear-gradient(160deg, #071431, #0e3a7c); color: #fff;
+    display: grid; place-items: center; font-size: 19px; font-weight: 900;
+    box-shadow: 0 6px 16px rgba(7,20,49,.28);
+  }
+  .pp-caption .txt b { display: block; font-size: 17px; font-weight: 900; color: #0d1b33; }
+  .pp-caption .txt small { font-size: 12.5px; color: #4e617e; font-weight: 400; }
+
+  .dialog {
+    width: 400px; background: #ffffff; border-radius: 28px; overflow: hidden;
+    box-shadow: 0 24px 60px rgba(7,20,49,.22);
+  }
+  .dialog .shield-row { display: flex; flex-direction: column; align-items: center; padding: 30px 24px 8px; }
+  .dialog .shield {
+    width: 62px; height: 62px; border-radius: 50%;
+    display: grid; place-items: center; margin-bottom: 14px;
+  }
+  .dialog h3 { text-align: center; font-size: 17px; font-weight: 900; color: #0d1b33; line-height: 1.7; }
+  .dialog p { text-align: center; font-size: 13px; color: #5f6b7f; line-height: 1.9; padding: 6px 26px 4px; }
+  .dialog .app-row {
+    display: flex; align-items: center; gap: 12px; background: #f4f8fd;
+    margin: 14px 22px 18px; border-radius: 16px; padding: 10px 14px;
+  }
+  .dialog .app-row img { width: 38px; height: auto; }
+  .dialog .app-row .a b { display: block; font-size: 13.5px; font-weight: 900; color: #0d1b33; }
+  .dialog .app-row .a small { font-size: 11px; color: #4e617e; }
+  .dialog .acts { display: flex; flex-direction: column; border-top: 1px solid #e8eef7; }
+  .dialog .acts .act {
+    padding: 14px; text-align: center; font-size: 14px; font-weight: 900; color: #0067c8;
+  }
+  .dialog .acts .act + .act { border-top: 1px solid #e8eef7; }
+  .dialog .acts .act.main { background: #0067c8; color: #ffffff; }
+  .dialog .warn-list { padding: 4px 26px 10px; }
+  .dialog .warn-list .w {
+    display: flex; gap: 10px; align-items: flex-start; font-size: 12.5px; color: #5f6b7f;
+    line-height: 1.8; margin-bottom: 7px;
+  }
+  .dialog .warn-list .w b { color: #0d1b33; }
+  .progress-wrap { padding: 22px 26px 26px; }
+  .progress {
+    height: 14px; border-radius: 999px; background: #e3edf9; overflow: hidden; position: relative;
+  }
+  .progress .fill {
+    position: absolute; inset: 0; width: 72%;
+    background: linear-gradient(90deg, #0067c8, #38a6ff); border-radius: 999px;
+  }
+  .progress-label { display: flex; justify-content: space-between; margin-top: 10px; font-size: 12px; color: #4e617e; font-weight: 700; }
+  .done-row { display: flex; align-items: center; gap: 14px; padding: 18px 26px 8px; }
+  .done-row .check {
+    width: 54px; height: 54px; border-radius: 50%; background: #e5f7ee; display: grid; place-items: center; flex-shrink: 0;
+  }
+  .done-row b { font-size: 15.5px; font-weight: 900; color: #0d1b33; display: block; line-height: 1.6; }
+  .done-row small { font-size: 12px; color: #4e617e; }
+  .pp-hint {
+    margin-top: 24px; width: 100%; border-radius: 16px; padding: 12px 16px;
+    background: rgba(237,168,29,.12); border: 1px solid rgba(237,168,29,.4);
+    font-size: 12.5px; color: #7a5607; line-height: 1.8; font-weight: 400;
+    display: flex; gap: 9px; align-items: flex-start;
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= 1) موك أب التطبيق ================= -->
+<div id="hero-shot">
+  <div class="hero-text">
+    <span class="badge"><span class="dot"></span> التطبيق الرسمي — أندرويد</span>
+    <h1>منصة مامب <span>في جيبكم</span></h1>
+    <p>دليل الجمعيات المغربية، المساعد الجمعوي الذكي، والفعاليات — في تطبيق واحد سريع وآمن.</p>
+  </div>
+  <div class="phone">
+    <div class="screen">
+      <div class="statusbar">
+        <span>09:41</span>
+        <span class="icons"><span class="batt"></span></span>
+      </div>
+      <div class="appbar">
+        <img src="file:///home/z/my-project/public/icon-192.png" alt="">
+        <div class="t"><b>منصة مامب</b><small>MAMP · إدارة الجمعيات</small></div>
+      </div>
+      <div class="mini-hero">
+        <h3>إدارة جمعيتكم <span>باحترافية</span></h3>
+        <p>انخراطات · محاسبة · تبرعات · فعاليات · وثائق رسمية</p>
+        <div class="search">ابحثوا عن جمعية أو خدمة…</div>
+      </div>
+      <div class="grid">
+        <div class="tile">
+          <div class="ic" style="background:#e3f0fd;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0067c8" stroke-width="2.2" stroke-linecap="round"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg>
+          </div>
+          <b>دليل الجمعيات</b><small>موثقة ورسمية</small>
+        </div>
+        <div class="tile">
+          <div class="ic" style="background:#fdf3dc;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#eda81d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 1 4 4c0 1.1-.45 2.1-1.17 2.83L14 9.66V11h-4V9.66l-.83-.83A4 4 0 0 1 12 2z"/><path d="M10 14h4v3h-4zM8 20h8v1H8z"/></svg>
+          </div>
+          <b>المساعد الجمعوي</b><small>إجابات موثقة</small>
+        </div>
+        <div class="tile">
+          <div class="ic" style="background:#e5f7ee;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#00b368" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
+          </div>
+          <b>الفعاليات</b><small>تسجيل مباشر</small>
+        </div>
+        <div class="tile">
+          <div class="ic" style="background:#e3f0fd;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0067c8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 7l4-4 4 4M21 17l-4 4-4-4" opacity="0"/><path d="M4 19h16M4 19V8l4 3V8l4 3V8l4 3v8"/></svg>
+          </div>
+          <b>المرجع القانوني</b><small>قانون 75.00</small>
+        </div>
+      </div>
+      <div class="chat">
+        <img src="file:///home/z/my-project/public/logo.png" alt="">
+        <p>المساعد الجمعوي<small>كيف نؤسس جمعية بالمغرب؟ — إليكم الخطوات…</small></p>
+      </div>
+      <div class="navbar">
+        <span class="n on"></span><span class="n"></span><span class="n"></span><span class="n"></span>
+      </div>
+    </div>
+  </div>
+  <div class="float-badge fb1">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00b368" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+    <span>الإصدار الرسمي<small>مباشرة من المنصة</small></span>
+  </div>
+  <div class="float-badge fb2">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0067c8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    <span>اتصال مشفّر HTTPS<small>حماية كاملة للبيانات</small></span>
+  </div>
+</div>
+
+<!-- ================= 2) Play Protect — الخطوة 1 ================= -->
+<div class="pp-scene" id="pp1">
+  <div class="pp-caption">
+    <span class="num">1</span>
+    <span class="txt"><b>رسالة Play Protect عند التثبيت</b><small>اختيار «المزيد من التفاصيل» — لا تقلقوا، الرسالة قياسية</small></span>
+  </div>
+  <div class="dialog">
+    <div class="shield-row">
+      <div class="shield" style="background:#fdf3dc;">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#eda81d" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4M12 15.5v.5"/></svg>
+      </div>
+      <h3>لم يتم فحص هذا التطبيق</h3>
+    </div>
+    <p>لتتم حمايتكم، يراجع Google Play Protect التطبيقات قبل تثبيتها. لم يُفحص هذا التطبيق لأنه لم يُنشر على متجر Play.</p>
+    <div class="app-row">
+      <img src="file:///home/z/my-project/public/icon-192.png" alt="">
+      <span class="a"><b>منصة مامب</b><small>ma.mamp.app</small></span>
+    </div>
+    <div class="acts">
+      <div class="act">إلغاء</div>
+      <div class="act main">المزيد من التفاصيل</div>
+    </div>
+  </div>
+  <div class="pp-hint">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b5810e" stroke-width="2.2" stroke-linecap="round" style="flex-shrink:0;margin-top:2px"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16.5v.5"/></svg>
+    <span>اضغطوا زر «المزيد من التفاصيل» بالأسفل — لا تختاروا «إلغاء».</span>
+  </div>
+</div>
+
+<!-- ================= 3) Play Protect — الخطوة 2 ================= -->
+<div class="pp-scene" id="pp2">
+  <div class="pp-caption">
+    <span class="num">2</span>
+    <span class="txt"><b>تفاصيل التحذير</b><small>الضغط على «التثبيت على أي حال» للمتابعة</small></span>
+  </div>
+  <div class="dialog">
+    <div class="shield-row">
+      <div class="shield" style="background:#e3f0fd;">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#0067c8" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8v.5"/></svg>
+      </div>
+      <h3>تثبيت تطبيق غير معروف</h3>
+    </div>
+    <div class="warn-list">
+      <div class="w">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#c0332b" stroke-width="2.3" stroke-linecap="round" style="flex-shrink:0;margin-top:4px"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+        <span><b>قد يشكّل خطراً على بياناتكم</b> — تطبيقات غير معروفة قد تسرق معطياتكم.</span>
+      </div>
+      <div class="w">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5f6b7f" stroke-width="2.3" stroke-linecap="round" style="flex-shrink:0;margin-top:4px"><circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8v.5"/></svg>
+        <span>هذا التحذير يظهر لكل التطبيقات الموزعة خارج متجر Play، حتى الرسمية منها.</span>
+      </div>
+    </div>
+    <div class="app-row">
+      <img src="file:///home/z/my-project/public/icon-192.png" alt="">
+      <span class="a"><b>منصة مامب</b><small>مصدر: mamp.pages.dev</small></span>
+    </div>
+    <div class="acts">
+      <div class="act">رجوع</div>
+      <div class="act main">التثبيت على أي حال</div>
+    </div>
+  </div>
+  <div class="pp-hint">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b5810e" stroke-width="2.2" stroke-linecap="round" style="flex-shrink:0;margin-top:2px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    <span>تطبيق منصة مامب رسمي وموزع مباشرة من الموقع الرسمي للمنصة — اضغطوا «التثبيت على أي حال».</span>
+  </div>
+</div>
+
+<!-- ================= 4) Play Protect — الخطوة 3 ================= -->
+<div class="pp-scene" id="pp3">
+  <div class="pp-caption">
+    <span class="num">3</span>
+    <span class="txt"><b>اكتمال التثبيت</b><small>فتح التطبيق والاستعمال مباشرة</small></span>
+  </div>
+  <div class="dialog">
+    <div class="done-row">
+      <span class="check">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00b368" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      </span>
+      <span><b>تم تثبيت التطبيق</b><small>منصة مامب — جاهز للاستعمال</small></span>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress"><span class="fill"></span></div>
+      <div class="progress-label"><span>تم التنزيل</span><span>التثبيت مكتمل ✓</span></div>
+    </div>
+    <div class="app-row" style="margin-top:2px;">
+      <img src="file:///home/z/my-project/public/icon-192.png" alt="">
+      <span class="a"><b>منصة مامب</b><small>افتحوا التطبيق من القائمة الرئيسية</small></span>
+    </div>
+    <div class="acts" style="margin-top:14px;border-radius:0;">
+      <div class="act main">فتح التطبيق</div>
+    </div>
+  </div>
+  <div class="pp-hint">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b5810e" stroke-width="2.2" stroke-linecap="round" style="flex-shrink:0;margin-top:2px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    <span>ملاحظة: تُطلب هذه الخطوات مرة واحدة فقط — التحديثات القادمة تمر بسلاسة.</span>
+  </div>
+</div>
+
+</body>
+</html>

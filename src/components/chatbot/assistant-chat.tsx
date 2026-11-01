@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Bot, SendHorizonal, ShieldCheck, RotateCcw, BookOpen } from "lucide-react";
+import { LogoMark } from "@/components/site/logo";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -105,8 +106,8 @@ export function AssistantChat() {
       {/* واجهة المحادثة */}
       <Card className="flex h-[600px] flex-col overflow-hidden">
         <div className="gradient-dark zellige-pattern flex items-center gap-3 p-4 text-white">
-          <span className="grid size-11 place-items-center rounded-xl border border-gold/40 bg-gold/20">
-            <Bot className="size-6 text-gold" />
+          <span className="grid size-11 place-items-center overflow-hidden rounded-xl border border-white/30 bg-white/95">
+            <LogoMark size={34} />
           </span>
           <div className="flex-1">
             <h2 className="text-sm font-extrabold">المساعد الجمعوي</h2>
@@ -130,8 +131,8 @@ export function AssistantChat() {
           {msgs.map((m, i) => (
             <div key={i} className={cn("msg-in flex gap-2.5", m.role === "user" ? "justify-start" : "justify-end")}>
               {m.role === "assistant" && (
-                <span className="mt-1 grid size-8 shrink-0 place-items-center rounded-full gradient-dark">
-                  <Bot className="size-4 text-gold" />
+                <span className="mt-1 grid size-8 shrink-0 place-items-center overflow-hidden rounded-full border border-border bg-white/95">
+                  <LogoMark size={20} />
                 </span>
               )}
               <div
@@ -149,8 +150,8 @@ export function AssistantChat() {
 
           {busy && (
             <div className="flex justify-end">
-              <span className="mt-1 grid size-8 place-items-center rounded-full gradient-dark">
-                <Bot className="size-4 text-gold" />
+              <span className="mt-1 grid size-8 shrink-0 place-items-center overflow-hidden rounded-full border border-border bg-white/95">
+                <LogoMark size={20} />
               </span>
               <div className="flex gap-1.5 rounded-2xl rounded-se-md border border-border bg-card px-5 py-4">
                 <span className="typing-dot size-2 rounded-full bg-primary/60" />

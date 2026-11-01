@@ -77,7 +77,7 @@ export default async function AssociationDetailPage({
             </div>
           </div>
           <div className="flex flex-col gap-2.5">
-            <Button asChild size="lg" className="h-12 gap-2 bg-gold px-6 font-extrabold text-[#10231b] hover:bg-gold/90">
+            <Button asChild size="lg" className="h-12 gap-2 bg-gold px-6 font-extrabold text-[#061229] hover:bg-gold/90">
               <Link href={`/associations/${a.slug}#donate`}>
                 <HeartHandshake className="size-5" />
                 تبرعوا للجمعية

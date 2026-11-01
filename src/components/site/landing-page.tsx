@@ -334,7 +334,7 @@ function Roles() {
               <TabsTrigger
                 key={r.value}
                 value={r.value}
-                className="rounded-xl px-4 py-2.5 text-[13px] font-bold data-[state=active]:bg-gold data-[state=active]:text-[#10231b]"
+                className="rounded-xl px-4 py-2.5 text-[13px] font-bold data-[state=active]:bg-gold data-[state=active]:text-[#061229]"
               >
                 <r.icon className="me-1.5 inline size-4" />
                 {r.title}
@@ -399,7 +399,7 @@ function HowItWorks() {
           >
             <div className="relative z-10 mx-auto mb-4 grid size-14 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/25">
               <s.icon className="size-6" />
-              <span className="num absolute -top-2 -start-2 grid size-6 place-items-center rounded-full bg-gold text-[11px] font-black text-[#10231b]">
+              <span className="num absolute -top-2 -start-2 grid size-6 place-items-center rounded-full bg-gold text-[11px] font-black text-[#061229]">
                 {i + 1}
               </span>
             </div>
@@ -513,7 +513,7 @@ function AssistantCTA() {
           وإن لم يعرف، يقولها بصراحة ويوجهكم للمصدر الرسمي.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <Button asChild size="lg" className="h-12 gap-2 bg-gold px-7 text-base font-extrabold text-[#10231b] hover:bg-gold/90">
+          <Button asChild size="lg" className="h-12 gap-2 bg-gold px-7 text-base font-extrabold text-[#061229] hover:bg-gold/90">
             <Link href="/assistant">
               <Bot className="size-5" />
               تحدثوا مع المساعد

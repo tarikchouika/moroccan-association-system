@@ -71,3 +71,7 @@ app-android/local.properties
 
 # مجلد تسليمات البيئة المحلية
 /download/
+
+# ملفات محلية مؤقتة
+/upload/
+/tmp-shots/

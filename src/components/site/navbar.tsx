@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { Menu, X, LayoutDashboard, LogIn } from "lucide-react";
 import { Logo } from "@/components/site/logo";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -61,6 +62,7 @@ export function Navbar() {
         </nav>
 
         <div className="hidden md:flex items-center gap-2">
+          <ThemeToggle />
           <Button asChild variant="ghost" className="font-bold">
             <Link href="/login">
               <LogIn className="size-4" />
@@ -76,14 +78,17 @@ export function Navbar() {
         </div>
 
         {/* زر الجوال */}
-        <button
-          className="md:hidden rounded-lg p-2 hover:bg-muted"
-          onClick={() => setOpen((o) => !o)}
-          aria-label={open ? "إغلاق القائمة" : "فتح القائمة"}
-          aria-expanded={open}
-        >
-          {open ? <X className="size-6" /> : <Menu className="size-6" />}
-        </button>
+        <div className="flex items-center gap-1.5 md:hidden">
+          <ThemeToggle />
+          <button
+            className="rounded-lg p-2 hover:bg-muted"
+            onClick={() => setOpen((o) => !o)}
+            aria-label={open ? "إغلاق القائمة" : "فتح القائمة"}
+            aria-expanded={open}
+          >
+            {open ? <X className="size-6" /> : <Menu className="size-6" />}
+          </button>
+        </div>
       </div>
 
       {/* قائمة الجوال */}

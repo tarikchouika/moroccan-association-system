@@ -9,6 +9,7 @@ import {
   Landmark, ChevronDown, Inbox, Sparkles,
 } from "lucide-react";
 import { Logo } from "@/components/site/logo";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -53,7 +54,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
             className={cn(
               "flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-[13.5px] font-bold transition-colors",
               active
-                ? "bg-gold text-[#10231b] shadow-md"
+                ? "bg-gold text-[#061229] shadow-md"
                 : "text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-white"
             )}
           >
@@ -185,6 +186,8 @@ export function DashboardChrome({ children }: { children: React.ReactNode }) {
               المساعد الجمعوي
             </Link>
           </Button>
+
+          <ThemeToggle />
 
           {/* قائمة المستخدم */}
           <DropdownMenu dir="rtl">

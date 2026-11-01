@@ -5,10 +5,11 @@
  * متصلة بـ /api/chat (قاعدة معارف موثقة + فلترة صارمة للروابط)
  */
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Bot, X, SendHorizonal, Sparkles, ShieldCheck, MessageCircle } from "lucide-react";
+import { X, SendHorizonal, Sparkles, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { localKBAnswer } from "@/lib/kb/client-answer";
+import { LogoMark } from "@/components/site/logo";
 
 interface Msg {
   role: "user" | "assistant";
@@ -110,7 +111,7 @@ export function ChatbotWidget() {
 
   return (
     <>
-      {/* زر التشغيل */}
+      {/* زر التشغيل — أيقونة اللوغو الرسمي */}
       <button
         onClick={() => setOpen((o) => !o)}
         aria-label="فتح المساعد الجمعوي"
@@ -121,9 +122,9 @@ export function ChatbotWidget() {
           open && "opacity-0 pointer-events-none"
         )}
       >
-        <span className="relative flex">
-          <MessageCircle className="size-6" />
-          <span className="absolute -top-1 -end-1 size-3 rounded-full bg-gold animate-pulse" />
+        <span className="relative flex size-9 items-center justify-center overflow-hidden rounded-full bg-white/95">
+          <LogoMark size={30} />
+          <span className="absolute -top-0.5 -end-0.5 size-2.5 rounded-full bg-gold animate-pulse" />
         </span>
         <span className="hidden sm:inline text-sm">المساعد الجمعوي</span>
       </button>
@@ -140,10 +141,10 @@ export function ChatbotWidget() {
           role="dialog"
           aria-label="المساعد الجمعوي"
         >
-          {/* الرأس */}
+          {/* الرأس — لوغو المنصة كأيقونة للمساعد */}
           <div className="gradient-dark zellige-pattern rounded-t-2xl p-4 text-white flex items-center gap-3">
-            <div className="relative flex size-11 items-center justify-center rounded-xl bg-gold/20 border border-gold/40">
-              <Bot className="size-6 text-gold" />
+            <div className="relative flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white/95 border border-white/30">
+              <LogoMark size={34} />
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="font-extrabold text-sm">المساعد الجمعوي</h3>
@@ -180,8 +181,8 @@ export function ChatbotWidget() {
                 )}
               >
                 {m.role === "assistant" && (
-                  <div className="size-7 shrink-0 rounded-full gradient-dark flex items-center justify-center me-2 mt-1">
-                    <Bot className="size-4 text-gold" />
+                  <div className="size-7 shrink-0 rounded-full bg-white/95 border border-border overflow-hidden flex items-center justify-center me-2 mt-1">
+                    <LogoMark size={20} />
                   </div>
                 )}
                 <div
@@ -199,8 +200,8 @@ export function ChatbotWidget() {
 
             {busy && (
               <div className="flex justify-end">
-                <div className="size-7 shrink-0 rounded-full gradient-dark flex items-center justify-center me-2 mt-1">
-                  <Bot className="size-4 text-gold" />
+                <div className="size-7 shrink-0 rounded-full bg-white/95 border border-border overflow-hidden flex items-center justify-center me-2 mt-1">
+                  <LogoMark size={20} />
                 </div>
                 <div className="bg-card border border-border rounded-2xl rounded-se-md px-4 py-3 flex gap-1.5">
                   <span className="typing-dot size-2 rounded-full bg-primary/60" />

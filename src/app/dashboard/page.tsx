@@ -105,7 +105,7 @@ export default function DashboardOverviewPage() {
     { icon: CalendarDays, label: "فعاليات", value: String(s.events), sub: `${s.upcomingEvents.length} قادمة`, tint: "bg-secondary text-primary" },
   ];
 
-  const pieColors = ["#0d6b4f", "#c9a227", "#2c8a6b", "#c4553b", "#7a9b8e", "#a3bfae"];
+  const pieColors = ["#0072d6", "#eda81d", "#00b368", "#c05a21", "#7e96b8", "#9db9d8"];
 
   return (
     <div className="space-y-6">
@@ -152,11 +152,11 @@ export default function DashboardOverviewPage() {
                   <Tooltip
                     formatter={(v: number, name: string) => [fmtMAD(v), name === "income" ? "مدخول" : "مصروف"]}
                     labelStyle={{ fontFamily: "Cairo", direction: "rtl" }}
-                    contentStyle={{ fontFamily: "Cairo", direction: "rtl", borderRadius: 12, border: "1px solid #e3e0d4" }}
+                    contentStyle={{ fontFamily: "Cairo", direction: "rtl", borderRadius: 12, border: "1px solid #dce6f4" }}
                   />
                   <Legend formatter={(v) => (v === "income" ? "مدخول" : "مصروف")} wrapperStyle={{ fontFamily: "Cairo" }} />
-                  <Bar dataKey="income" fill="#0d6b4f" radius={[4, 4, 0, 0]} name="income" />
-                  <Bar dataKey="expense" fill="#c9a227" radius={[4, 4, 0, 0]} name="expense" />
+                  <Bar dataKey="income" fill="#0072d6" radius={[4, 4, 0, 0]} name="income" />
+                  <Bar dataKey="expense" fill="#eda81d" radius={[4, 4, 0, 0]} name="expense" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -187,7 +187,7 @@ export default function DashboardOverviewPage() {
                     </Pie>
                     <Tooltip
                       formatter={(v: number, n: string) => [fmtMAD(v), n]}
-                      contentStyle={{ fontFamily: "Cairo", direction: "rtl", borderRadius: 12, border: "1px solid #e3e0d4" }}
+                      contentStyle={{ fontFamily: "Cairo", direction: "rtl", borderRadius: 12, border: "1px solid #dce6f4" }}
                     />
                   </PieChart>
                 </ResponsiveContainer>

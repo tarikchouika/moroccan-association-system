@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="brand_green">#0d6b4f</color>
-    <color name="brand_dark">#0b1410</color>
-    <color name="brand_gold">#c9a227</color>
-    <color name="brand_cream">#faf9f5</color>
-    <color name="ic_launcher_background">#0d6b4f</color>
+    <!-- ألوان الهوية الرسمية — لوغو درع MAMP -->
+    <color name="brand_primary">#0067c8</color>
+    <color name="brand_azure">#0090f8</color>
+    <color name="brand_dark">#0a1128</color>
+    <color name="brand_navy">#0a1733</color>
+    <color name="brand_gold">#eda81d</color>
+    <color name="brand_light">#f6fafe</color>
+    <color name="ic_launcher_background">#0a1733</color>
 </resources>

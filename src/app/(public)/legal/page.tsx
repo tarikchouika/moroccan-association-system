@@ -183,7 +183,7 @@ export default function LegalPage() {
               كلها متوفرة رسمياً عبر صفحة الجمعيات بالأمانة العامة للحكومة.
             </p>
           </div>
-          <Button asChild size="lg" className="h-12 gap-2 bg-gold px-6 font-extrabold text-[#10231b] hover:bg-gold/90">
+          <Button asChild size="lg" className="h-12 gap-2 bg-gold px-6 font-extrabold text-[#061229] hover:bg-gold/90">
             <a href={OFFICIAL_LINKS.sggAssociations.url} target="_blank" rel="noopener noreferrer">
               الوصول إلى النماذج
               <ExternalLink className="size-4" />

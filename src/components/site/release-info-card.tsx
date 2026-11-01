@@ -1,15 +1,19 @@
 "use client";
 
 /**
- * بطاقة معلومات أحدث إصدار — تجلب بيانات آخر إصدار من GitHub (مستودع عمومي)
- * وتعرض الإصدار والحجم والتاريخ وبصمة الشهادة، مع تدهور رشيق عند تعذر الاتصال.
+ * بطاقة معلومات أحدث إصدار — تحاول جلب latest.json من رابط كلاودفلير المباشر
+ * (مشروع mamp-dl الذي ينشره سير عمل GitHub آلياً) ثم تعود لواجهة GitHub.
+ * تتضمن زر تحميل مباشراً من كلاودفلير + رابطاً احتياطياً من GitHub.
  */
 import { useEffect, useState } from "react";
-import { Tag, CalendarDays, HardDrive, RefreshCw, ShieldCheck } from "lucide-react";
+import { Tag, CalendarDays, HardDrive, RefreshCw, Download, Cloud, Github } from "lucide-react";
 
-const RELEASE_API =
+/** رابط التحميل المباشر من كلاودفلير — يخدم دائماً آخر إصدار */
+const CF_LATEST_JSON = "https://mamp-dl.pages.dev/latest.json";
+const CF_DOWNLOAD_URL = "https://mamp-dl.pages.dev/mamp.apk";
+const GH_RELEASE_API =
   "https://api.github.com/repos/tarikchouika/moroccan-association-system/releases/latest";
-const DOWNLOAD_URL =
+const GH_DOWNLOAD_URL =
   "https://github.com/tarikchouika/moroccan-association-system/releases/latest/download/mamp.apk";
 
 interface ReleaseInfo {
@@ -17,7 +21,6 @@ interface ReleaseInfo {
   name: string;
   date: string;
   sizeMB: string | null;
-  fingerprint: string | null;
 }
 
 function formatSize(bytes: number): string {
@@ -31,25 +34,51 @@ export function ReleaseInfoCard() {
 
   useEffect(() => {
     let cancelled = false;
-    fetch(RELEASE_API, { headers: { Accept: "application/vnd.github+json" } })
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("failed"))))
-      .then((data) => {
+
+    async function fromCloudflare(): Promise<ReleaseInfo | null> {
+      const r = await fetch(CF_LATEST_JSON, { cache: "no-store" });
+      if (!r.ok) return null;
+      const d = await r.json();
+      if (!d?.tag) return null;
+      return {
+        tag: String(d.tag).replace(/^app-/, ""),
+        name: d.name ?? "",
+        date: d.date ? new Date(d.date).toLocaleDateString("ar-MA") : "",
+        sizeMB: d.size ? formatSize(Number(d.size)) : null,
+      };
+    }
+
+    async function fromGitHub(): Promise<ReleaseInfo | null> {
+      const r = await fetch(GH_RELEASE_API, {
+        headers: { Accept: "application/vnd.github+json" },
+      });
+      if (!r.ok) return null;
+      const data = await r.json();
+      const apk = (data.assets ?? []).find((a: { name: string }) => a.name === "mamp.apk");
+      return {
+        tag: (data.tag_name ?? "").replace(/^app-/, ""),
+        name: data.name ?? "",
+        date: data.published_at ? new Date(data.published_at).toLocaleDateString("ar-MA") : "",
+        sizeMB: apk ? formatSize(apk.size) : null,
+      };
+    }
+
+    (async () => {
+      try {
+        const cf = await fromCloudflare().catch(() => null);
         if (cancelled) return;
-        const apk = (data.assets ?? []).find((a: { name: string }) => a.name === "mamp.apk");
-        const body: string = data.body ?? "";
-        // بصمة الشهادة بصيغة الإصدارات الجديدة أو القديمة (أحرف كبيرة أو صغيرة)
-        const fpMatch =
-          body.match(/بصمة الشهادة \(SHA-256\):\s*`?([0-9a-fA-F:]+)`?/) ??
-          body.match(/Signer #1 certificate SHA-256 digest:\s*([0-9a-fA-F:]+)/i);
-        setInfo({
-          tag: (data.tag_name ?? "").replace(/^app-/, ""),
-          name: data.name ?? "",
-          date: data.published_at ? new Date(data.published_at).toLocaleDateString("ar-MA") : "",
-          sizeMB: apk ? formatSize(apk.size) : null,
-          fingerprint: fpMatch ? fpMatch[1] : null,
-        });
-      })
-      .catch(() => !cancelled && setFailed(true));
+        if (cf) {
+          setInfo(cf);
+          return;
+        }
+        const gh = await fromGitHub();
+        if (cancelled) return;
+        if (gh) setInfo(gh);
+        else setFailed(true);
+      } catch {
+        if (!cancelled) setFailed(true);
+      }
+    })();
     return () => {
       cancelled = true;
     };
@@ -70,7 +99,7 @@ export function ReleaseInfoCard() {
 
       {failed && !info ? (
         <p className="text-[13px] leading-7 text-muted-foreground">
-          تعذر جلب تفاصيل الإصدار حالياً — الرابط الدائم بالأسفل يوجهكم دائماً
+          تعذر جلب تفاصيل الإصدار حالياً — رابط التحميل بالأسفل يوجهكم دائماً
           لآخر نسخة رسمية.
         </p>
       ) : (
@@ -87,33 +116,28 @@ export function ReleaseInfoCard() {
         </dl>
       )}
 
-      {info?.fingerprint && (
-        <div className="mt-4 rounded-xl border border-gold/30 bg-gold-soft/40 p-3">
-          <p className="flex items-center gap-1.5 text-[11px] font-extrabold text-foreground">
-            <ShieldCheck className="size-3.5 text-primary" />
-            بصمة شهادة التوقيع (SHA-256)
-          </p>
-          <code dir="ltr" className="mt-1 block break-all text-[10px] leading-5 text-muted-foreground">
-            {info.fingerprint}
-          </code>
-        </div>
-      )}
-
+      {/* التحميل المباشر من كلاودفلير */}
       <a
-        href={DOWNLOAD_URL}
+        href={CF_DOWNLOAD_URL}
         download
         className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-extrabold text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:opacity-95 active:scale-[0.98]"
       >
-        <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M12 3v12" />
-          <path d="m7 10 5 5 5-5" />
-          <path d="M5 21h14" />
-        </svg>
-        تحميل ملف APK — آخر إصدار رسمي
+        <Cloud className="size-4.5" />
+        تحميل مباشر — كلاودفلير
       </a>
       <p className="mt-2 text-center text-[11px] leading-5 text-muted-foreground">
-        الرابط دائم: يوجه دائماً لأحدث إصدار موقّع تلقائياً من المستودع الرسمي.
+        رابط دائم من شبكة كلاودفلير يخدم دائماً آخر إصدار رسمي بأسرع سرعة.
       </p>
+
+      {/* رابط احتياطي: GitHub */}
+      <a
+        href={GH_DOWNLOAD_URL}
+        download
+        className="mt-2.5 flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 py-2.5 text-[13px] font-bold text-foreground transition-all hover:border-primary/40 hover:text-primary"
+      >
+        <Github className="size-4" />
+        رابط احتياطي — GitHub Releases
+      </a>
     </div>
   );
 }

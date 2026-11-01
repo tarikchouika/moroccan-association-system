@@ -5,12 +5,16 @@
 # إصدارات GitHub، ما يوفر رابطاً دائماً لآخر تحديث:
 #
 #   https://github.com/tarikchouika/moroccan-association-system/releases/latest/download/mamp.apk
+#   والرابط المباشر من كلاودفلير (أسرع):
+#   https://mamp-dl.pages.dev/mamp.apk
 #
 # المطلوب (أسرار المستودع):
 #   MAMP_KEYSTORE_BASE64    — ملف المخزن (PKCS12) مرمزاً بـ base64
 #   MAMP_KEYSTORE_PASSWORD  — كلمة سر المخزن
 #   MAMP_KEY_ALIAS          — الاسم المستعار للمفتاح (mamp)
 #   MAMP_KEY_PASSWORD       — كلمة سر المفتاح
+#   CLOUDFLARE_API_TOKEN    — رمز كلاودفلير بصلاحية Pages:Edit
+#   CLOUDFLARE_ACCOUNT_ID   — معرف حساب كلاودفلير
 # ============================================================================
 name: build-android-apk
 
@@ -129,6 +133,8 @@ jobs:
             echo "---"
             echo "**الرابط الدائم لآخر إصدار:** https://github.com/tarikchouika/moroccan-association-system/releases/latest/download/mamp.apk"
             echo ""
+            echo "**الرابط المباشر من كلاودفلير:** https://mamp-dl.pages.dev/mamp.apk"
+            echo ""
             echo "الشهادة باسم CN=TARIK CHOUIKA بصلاحية 30 سنة. أي ملف لا يحمل هذا التوقيع ليس إصداراً رسمياً."
           } > release-notes.md
           cat release-notes.md
@@ -158,3 +164,39 @@ jobs:
           fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # ============================================================
+      # الرابط المباشر من كلاودفلير: نشر APK + latest.json على مشروع
+      # Pages مستقل (mamp-dl) — يخدم دائماً آخر إصدار عبر CDN كلاودفلير
+      # ============================================================
+      - name: نشر الرابط المباشر على كلاودفلير
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::warning::أسرار كلاودفلير غير مضبوطة — يتوقف النشر على GitHub Releases فقط"
+            exit 0
+          fi
+          mkdir -p cf-dl
+          cp mamp.apk cf-dl/
+          # ترويسات CORS كي تتمكن بطاقة الإصدار في الموقع من قراءة latest.json
+          cat > cf-dl/_headers <<'HDR'
+          /*
+            Access-Control-Allow-Origin: *
+            Content-Disposition: attachment
+          HDR
+          SIZE=$(stat -c%s mamp.apk)
+          cat > cf-dl/latest.json <<JSON
+          {
+            "tag": "v1.0.${GITHUB_RUN_NUMBER}",
+            "name": "MAMP Android v1.0.${GITHUB_RUN_NUMBER}",
+            "date": "$(date -u '+%Y-%m-%dT%H:%M:%SZ')",
+            "size": ${SIZE},
+            "url": "https://mamp-dl.pages.dev/mamp.apk"
+          }
+          JSON
+          npx --yes wrangler@3 pages project create mamp-dl --production-branch=main 2>/dev/null \
+            || echo "ℹ مشروع mamp-dl موجود مسبقاً"
+          npx --yes wrangler@3 pages deploy cf-dl --project-name=mamp-dl --branch=main
+          echo "✓ الرابط المباشر: https://mamp-dl.pages.dev/mamp.apk"

@@ -10,11 +10,12 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PUBLIC = os.path.join(ROOT, "public")
 FONTS = os.path.expanduser("~/.fonts")
 
-# ألوان الهوية الرسمية
-GREEN = (13, 107, 79)      # 0d6b4f
-GREEN_DARK = (8, 61, 46)   # أغمق للتدرج
-GOLD = (201, 162, 39)      # c9a227
-CREAM = (250, 249, 245)    # faf9f5
+# ألوان الهوية الرسمية — لوغو درع MAMP
+AZURE = (0, 103, 200)      # 0067c8 — الأزرق الأساسي
+NAVY = (7, 20, 49)         # 071431 — الكحلي العميق
+NAVY_BOTTOM = (12, 44, 96) # 0c2c60 — أسفل التدرج
+GOLD = (237, 168, 29)      # eda81d — العنبري
+CREAM = (246, 250, 254)    # f6fafe
 WHITE = (255, 255, 255)
 
 AR_BOLD = os.path.join(FONTS, "NotoSansArabic-Bold.ttf")
@@ -57,7 +58,7 @@ def zellige_band(draw, cx, cy, r, color, width=2):
 
 def generate_og():
     W, H = 1200, 630
-    img = vertical_gradient((W, H), GREEN_DARK, GREEN).convert("RGBA")
+    img = vertical_gradient((W, H), NAVY, NAVY_BOTTOM).convert("RGBA")
     draw = ImageDraw.Draw(img)
 
     # زخرفة زليج خفيفة في الزوايا
@@ -75,8 +76,9 @@ def generate_og():
     # نستخرج العلامة من أيقونة التطبيق (قص المركز بعد إزالة الخلفية عبر mark svg المولد)
     mark_file = os.path.join(ROOT, "app-android/app/src/main/res/drawable-nodpi/ic_splash_logo.png")
     if os.path.exists(mark_file):
-        mark = Image.open(mark_file).convert("RGBA").resize((150, 150), Image.LANCZOS)
-        img.paste(mark, (W // 2 - 75, 78), mark)
+        mark = Image.open(mark_file).convert("RGBA")
+        mark.thumbnail((170, 150), Image.LANCZOS)
+        img.paste(mark, (W // 2 - mark.width // 2, 78), mark)
 
     # الخطوط
     f_title = ImageFont.truetype(AR_BOLD, 104)
@@ -118,7 +120,7 @@ def generate_qr():
     )
     qr.add_data("https://mamp.pages.dev/app/")
     qr.make(fit=True)
-    img = qr.make_image(fill_color=(11, 20, 16), back_color=(255, 255, 255))
+    img = qr.make_image(fill_color=(10, 17, 40), back_color=(255, 255, 255))
     out = os.path.join(PUBLIC, "qr-app.png")
     img.save(out)
     print(f"  ✓ {out} ({img.size[0]}x{img.size[1]}) — يوجه إلى صفحة التطبيق")

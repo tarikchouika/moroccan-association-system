@@ -34,10 +34,11 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
+      { url: "/favicon.ico", sizes: "48x48" },
       { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
       { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
     ],
-    apple: [{ url: "/icon-192.png", sizes: "192x192", type: "image/png" }],
+    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
   },
   openGraph: {
     type: "website",
@@ -78,10 +79,25 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0d6b4f",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f6fafe" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a1128" },
+  ],
   width: "device-width",
   initialScale: 1,
 };
+
+/** سكربت مبكر لتفادي وميض الوضع القاتم قبل الترطيب (FOUC) */
+const themeInitScript = `
+(function(){
+  try {
+    var t = localStorage.getItem("mamp-theme");
+    if (t === "dark" || (!t && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+      document.documentElement.classList.add("dark");
+    }
+  } catch (e) {}
+})();
+`;
 
 export default function RootLayout({
   children,
@@ -103,6 +119,9 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased bg-background text-foreground min-h-screen flex flex-col">
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        {/* العلامة المائية — لوغو المنصة في خلفية جميع الصفحات */}
+        <div className="mamp-watermark" aria-hidden="true" />
         {children}
         <Toaster />
         <ChatbotWidget />

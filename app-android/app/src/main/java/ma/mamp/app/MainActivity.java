@@ -4,10 +4,15 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Insets;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.MotionEvent;
+import android.view.View;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
@@ -20,6 +25,10 @@ import android.widget.Toast;
 /**
  * النشاط الرئيسي لتطبيق منصة مامب — بدون أي اعتماديات خارجية (صفر مكتبات)
  * غلاف ويب رسمي للمنصة مع:
+ *   • وضع الانغماس الكامل: ملء الشاشة 100% وإخفاء شريطي النظام العلوي والسفلي
+ *     (يظهران مؤقتاً بالسحب من الأعلى/الأسفل — IMMERSIVE STICKY)
+ *   • تهيئة مثالية للهواتف واللوح على حد سواء (ملء كامل للأبعاد)
+ *   • لوحة المفاتيح لا تغطي حقل الكتابة (حشوة ديناميكية حسب IME)
  *   • فتح الروابط الخارجية في المتصفح
  *   • السحب للأسفل من أعلى الصفحة = تحديث
  *   • صفحة عدم الاتصال بالشبكة (عربية)
@@ -32,7 +41,12 @@ public class MainActivity extends Activity {
     private static final String ALLOWED_HOST = "mamp.pages.dev";
     private static final int REFRESH_SWIPE_PX = 260;
 
+    /** ألوان الهوية الرسمية للوغو المنصة */
+    private static final String COLOR_NAVY = "#0a1128";   // كحلي الخلفية
+    private static final String COLOR_LIGHT = "#f6fafe";  // خلفية الصفحات الفاتحة
+
     private WebView webView;
+    private FrameLayout root;
     private float touchDownY = -1f;
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -41,14 +55,14 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         webView = new WebView(this);
-        FrameLayout root = new FrameLayout(this);
+        root = new FrameLayout(this);
         root.addView(webView, new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT));
         setContentView(root);
 
-        getWindow().setStatusBarColor(Color.parseColor("#0b1410"));
-        getWindow().setNavigationBarColor(Color.parseColor("#0b1410"));
+        applyImmersiveMode();
+        applyKeyboardInsets();
 
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
@@ -58,8 +72,11 @@ public class MainActivity extends Activity {
         settings.setMediaPlaybackRequiresUserGesture(true);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
         settings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        // ملء عرض الشاشة على الجوال واللوح دون تكبير اصطناعي
+        settings.setLoadWithOverviewMode(true);
+        settings.setUseWideViewPort(true);
 
-        webView.setBackgroundColor(Color.parseColor("#faf9f5"));
+        webView.setBackgroundColor(Color.parseColor(COLOR_LIGHT));
         webView.setVerticalScrollBarEnabled(false);
 
         webView.setWebViewClient(new WebViewClient() {
@@ -73,11 +90,6 @@ public class MainActivity extends Activity {
                 }
                 openExternally(url);
                 return true;
-            }
-
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                // لا شيء إضافي بعد اكتمال التحميل
             }
 
             @SuppressWarnings("deprecation")
@@ -111,6 +123,66 @@ public class MainActivity extends Activity {
             webView.restoreState(savedInstanceState);
         } else {
             webView.loadUrl(HOME_URL);
+        }
+    }
+
+    /**
+     * وضع الانغماس الكامل (Immersive Sticky):
+     * المحتوى يملأ الشاشة 100%، وشريطا النظام مخفيان ويظهران مؤقتاً
+     * بالسحب من الحافة العلوية أو السفلية ثم يختفيان تلقائياً.
+     */
+    private void applyImmersiveMode() {
+        if (Build.VERSION.SDK_INT >= 30) {
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
+            getWindow().setNavigationBarColor(Color.TRANSPARENT);
+            getWindow().setDecorFitsSystemWindows(false);
+            WindowInsetsController c = getWindow().getInsetsController();
+            if (c != null) {
+                c.hide(WindowInsets.Type.systemBars());
+                // السحب من الحواف يظهر الشريطين مؤقتاً (شفافان فوق المحتوى)
+                c.setSystemBarsBehavior(
+                        WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+                // أيقونات فاتحة على الخلفية الكحلية
+                c.setSystemBarsAppearance(0, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS);
+                c.setSystemBarsAppearance(0, WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS);
+            }
+        } else {
+            getWindow().setStatusBarColor(Color.parseColor(COLOR_NAVY));
+            getWindow().setNavigationBarColor(Color.parseColor(COLOR_NAVY));
+            View decor = getWindow().getDecorView();
+            decor.setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                            | View.SYSTEM_UI_FLAG_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+        }
+    }
+
+    /**
+     * لوحة المفاتيح: على أندرويد 11+ تُعالَج الحشوة يدوياً كي لا يبقى حقل
+     * الكتابة (مثل المساعد الجمعوي) مخفياً خلف IME مع تفعيل ملء الشاشة.
+     */
+    private void applyKeyboardInsets() {
+        if (Build.VERSION.SDK_INT >= 30) {
+            root.setOnApplyWindowInsetsListener((v, insets) -> {
+                Insets ime = insets.getInsets(WindowInsets.Type.ime());
+                v.setPadding(0, 0, 0, ime.bottom);
+                return insets;
+            });
+        } else {
+            getWindow().setSoftInputMode(
+                    android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+        }
+    }
+
+    /** إعادة تفعيل الانغماس بعد كل استعادة لتركيز النافذة (بعد ظهور الأشرطة) */
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            applyImmersiveMode();
         }
     }
 

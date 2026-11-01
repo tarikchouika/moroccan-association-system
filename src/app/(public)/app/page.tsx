@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  Smartphone, Download, ShieldCheck, PackageCheck, Rocket,
-  BadgeCheck, Lock, Wifi, CheckCircle2, ChevronDown,
+  Smartphone, Download, PackageCheck, Rocket,
+  BadgeCheck, Lock, Wifi, CheckCircle2, ChevronDown, Cloud,
+  FileArchive, MousePointerClick, TabletSmartphone,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,9 +13,12 @@ import { ReleaseInfoCard } from "@/components/site/release-info-card";
 export const metadata: Metadata = {
   title: "تطبيق أندرويد الرسمي",
   description:
-    "حمّلوا تطبيق منصة مامب لأندرويد — الإصدار الرسمي الموقّع بشهادة CN=TARIK CHOUIKA، مع دليل خطوة بخطوة للتنزيل والتثبيت الآمن.",
+    "حمّلوا تطبيق منصة مامب لأندرويد — رابط مباشر من كلاودفلير، مع دليل مبسّط بالصور للتنزيل والتثبيت وتجاوز رسالة Play Protect.",
   alternates: { canonical: "/app/" },
 };
+
+/** رابط ZIP نسخة الويب الكاملة — يولد آلياً مع كل نشر على كلاودفلير */
+const SITE_ZIP_URL = "https://mamp.pages.dev/mamp-site-latest.zip";
 
 /** بيانات منظمة للتطبيق — تحسين الفهرسة */
 const appJsonLd = {
@@ -26,8 +30,7 @@ const appJsonLd = {
   inLanguage: "ar",
   offers: { "@type": "Offer", price: "0", priceCurrency: "MAD" },
   author: { "@type": "Person", name: "TARIK CHOUIKA" },
-  downloadUrl:
-    "https://github.com/tarikchouika/moroccan-association-system/releases/latest/download/mamp.apk",
+  downloadUrl: "https://mamp-dl.pages.dev/mamp.apk",
 };
 
 const faqJsonLd = {
@@ -39,15 +42,7 @@ const faqJsonLd = {
       name: "لماذا يطلب أندرويد السماح بالتثبيت من مصادر غير معروفة؟",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "لأن التطبيق يُوزع مباشرة عبر المستودع الرسمي للمنصة بدل متجر Google Play. الرسالة تحذير قياسي من أندرويد لكل تطبيق خارج المتجر، وبمجرد السماح مرة واحدة سيُثبَّت التطبيق بشكل عادي.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "كيف أتأكد أن الملف رسمي ولم يُعبث به؟",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "كل إصدار موقّع رقمياً بشهادة CN=TARIK CHOUIKA بصلاحية 30 سنة، وبصمة الشهادة SHA-256 منشورة في ملاحظات كل إصدار على GitHub وفي هذه الصفحة. أي ملف لا يحمل هذا التوقيع ليس إصداراً رسمياً.",
+        text: "لأن التطبيق يُوزع مباشرة عبر الموقع الرسمي للمنصة بدل متجر Google Play. الرسالة تحذير قياسي من أندرويد لكل تطبيق خارج المتجر، وبمجرد السماح مرة واحدة سيُثبَّت التطبيق بشكل عادي.",
       },
     },
     {
@@ -65,12 +60,12 @@ const STEPS = [
   {
     icon: Download,
     title: "الخطوة 1 — تحميل الملف",
-    desc: "اضغطوا زر «تحميل ملف APK» في هذه الصفحة، أو امسحوا رمز QR بكاميرا الهاتف. سيُحمّل ملف mamp.apk من المستودع الرسمي للمنصة على GitHub.",
+    desc: "اضغطوا زر «تحميل مباشر — كلاودفلير» في هذه الصفحة، أو امسحوا رمز QR بكاميرا الهاتف. سيُحمّل ملف mamp.apk بأسرع سرعة من شبكة كلاودفلير العالمية.",
   },
   {
-    icon: ShieldCheck,
-    title: "الخطوة 2 — السماح بالتثبيت",
-    desc: "عند فتح الملف سيطلب أندرويد السماح بتثبيت التطبيقات من هذا المصدر (رسالة قياسية لكل تطبيق خارج المتجر). اضغطوا «الإعدادات» ثم فعّلوا «السماح من هذا المصدر».",
+    icon: MousePointerClick,
+    title: "الخطوة 2 — تجاوز رسالة Play Protect",
+    desc: "قد تظهر رسالة «لم يتم فحص هذا التطبيق» — وهي رسالة قياسية لكل تطبيق خارج المتجر. اضغطوا «المزيد من التفاصيل» ثم «التثبيت على أي حال» كما في الصور بالأسفل.",
   },
   {
     icon: PackageCheck,
@@ -84,21 +79,37 @@ const STEPS = [
   },
 ];
 
+/** دليل تجاوز Play Protect بالصور — نفس الصور المولدة أعلاه */
+const PLAY_PROTECT = [
+  {
+    img: "/playprotect-1.png",
+    title: "رسالة Play Protect عند التثبيت",
+    desc: "عند فتح ملف APK قد تظهر رسالة «لم يتم فحص هذا التطبيق». اضغطوا الزر الأزرق «المزيد من التفاصيل» بالأسفل — ولا تختاروا «إلغاء».",
+  },
+  {
+    img: "/playprotect-2.png",
+    title: "تفاصيل التحذير",
+    desc: "يشرح أندرويد أن التطبيق خارج متجر Play — وهذا طبيعي لكل التطبيقات الموزعة مباشرة. اضغطوا «التثبيت على أي حال» للمتابعة.",
+  },
+  {
+    img: "/playprotect-3.png",
+    title: "اكتمال التثبيت",
+    desc: "خلال ثوانٍ يكتمل التثبيت ويظهر زر «فتح التطبيق». هذه الخطوات تُطلب مرة واحدة فقط — التحديثات القادمة تمر بسلاسة.",
+  },
+];
+
 const FEATURES = [
   { icon: BadgeCheck, text: "الإصدار الرسمي الوحيد المعتمد للمنصة" },
   { icon: Lock, text: "اتصال مشفر HTTPS فقط — لا محتوى مختلط" },
   { icon: Wifi, text: "صفحة عربية واضحة عند انقطاع الاتصال" },
   { icon: CheckCircle2, text: "تحديث تلقائي: نفس الرابط يخدم دائماً آخر إصدار" },
+  { icon: TabletSmartphone, text: "يتكيف مع الهواتف واللوح — ملء كامل للشاشة" },
 ];
 
 const FAQ = [
   {
     q: "لماذا يطلب أندرويد السماح بالتثبيت من «مصادر غير معروفة»؟",
-    a: "لأن التطبيق يُوزع مباشرة عبر المستودع الرسمي للمنصة على GitHub بدل متجر Google Play. هذه الرسالة تحذير قياسي يظهر لكل تطبيق خارج المتجر، وبمجرد السماح مرة واحدة سيُثبَّت التطبيق بشكل عادي تماماً.",
-  },
-  {
-    q: "كيف أتأكد أن الملف رسمي ولم يُعبث به؟",
-    a: "كل إصدار موقّع رقمياً بشهادة CN=TARIK CHOUIKA بصلاحية 30 سنة. بصمة الشهادة (SHA-256) تُنشر تلقائياً في ملاحظات كل إصدار على GitHub وتُعرض في هذه الصفحة. أي ملف لا يحمل هذا التوقيع ليس إصداراً رسمياً ولا يجب تثبيته.",
+    a: "لأن التطبيق يُوزع مباشرة عبر الموقع الرسمي للمنصة بدل متجر Google Play. هذه الرسالة تحذير قياسي يظهر لكل تطبيق خارج المتجر، وبمجرد السماح مرة واحدة سيُثبَّت التطبيق بشكل عادي تماماً.",
   },
   {
     q: "ما هي متطلبات التشغيل؟",
@@ -108,6 +119,10 @@ const FAQ = [
     q: "هل يتوفر التطبيق على iOS؟",
     a: "حالياً الإصدار الرسمي مخصص لأندرويد. يمكن لمستعملي iPhone وiPad استعمال نسخة الويب الكاملة مباشرة من المتصفح (Safari أو Chrome) عبر mamp.pages.dev بنفس الخدمات والمحتوى.",
   },
+  {
+    q: "كيف أحصل على نسخة من موقع المنصة نفسه؟",
+    a: "نسخة الويب الكاملة للمنصة متوفرة كملف مضغوط ZIP عبر رابط مباشر من كلاودفلير في هذه الصفحة (قسم «نسخة الويب الكاملة»)، ويُحدَّث الملف تلقائياً مع كل نشر رسمي جديد.",
+  },
 ];
 
 export default function AppPage() {
@@ -116,20 +131,32 @@ export default function AppPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(appJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
-      {/* البطل */}
-      <section className="mb-12 text-center">
-        <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-secondary/60 px-4 py-1.5 text-xs font-extrabold text-primary">
-          <Smartphone className="size-3.5" />
-          التطبيق الرسمي — أندرويد
+      {/* البطل + صورة التطبيق */}
+      <section className="mb-12">
+        <div className="mb-5 text-center">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-secondary/60 px-4 py-1.5 text-xs font-extrabold text-primary">
+            <Smartphone className="size-3.5" />
+            التطبيق الرسمي — أندرويد
+          </div>
+          <h1 className="text-3xl font-black tracking-tight sm:text-4xl">
+            منصة مامب في جيبكم{" "}
+            <span className="text-primary">بتطبيق واحد</span>
+          </h1>
+          <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-muted-foreground">
+            تطبيق أندرويد الرسمي للمنصة: تصفحوا دليل الجمعيات، تواصلوا مع المساعد
+            الجمعوي، وسجلوا في الفعاليات — بضغطة واحدة وبتحميل مباشر من كلاودفلير.
+          </p>
         </div>
-        <h1 className="text-3xl font-black tracking-tight sm:text-4xl">
-          منصة مامب في جيبكم{" "}
-          <span className="text-primary">بتطبيق واحد</span>
-        </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-muted-foreground">
-          تطبيق أندرويد الرسمي للمنصة: تصفحوا دليل الجمعيات، تواصلوا مع المساعد
-          الجمعوي، وسجلوا في الفعاليات — بضغطة واحدة وبتوقيع رقمي موثّق.
-        </p>
+        <div className="mx-auto max-w-4xl overflow-hidden rounded-3xl border border-border shadow-xl shadow-primary/5">
+          <Image
+            src="/app-hero.png"
+            alt="واجهة تطبيق منصة مامب على هاتف أندرويد — الدليل والمساعد الجمعوي والفعاليات"
+            width={960}
+            height={640}
+            priority
+            className="h-auto w-full"
+          />
+        </div>
       </section>
 
       <div className="grid items-start gap-8 lg:grid-cols-[1fr_400px]">
@@ -143,7 +170,7 @@ export default function AppPage() {
                   <span className="grid size-14 place-items-center rounded-2xl bg-primary/10">
                     <s.icon className="size-7 text-primary" />
                   </span>
-                  <span className="absolute -end-1.5 -top-1.5 grid size-5 place-items-center rounded-full bg-gold text-[10px] font-black text-foreground">
+                  <span className="absolute -end-1.5 -top-1.5 grid size-5 place-items-center rounded-full bg-gold text-[10px] font-black text-[#061229]">
                     {i + 1}
                   </span>
                 </div>
@@ -159,14 +186,48 @@ export default function AppPage() {
           <div className="rounded-2xl border border-gold/40 bg-gold-soft/50 p-4 text-[13px] leading-7">
             <p className="font-extrabold">💡 ملاحظة مهمة حول رسالة أندرويد</p>
             <p className="mt-1 text-muted-foreground">
-              ظهور عبارة «مصدر غير معروف» أمر طبيعي ومتوقع: التطبيق يُوزع مباشرة
-              من المستودع الرسمي للمنصة وليس من متجر تطبيقات. بمجرد السماح
-              للمصدر مرة واحدة، ستمر التثبيات القادمة بسلاسة كاملة.
+              ظهور عبارة «مصدر غير معروف» أو «لم يتم فحص هذا التطبيق» أمر طبيعي
+              ومتوقع: التطبيق يُوزع مباشرة من الموقع الرسمي للمنصة وليس من متجر
+              تطبيقات. بمجرد السماح للمصدر مرة واحدة، ستمر التثبيات القادمة
+              بسلاسة كاملة.
             </p>
+          </div>
+
+          {/* دليل Play Protect بالصور */}
+          <h2 className="pt-6 text-xl font-extrabold">
+            تجاوز رسالة Play Protect — خطوة بخطوة بالصور
+          </h2>
+          <p className="-mt-2 text-sm leading-7 text-muted-foreground">
+            تظهر هذه الرسالة على هواتف أندرويد الحديثة عند تثبيت أي تطبيق خارج
+            متجر Play. اتبعوا الصور الثلاث التالية بالترتيب:
+          </p>
+          <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+            {PLAY_PROTECT.map((p, i) => (
+              <Card key={p.title} className="overflow-hidden">
+                <div className="relative bg-muted/40">
+                  <Image
+                    src={p.img}
+                    alt={`الخطوة ${i + 1} من تجاوز رسالة Play Protect: ${p.title}`}
+                    width={560}
+                    height={560}
+                    className="h-auto w-full"
+                  />
+                </div>
+                <CardContent className="p-4">
+                  <h3 className="mb-1.5 flex items-center gap-2 text-[14px] font-extrabold leading-6">
+                    <span className="grid size-6 shrink-0 place-items-center rounded-lg bg-primary text-[11px] font-black text-primary-foreground">
+                      {i + 1}
+                    </span>
+                    {p.title}
+                  </h3>
+                  <p className="text-[12.5px] leading-6 text-muted-foreground">{p.desc}</p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
 
-        {/* العمود الجانبي: التحميل + QR + الأمان */}
+        {/* العمود الجانبي */}
         <div className="space-y-6 lg:sticky lg:top-24">
           <ReleaseInfoCard />
 
@@ -192,34 +253,11 @@ export default function AppPage() {
             </CardContent>
           </Card>
 
-          {/* بطاقة الأمان والتوقيع */}
-          <Card className="border-primary/20">
+          {/* مزايا التطبيق */}
+          <Card>
             <CardContent className="p-5">
-              <h3 className="mb-3 flex items-center gap-2 text-sm font-extrabold">
-                <ShieldCheck className="size-4 text-primary" />
-                الأمان والتوقيع الرقمي
-              </h3>
-              <ul className="space-y-2.5">
-                <li className="flex items-start gap-2.5 text-[13px] leading-6 text-muted-foreground">
-                  <BadgeCheck className="mt-0.5 size-4 shrink-0 text-gold" />
-                  <span>
-                    موقّع بشهادة رقمية باسم{" "}
-                    <code dir="ltr" className="rounded bg-muted px-1.5 py-0.5 text-[11px] font-bold">
-                      CN=TARIK CHOUIKA
-                    </code>{" "}
-                    — صلاحية 30 سنة (2026 – 2056)
-                  </span>
-                </li>
-                <li className="flex items-start gap-2.5 text-[13px] leading-6 text-muted-foreground">
-                  <BadgeCheck className="mt-0.5 size-4 shrink-0 text-gold" />
-                  <span>يُبنى ويُوقّع آلياً عبر سير عمل GitHub — بلا تدخل يدوي</span>
-                </li>
-                <li className="flex items-start gap-2.5 text-[13px] leading-6 text-muted-foreground">
-                  <BadgeCheck className="mt-0.5 size-4 shrink-0 text-gold" />
-                  <span>بصمة الشهادة والملف (SHA-256) منشورة في كل إصدار</span>
-                </li>
-              </ul>
-              <div className="mt-4 flex flex-wrap gap-1.5">
+              <h3 className="mb-3 text-sm font-extrabold">مزايا التطبيق</h3>
+              <div className="flex flex-wrap gap-1.5">
                 {FEATURES.map((f) => (
                   <Badge key={f.text} variant="secondary" className="gap-1 text-[10px] font-bold">
                     <f.icon className="size-3 text-primary" />
@@ -227,6 +265,31 @@ export default function AppPage() {
                   </Badge>
                 ))}
               </div>
+            </CardContent>
+          </Card>
+
+          {/* نسخة الويب الكاملة — ZIP من كلاودفلير */}
+          <Card className="border-primary/20">
+            <CardContent className="p-5">
+              <h3 className="mb-2 flex items-center gap-2 text-sm font-extrabold">
+                <FileArchive className="size-4 text-primary" />
+                نسخة الويب الكاملة
+              </h3>
+              <p className="mb-4 text-[12.5px] leading-6 text-muted-foreground">
+                آخر نسخة من موقع المنصة كاملة في ملف مضغوط واحد — رابط مباشر من
+                كلاودفلير يتحدث تلقائياً مع كل نشر رسمي جديد.
+              </p>
+              <a
+                href={SITE_ZIP_URL}
+                download
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-secondary px-4 py-3 text-[13px] font-extrabold text-secondary-foreground transition-all hover:bg-secondary/70 active:scale-[0.98]"
+              >
+                <Cloud className="size-4.5 text-primary" />
+                تحميل الموقع — ZIP مباشر
+              </a>
+              <p dir="ltr" className="mt-2.5 break-all text-center text-[10px] leading-4 text-muted-foreground">
+                mamp.pages.dev/mamp-site-latest.zip
+              </p>
             </CardContent>
           </Card>
 

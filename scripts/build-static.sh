@@ -55,7 +55,29 @@ for p in index.html associations/index.html legal/index.html legal/terms/index.h
   fi
 done
 
-echo "==> [5/5] اكتمل البناء الثابت في: $OUT_DIR/"
+echo "==> [5/6] توليد حزمة ZIP — نسخة الويب الكاملة (رابط كلاودفلير المباشر)"
+python3 - <<'PYZIP'
+import os, zipfile
+OUT = "out"
+zpath = os.path.join(OUT, "mamp-site-latest.zip")
+if os.path.exists(zpath):
+    os.remove(zpath)
+count = 0
+with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as z:
+    for root, dirs, files in os.walk(OUT):
+        for f in sorted(files):
+            p = os.path.join(root, f)
+            if os.path.abspath(p) == os.path.abspath(zpath):
+                continue
+            z.write(p, os.path.relpath(p, OUT))
+            count += 1
+size_mb = os.path.getsize(zpath) / (1024 * 1024)
+print(f"    ملفات مضغوطة: {count}")
+print(f"    الحجم: {size_mb:.1f} م.ب")
+print(f"    الرابط المباشر بعد النشر: https://mamp.pages.dev/mamp-site-latest.zip")
+PYZIP
+
+echo "==> [6/6] اكتمل البناء الثابت في: $OUT_DIR/"
 echo ""
 echo "للنشر على Cloudflare Pages:"
 echo "  npx wrangler pages deploy $OUT_DIR --project-name=mamp"
