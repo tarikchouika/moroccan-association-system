@@ -91,7 +91,21 @@ jobs:
 
       - name: استخراج بيانات الشهادة والتوقيع
         run: |
-          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner 2>/dev/null | sort -V | tail -1)
+          # 1) معلومات الشهادة من مخزن التوقيع مباشرة (keytool — مضمون التوفر)
+          CERT_DN=$(keytool -list -v -keystore "$KEYSTORE_FILE" -storepass "$KEYSTORE_PASSWORD" -storetype PKCS12 2>/dev/null | grep "Owner:" | head -1 | sed 's/^Owner: *//')
+          CERT_SHA=$(keytool -list -v -keystore "$KEYSTORE_FILE" -storepass "$KEYSTORE_PASSWORD" -storetype PKCS12 2>/dev/null | grep "SHA256:" | head -1 | sed 's/.*SHA256: *//' | tr -d ' :')
+          CERT_VALID=$(keytool -list -v -keystore "$KEYSTORE_FILE" -storepass "$KEYSTORE_PASSWORD" -storetype PKCS12 2>/dev/null | grep "Valid from:" | head -1 | sed 's/^Valid from: *//')
+
+          # 2) التحقق من مخطط توقيع APK (أفضل جهد عبر apksigner)
+          SCHEMES=""
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" /usr/local/lib/android/sdk/build-tools -name apksigner 2>/dev/null | sort -V | tail -1 || true)
+          if [ -n "$APKSIGNER" ] && [ -x "$APKSIGNER" ]; then
+            echo "استعمال apksigner: $APKSIGNER"
+            SCHEMES=$("$APKSIGNER" verify --verbose mamp.apk 2>/dev/null | grep -E "^Verified using v[12] \(.*\): true" | cut -d: -f1 | sed 's/^/  - /' || true)
+          else
+            echo "⚠️ apksigner غير متاح — تُعرض معلومات الشهادة من المخزن"
+          fi
+
           {
             echo "# تطبيق مامب لأندرويد — v1.0.${GITHUB_RUN_NUMBER}"
             echo ""
@@ -99,9 +113,13 @@ jobs:
             echo "**حجم الملف:** $(du -h mamp.apk | cut -f1)"
             echo ""
             echo "## التوقيع الرقمي"
-            echo '```'
-            "$APKSIGNER" verify --print-certs mamp.apk 2>/dev/null | grep -E "Signer #1 certificate (DN|SHA-256)" || true
-            echo '```'
+            echo "- الشهادة: \`${CERT_DN}\`"
+            echo "- الصلاحية: 30 سنة (\`$CERT_VALID\`)"
+            echo "- بصمة الشهادة (SHA-256): \`${CERT_SHA}\`"
+            if [ -n "$SCHEMES" ]; then
+              echo "- مخططات التوقيع المفعلة:"
+              echo "$SCHEMES"
+            fi
             echo ""
             echo "## بصمة الملف (SHA-256)"
             echo '```'

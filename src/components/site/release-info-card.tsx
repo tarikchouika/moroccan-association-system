@@ -36,9 +36,10 @@ export function ReleaseInfoCard() {
         if (cancelled) return;
         const apk = (data.assets ?? []).find((a: { name: string }) => a.name === "mamp.apk");
         const body: string = data.body ?? "";
-        const fpMatch = body.match(
-          /Signer #1 certificate SHA-256 digest:\s*([0-9a-f:]+)/i
-        );
+        // بصمة الشهادة بصيغة الإصدارات الجديدة أو القديمة
+        const fpMatch =
+          body.match(/بصمة الشهادة \(SHA-256\):\s*`?([0-9a-f:]+)`?/i) ??
+          body.match(/Signer #1 certificate SHA-256 digest:\s*([0-9a-f:]+)/i);
         setInfo({
           tag: (data.tag_name ?? "").replace(/^app-/, ""),
           name: data.name ?? "",
