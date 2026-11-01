@@ -39,13 +39,18 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: تجهيز Android SDK
-        uses: android-actions/setup-android@v3
-
       - name: تثبيت مكونات SDK المطلوبة
         run: |
-          yes | sdkmanager --licenses > /dev/null 2>&1 || true
-          sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools" > /dev/null
+          # عدّاءات GitHub تحمل Android SDK مسبقاً — نثبت فقط ما نحتاجه ونقبل الرخص
+          SDKMANAGER=$(ls "$ANDROID_HOME"/cmdline-tools/*/bin/sdkmanager 2>/dev/null | sort -V | tail -1)
+          if [ -z "$SDKMANAGER" ]; then
+            echo "::error::sdkmanager غير موجود في $ANDROID_HOME"
+            exit 1
+          fi
+          echo "استعمال: $SDKMANAGER"
+          yes | "$SDKMANAGER" --licenses > /dev/null 2>&1 || true
+          "$SDKMANAGER" "platforms;android-34" "build-tools;34.0.0" "platform-tools" > /dev/null
+          "$SDKMANAGER" --list_installed | head -20
 
       - name: التحقق من مفاتيح التوقيع
         env:
