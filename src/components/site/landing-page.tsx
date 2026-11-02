@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/accordion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { DemoData } from "@/generated/types";
-import { useI18n, useDemoI18n } from "@/lib/i18n/provider";
+import { useI18n, useDemoI18n, useDocumentTitle } from "@/lib/i18n/provider";
 
 // -------------------------------------------------------------------
 // عداد متحرك
@@ -514,6 +514,9 @@ function FAQ() {
 // الصفحة
 // -------------------------------------------------------------------
 export function LandingPage({ data }: { data: DemoData }) {
+  const { d } = useI18n();
+  // الصفحة الرئيسية: عنوان الموقع الافتراضي + وصف موحد بلغة الواجهة
+  useDocumentTitle(undefined, d.meta.siteDescription);
   return (
     <>
       <Hero stats={data.stats} featured={data.associations[0]} />

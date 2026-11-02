@@ -111,6 +111,37 @@ export function useI18n(): I18nValue {
   return ctx;
 }
 
+/**
+ * يضبط عنوان التبويب (ووصف الصفحة اختيارياً) بلغة الواجهة الحالية،
+ * ويتحدث تلقائياً عند تغيير اللغة — فيظل التبويب متطابقاً مع لغة المحتوى.
+ * • بدون عنوان: يُستعمل عنوان الموقع الافتراضي (الصفحة الرئيسية).
+ * • الوصف يُطبق مرة واحدة لكل لغة على الصفحة الرئيسية فقط (تجنب مسح أوصاف الصفحات الداخلية).
+ */
+export function useDocumentTitle(title?: string, description?: string) {
+  const { lang, d } = useI18n();
+  useEffect(() => {
+    const full = title ? `${title} | ${d.meta.siteName}` : d.meta.siteTitle;
+    if (document.title !== full) document.title = full;
+    if (description) {
+      const el = document.querySelector('meta[name="description"]');
+      if (el && el.getAttribute("content") !== description) {
+        el.setAttribute("content", description);
+      }
+    }
+    // حماية: قد يعيد React فرض عنوان RSC العربي عند اكتمال الترطيب المتأخر
+    // (مثل تحميل ودجت المساعد) — المراقب يعيد تثبيت عنوان لغة الواجهة فوراً.
+    const titleEl = document.head.querySelector("title");
+    let observer: MutationObserver | null = null;
+    if (titleEl) {
+      observer = new MutationObserver(() => {
+        if (document.title !== full) document.title = full;
+      });
+      observer.observe(titleEl, { childList: true, characterData: true, subtree: true });
+    }
+    return () => observer?.disconnect();
+  }, [title, description, lang, d.meta.siteName, d.meta.siteTitle]);
+}
+
 /** مساعدو توطين بيانات العرض (الجمعيات والفعاليات) مع رجوع للعربية */
 export function useDemoI18n() {
   const { lang, d, locale } = useI18n();

@@ -339,6 +339,29 @@ export interface Dict {
     /** فعاليات العرض (مفتاح = العنوان العربي) */
     events: Record<string, { title: string; location: string }>;
   };
+
+  /** بيانات وصفية للتبويب ومحركات البحث — تتحدث ديناميكياً بلغة الواجهة */
+  meta: {
+    /** اسم المنصة القصير (لاحقة عناوين التبويب) */
+    siteName: string;
+    /** عنوان التبويب الافتراضي (الصفحة الرئيسية) */
+    siteTitle: string;
+    /** وصف الموقع — يحدّث وسم meta description بلغة الواجهة */
+    siteDescription: string;
+    /** عناوين الصفحات كما تظهر في التبويب (بدون اللاحقة) */
+    pages: {
+      associations: string;
+      legal: string;
+      terms: string;
+      privacy: string;
+      cookies: string;
+      assistant: string;
+      app: string;
+      login: string;
+      register: string;
+      notFound: string;
+    };
+  };
 }
 
 /** نوع مسارات مفاتيح القاموس — t("home.hero.title") */

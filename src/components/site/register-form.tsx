@@ -10,10 +10,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Logo } from "@/components/site/logo";
-import { useI18n } from "@/lib/i18n/provider";
+import { useI18n, useDocumentTitle } from "@/lib/i18n/provider";
 
 export function RegisterForm() {
   const { d } = useI18n();
+  useDocumentTitle(d.meta.pages.register);
   const t = d.auth.register;
   const router = useRouter();
   const [form, setForm] = useState({ fullName: "", email: "", password: "", phone: "" });

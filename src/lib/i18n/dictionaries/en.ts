@@ -593,4 +593,21 @@ export const en: Dict = {
       },
     },
   },
+  meta: {
+    siteName: "MAMP Platform",
+    siteTitle: "MAMP Platform — Management of Moroccan Associations",
+    siteDescription: "Professional digital platform for managing Moroccan associations: memberships, accounting, donations, events and official documents — in accordance with Law 75.00 and Royal Dahir 1.58.376.",
+    pages: {
+      associations: "Directory of certified associations",
+      legal: "Legal reference for Moroccan associative work",
+      terms: "Terms of use of the platform",
+      privacy: "Privacy and data protection policy",
+      cookies: "Cookie policy",
+      assistant: "Associative Assistant",
+      app: "Official Android app",
+      login: "Log in",
+      register: "Create an account",
+      notFound: "Page not found",
+    },
+  },
 };

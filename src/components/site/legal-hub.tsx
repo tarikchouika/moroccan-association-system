@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { OFFICIAL_LINKS } from "@/lib/kb/data";
-import { useI18n } from "@/lib/i18n/provider";
+import { useI18n, useDocumentTitle } from "@/lib/i18n/provider";
 
 const LAW_ICONS = [ScrollText, Scale, FileSignature, ShieldCheck, BookOpenCheck, Coins];
 const STEP_ICONS = [Building2, FileSignature, Stamp, Landmark, Newspaper];
@@ -17,6 +17,7 @@ const STEP_ICONS = [Building2, FileSignature, Stamp, Landmark, Newspaper];
 /** جسم صفحة المرجع القانوني — مكون عميل متعدد اللغات */
 export function LegalHub() {
   const { d, kb } = useI18n();
+  useDocumentTitle(d.meta.pages.legal);
   const h = d.legal.hub;
 
   return (

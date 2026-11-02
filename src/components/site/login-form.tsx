@@ -9,10 +9,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/site/logo";
-import { useI18n } from "@/lib/i18n/provider";
+import { useI18n, useDocumentTitle } from "@/lib/i18n/provider";
 
 export function LoginForm() {
   const { d } = useI18n();
+  useDocumentTitle(d.meta.pages.login);
   const t = d.auth.login;
   const router = useRouter();
   const [email, setEmail] = useState("");

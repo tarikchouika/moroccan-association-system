@@ -9,10 +9,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { DemoAssociation } from "@/generated/types";
-import { useI18n, useDemoI18n } from "@/lib/i18n/provider";
+import { useI18n, useDemoI18n, useDocumentTitle } from "@/lib/i18n/provider";
 
 export function AssociationsBrowser({ associations }: { associations: DemoAssociation[] }) {
   const { d, dir } = useI18n();
+  useDocumentTitle(d.meta.pages.associations);
   const demo = useDemoI18n();
   const [q, setQ] = useState("");
   const [city, setCity] = useState("all");

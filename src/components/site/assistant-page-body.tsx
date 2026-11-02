@@ -1,11 +1,12 @@
 "use client";
 
 import { AssistantChat } from "@/components/chatbot/assistant-chat";
-import { useI18n } from "@/lib/i18n/provider";
+import { useI18n, useDocumentTitle } from "@/lib/i18n/provider";
 
 /** جسم صفحة المساعد — مكون عميل متعدد اللغات */
 export function AssistantPageBody() {
   const { d } = useI18n();
+  useDocumentTitle(d.meta.pages.assistant);
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
       <div className="mb-8 text-center">

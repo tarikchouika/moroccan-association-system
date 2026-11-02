@@ -10,7 +10,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { ReleaseInfoCard } from "@/components/site/release-info-card";
-import { useI18n } from "@/lib/i18n/provider";
+import { useI18n, useDocumentTitle } from "@/lib/i18n/provider";
 
 /** رابط ZIP نسخة الويب الكاملة — يولد آلياً مع كل نشر على كلاودفلير */
 const SITE_ZIP_URL = "https://mamp.pages.dev/mamp-site-latest.zip";
@@ -21,6 +21,7 @@ const FEATURE_ICONS = [BadgeCheck, Lock, Wifi, CheckCircle2, TabletSmartphone];
 /** جسم صفحة التطبيق — مكون عميل متعدد اللغات */
 export function AppDownloadBody() {
   const { d } = useI18n();
+  useDocumentTitle(d.meta.pages.app);
   const t = d.app;
 
   return (

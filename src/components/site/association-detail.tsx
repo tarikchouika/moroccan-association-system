@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { DemoAssociation, DemoEvent } from "@/generated/types";
-import { useI18n, useDemoI18n } from "@/lib/i18n/provider";
+import { useI18n, useDemoI18n, useDocumentTitle } from "@/lib/i18n/provider";
 
 /** جسم صفحة الجمعية — مكون عميل ليتفاعل مع تغيير اللغة */
 export function AssociationDetailBody({
@@ -21,6 +21,7 @@ export function AssociationDetailBody({
 }) {
   const { d } = useI18n();
   const demo = useDemoI18n();
+  useDocumentTitle(demo.assocName(a));
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">

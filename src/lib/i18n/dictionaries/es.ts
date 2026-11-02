@@ -625,4 +625,21 @@ export const es: Dict = {
       },
     },
   },
+  meta: {
+    siteName: "Plataforma MAMP",
+    siteTitle: "Plataforma MAMP — Gestión de las asociaciones marroquíes",
+    siteDescription: "Plataforma digital profesional para la gestión de las asociaciones marroquíes: membresías, contabilidad, donaciones, eventos y documentos oficiales — conforme a la Ley 75.00 y el Dahir Real 1.58.376.",
+    pages: {
+      associations: "Directorio de asociaciones certificadas",
+      legal: "Referencia legal del trabajo asociativo marroquí",
+      terms: "Condiciones de uso de la plataforma",
+      privacy: "Política de privacidad y protección de datos",
+      cookies: "Política de cookies",
+      assistant: "Asistente Asociativo",
+      app: "Aplicación Android oficial",
+      login: "Iniciar sesión",
+      register: "Crear una cuenta",
+      notFound: "Página no encontrada",
+    },
+  },
 };

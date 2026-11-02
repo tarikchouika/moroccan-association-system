@@ -627,4 +627,21 @@ export const de: Dict = {
       },
     },
   },
+  meta: {
+    siteName: "MAMP-Plattform",
+    siteTitle: "MAMP-Plattform — Verwaltung marokkanischer Vereine",
+    siteDescription: "Professionelle digitale Plattform für die Verwaltung marokkanischer Vereine: Mitgliedschaften, Buchhaltung, Spenden, Veranstaltungen und offizielle Dokumente — gemäß Gesetz 75.00 und Königlichem Dahir 1.58.376.",
+    pages: {
+      associations: "Verzeichnis zertifizierter Vereine",
+      legal: "Rechtsgrundlagen der marokkanischen Vereinsarbeit",
+      terms: "Nutzungsbedingungen der Plattform",
+      privacy: "Datenschutz- und Datenschutzerklärung",
+      cookies: "Cookie-Richtlinie",
+      assistant: "Vereinsassistent",
+      app: "Offizielle Android-App",
+      login: "Anmelden",
+      register: "Konto erstellen",
+      notFound: "Seite nicht gefunden",
+    },
+  },
 };

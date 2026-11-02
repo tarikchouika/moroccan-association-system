@@ -593,4 +593,21 @@ export const nl: Dict = {
       },
     },
   },
+  meta: {
+    siteName: "Platform MAMP",
+    siteTitle: "Platform MAMP — Beheer van Marokkaanse verenigingen",
+    siteDescription: "Professioneel digitaal platform voor het beheer van Marokkaanse verenigingen: lidmaatschappen, boekhouding, donaties, evenementen en officiële documenten — overeenkomstig Wet 75.00 en het Koninklijk Dahir 1.58.376.",
+    pages: {
+      associations: "Gids van gecertificeerde verenigingen",
+      legal: "Juridische referentie voor Marokkaans verenigingswerk",
+      terms: "Gebruiksvoorwaarden van het platform",
+      privacy: "Privacybeleid en gegevensbescherming",
+      cookies: "Cookiebeleid",
+      assistant: "Verenigingsassistent",
+      app: "Officiële Android-app",
+      login: "Inloggen",
+      register: "Account aanmaken",
+      notFound: "Pagina niet gevonden",
+    },
+  },
 };

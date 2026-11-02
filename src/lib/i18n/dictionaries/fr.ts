@@ -593,4 +593,21 @@ export const fr: Dict = {
       },
     },
   },
+  meta: {
+    siteName: "Plateforme MAMP",
+    siteTitle: "Plateforme MAMP — Gestion des associations marocaines",
+    siteDescription: "Plateforme numérique professionnelle de gestion des associations marocaines : adhésions, comptabilité, dons, événements et documents officiels — conformément à la loi 75.00 et au dahir n° 1.58.376.",
+    pages: {
+      associations: "Annuaire des associations certifiées",
+      legal: "Référence juridique du travail associatif marocain",
+      terms: "Conditions d'utilisation de la plateforme",
+      privacy: "Politique de confidentialité et de protection des données",
+      cookies: "Politique relative aux cookies",
+      assistant: "Assistant Associatif",
+      app: "Application Android officielle",
+      login: "Connexion",
+      register: "Créer un compte",
+      notFound: "Page introuvable",
+    },
+  },
 };
