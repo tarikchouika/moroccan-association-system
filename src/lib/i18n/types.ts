@@ -217,9 +217,6 @@ export interface Dict {
       errorNetwork: string;
       noAccount: string;
       createAccount: string;
-      demoTitle: string;
-      demoAccounts: Array<{ email: string; role: string }>;
-      demoNote: string;
     };
     register: {
       title: string;

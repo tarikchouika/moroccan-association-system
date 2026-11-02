@@ -307,14 +307,6 @@ export const nl: Dict = {
       errorNetwork: "Er kon geen verbinding met de server worden gemaakt. Controleer uw netwerkverbinding.",
       noAccount: "Heeft u geen account?",
       createAccount: "Maak gratis een account aan",
-      demoTitle: "Demo-accounts voor de lokale versie (wachtwoord: Mamp@2026)",
-      demoAccounts: [
-        { email: "admin@mamp.ma", role: "Superbeheerder" },
-        { email: "user1@mamp.ma", role: "Voorzitster van een vereniging" },
-        { email: "user2@mamp.ma", role: "Penningmeester" },
-        { email: "partenaire@mamp.ma", role: "Partnerinstantie" },
-      ],
-      demoNote: "Op de gepubliceerde versie (mamp.pages.dev) werken de demopanelen met testgegevens, zonder inloggen.",
     },
     register: {
       title: "Nieuw account aanmaken",

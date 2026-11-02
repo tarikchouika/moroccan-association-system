@@ -307,14 +307,6 @@ export const ru: Dict = {
       errorNetwork: "Не удалось подключиться к серверу. Проверьте сеть.",
       noAccount: "Нет учётной записи?",
       createAccount: "Создайте бесплатную учётную запись",
-      demoTitle: "Демонстрационные учётные записи локальной версии (пароль: Mamp@2026)",
-      demoAccounts: [
-        { email: "admin@mamp.ma", role: "суперадминистратор" },
-        { email: "user1@mamp.ma", role: "председатель ассоциации" },
-        { email: "user2@mamp.ma", role: "казначей" },
-        { email: "partenaire@mamp.ma", role: "партнёрская организация" },
-      ],
-      demoNote: "В опубликованной версии (mamp.pages.dev) демонстрационные панели работают с тестовыми данными без входа в систему.",
     },
     register: {
       title: "Создание новой учётной записи",

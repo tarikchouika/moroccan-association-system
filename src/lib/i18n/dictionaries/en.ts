@@ -307,14 +307,6 @@ export const en: Dict = {
       errorNetwork: "Could not connect to the server. Check your network.",
       noAccount: "Don't have an account?",
       createAccount: "Create a free account",
-      demoTitle: "Demo accounts for the local version (password: Mamp@2026)",
-      demoAccounts: [
-        { email: "admin@mamp.ma", role: "Super admin" },
-        { email: "user1@mamp.ma", role: "Association president" },
-        { email: "user2@mamp.ma", role: "Treasurer" },
-        { email: "partenaire@mamp.ma", role: "Partner entity" },
-      ],
-      demoNote: "On the published version (mamp.pages.dev), the showcase dashboards run on demo data without login.",
     },
     register: {
       title: "Create a new account",

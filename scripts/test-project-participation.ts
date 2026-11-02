@@ -1,6 +1,7 @@
 /**
  * اختبار مسار المشاركة: جلب مشاريع ميدو + قبول المشاركة + تحقق
  * التنفيذ: bun scripts/test-project-participation.ts
+ * المتطلب: بذرة التطوير التجريبية أولاً — bun run db:seed:demo
  */
 const BASE = "http://localhost:3000";
 

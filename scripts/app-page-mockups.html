@@ -2,50 +2,54 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  @font-face {
-    font-family: "NotoAr";
-    src: url("file:///home/z/.fonts/NotoSansArabic-Regular.ttf");
-    font-weight: 400;
-  }
-  @font-face {
-    font-family: "NotoAr";
-    src: url("file:///home/z/.fonts/NotoSansArabic-Bold.ttf");
-    font-weight: 700 900;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; font-family: "NotoAr", "Noto Sans Arabic", sans-serif; }
-  body { background: #ffffff; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html.ltr body, html.ltr .card-outer, html.ltr .phone, html.ltr .pp { direction: ltr; }
+  body { font-family: "Cairo", "Inter", sans-serif; background: #ffffff; }
+  html.latn body { font-family: "Inter", "Cairo", sans-serif; }
+  .latn-ltr { direction: ltr; }
 
-  /* ============ 1) موك أب التطبيق ============ */
+  /* ================= 1) صورة البطل — 960×640 ================= */
   #hero-shot {
-    width: 960px; height: 640px;
+    width: 960px; height: 640px; direction: ltr;
     background:
-      radial-gradient(700px 400px at 85% -10%, rgba(237,168,29,.18), transparent 60%),
-      radial-gradient(800px 500px at 10% 110%, rgba(0,103,200,.22), transparent 60%),
+      radial-gradient(700px 400px at 88% -10%, rgba(237,168,29,.16), transparent 60%),
+      radial-gradient(800px 500px at 8% 110%, rgba(0,103,200,.20), transparent 60%),
       linear-gradient(160deg, #f6fafe 0%, #e8f2fd 100%);
-    display: flex; align-items: center; justify-content: center; gap: 70px;
+    display: flex; align-items: center; justify-content: center; gap: 64px;
     position: relative; overflow: hidden;
   }
   #hero-shot::before {
     content: ""; position: absolute; inset: 0;
     background-image: url("data:image/svg+xml,%3Csvg width='64' height='64' viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M32 4l7 7-7 7-7-7 7-7zM32 46l7 7-7 7-7-7 7-7zM4 32l7-7 7 7-7 7-7-7zM46 32l7-7 7 7-7 7-7-7z' fill='%230067c8' fill-opacity='0.05'/%3E%3C/svg%3E");
   }
-  .hero-text { position: relative; z-index: 2; max-width: 380px; }
+  .hero-text { position: relative; z-index: 2; max-width: 400px; direction: var(--hero-dir, rtl); text-align: start; }
   .hero-text .badge {
-    display: inline-flex; align-items: center; gap: 8px;
+    display: inline-flex; align-items: center; gap: 9px;
     background: #ffffff; border: 1px solid #dce6f4; border-radius: 999px;
     padding: 8px 16px; font-size: 14px; font-weight: 700; color: #0067c8;
     box-shadow: 0 4px 14px rgba(0,103,200,.10);
   }
   .hero-text .badge .dot { width: 9px; height: 9px; border-radius: 50%; background: #00b368; }
-  .hero-text h1 { font-size: 40px; font-weight: 900; color: #0d1b33; line-height: 1.35; margin: 18px 0 10px; }
+  .hero-text h1 { font-size: 38px; font-weight: 900; color: #0d1b33; line-height: 1.4; margin: 18px 0 10px; }
   .hero-text h1 span { color: #0067c8; }
   .hero-text p { font-size: 16px; color: #4e617e; line-height: 1.9; }
+  .hero-bubbles { display: flex; gap: 10px; margin-top: 22px; flex-wrap: wrap; }
+  .bubble {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: #ffffff; border: 1px solid #dce6f4; border-radius: 12px;
+    padding: 9px 13px; font-size: 12.5px; font-weight: 700; color: #0d1b33;
+    box-shadow: 0 3px 10px rgba(13,27,51,.06);
+  }
+  .bubble .ico { width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; font-size: 13px; }
 
   /* إطار الهاتف */
   .phone {
-    position: relative; z-index: 2; width: 330px; height: 610px;
-    background: #071431; border-radius: 46px; padding: 10px;
+    position: relative; z-index: 2; width: 330px; height: 600px;
+    background: #071431; border-radius: 46px; padding: 10px; direction: ltr;
     box-shadow: 0 30px 70px rgba(7,20,49,.35), 0 8px 24px rgba(7,20,49,.25);
   }
   .phone .screen {
@@ -53,306 +57,423 @@
     background: #f6fafe; display: flex; flex-direction: column; position: relative;
   }
   .statusbar {
-    height: 34px; display: flex; align-items: center; justify-content: space-between;
+    height: 36px; display: flex; align-items: center; justify-content: space-between;
     padding: 0 20px; font-size: 12px; font-weight: 700; color: #fff;
     background: linear-gradient(160deg, #0a1733 0%, #0c1f44 100%);
   }
   .statusbar .icons { display: flex; gap: 5px; align-items: center; }
-  .statusbar .batt { width: 20px; height: 10px; border: 1.5px solid #fff; border-radius: 3px; position: relative; }
-  .statusbar .batt::after { content: ""; position: absolute; inset: 1.5px; right: 1.5px; width: 60%; background: #fff; border-radius: 1px; }
   .appbar {
-    background: linear-gradient(160deg, #0a1733 0%, #0c1f44 100%); color: #fff;
-    padding: 10px 16px 16px; display: flex; align-items: center; gap: 10px;
+    background: linear-gradient(160deg, #0a1733 0%, #0c1f44 100%);
+    padding: 10px 18px 16px; color: #fff;
   }
-  .appbar img { width: 34px; height: auto; }
-  .appbar .t { line-height: 1.2; }
-  .appbar .t b { font-size: 15px; font-weight: 900; display: block; }
-  .appbar .t small { font-size: 10px; color: #9fd0ff; font-weight: 700; }
-  .mini-hero {
-    margin: 12px; border-radius: 18px; padding: 16px;
-    background: radial-gradient(200px 120px at 90% -20%, rgba(56,166,255,.35), transparent 60%), linear-gradient(150deg, #0e2a5c 0%, #0a1733 100%);
-    color: #fff;
+  .appbar .row1 { display: flex; align-items: center; gap: 10px; }
+  .appbar .logo-mark {
+    width: 34px; height: 34px; border-radius: 10px;
+    background: conic-gradient(from 210deg, #0067c8, #00b368, #eda41d, #0067c8);
+    display: grid; place-items: center; font-weight: 900; font-size: 12px; color: #071431;
   }
-  .mini-hero h3 { font-size: 15px; font-weight: 900; line-height: 1.6; }
-  .mini-hero h3 span { color: #8fc7ff; }
-  .mini-hero p { font-size: 10.5px; color: rgba(255,255,255,.65); margin-top: 3px; }
-  .search {
-    margin-top: 10px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.18);
-    border-radius: 10px; padding: 7px 12px; font-size: 11px; color: rgba(255,255,255,.55);
+  .appbar .t1 { font-size: 16px; font-weight: 800; }
+  .appbar .t2 { font-size: 10.5px; opacity: .75; font-weight: 600; margin-top: 1px; }
+  .appbar .avatar { margin-inline-start: auto; width: 32px; height: 32px; border-radius: 50%;
+    background: #eda41d; color: #071431; display: grid; place-items: center; font-weight: 800; font-size: 12px; }
+  .appbar .search {
+    margin-top: 12px; background: rgba(255,255,255,.10); border-radius: 10px;
+    padding: 8px 12px; font-size: 11.5px; color: rgba(255,255,255,.75); font-weight: 600;
   }
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; padding: 2px 12px 10px; }
-  .tile {
-    background: #ffffff; border: 1px solid #dce6f4; border-radius: 14px; padding: 12px;
-    box-shadow: 0 2px 8px rgba(13,27,51,.05);
+  .app-body { flex: 1; padding: 14px 14px 10px; overflow: hidden; }
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+  .stat {
+    background: #fff; border: 1px solid #e3ecf7; border-radius: 14px; padding: 10px 12px;
+    box-shadow: 0 2px 8px rgba(13,27,51,.04);
   }
-  .tile .ic { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; margin-bottom: 8px; }
-  .tile b { font-size: 11.5px; font-weight: 900; color: #0d1b33; display: block; }
-  .tile small { font-size: 9.5px; color: #4e617e; }
-  .chat {
-    margin: 0 12px; background: #ffffff; border: 1px solid #dce6f4; border-radius: 14px;
-    padding: 10px 12px; display: flex; gap: 9px; align-items: center;
-    box-shadow: 0 2px 8px rgba(13,27,51,.05);
+  .stat .n { font-size: 17px; font-weight: 900; color: #0d1b33; }
+  .stat .l { font-size: 10px; color: #7c8ba1; font-weight: 700; margin-top: 2px; }
+  .stat.blue .n { color: #0067c8; } .stat.gold .n { color: #c98d10; }
+  .sec-title { display: flex; align-items: center; justify-content: space-between; margin: 13px 2px 8px; }
+  .sec-title .a { font-size: 12.5px; font-weight: 800; color: #0d1b33; }
+  .sec-title .b { font-size: 10px; font-weight: 700; color: #0067c8; }
+  .assoc-list { display: flex; flex-direction: column; gap: 8px; }
+  .assoc {
+    display: flex; align-items: center; gap: 10px; background: #fff;
+    border: 1px solid #e3ecf7; border-radius: 13px; padding: 9px 11px;
   }
-  .chat img { width: 26px; height: auto; }
-  .chat p { font-size: 10.5px; color: #0d1b33; font-weight: 700; line-height: 1.7; }
-  .chat p small { display: block; color: #4e617e; font-weight: 400; }
-  .navbar {
-    margin-top: auto; height: 44px; background: #ffffff; border-top: 1px solid #dce6f4;
-    display: flex; align-items: center; justify-content: space-around;
+  .assoc .lg { width: 34px; height: 34px; border-radius: 10px; flex: none;
+    display: grid; place-items: center; font-weight: 800; font-size: 13px; }
+  .assoc .nm { font-size: 11.5px; font-weight: 800; color: #0d1b33; }
+  .assoc .ct { font-size: 9.5px; color: #7c8ba1; font-weight: 600; margin-top: 1px; }
+  .assoc .st { margin-inline-start: auto; font-size: 9px; font-weight: 800; color: #008a52;
+    background: #e3f7ed; border-radius: 999px; padding: 3px 8px; flex: none; }
+  .bottombar {
+    height: 52px; background: #ffffff; border-top: 1px solid #e3ecf7;
+    display: flex; align-items: center; justify-content: space-around; padding: 0 8px;
   }
-  .navbar .n { width: 44px; height: 4px; border-radius: 4px; background: #dce6f4; }
-  .navbar .n.on { background: #0067c8; width: 20px; }
-  .float-badge {
-    position: absolute; z-index: 3; background: #ffffff; border-radius: 14px;
-    padding: 10px 16px; display: flex; align-items: center; gap: 9px;
-    box-shadow: 0 10px 30px rgba(7,20,49,.16); border: 1px solid #dce6f4;
-    font-size: 13px; font-weight: 900; color: #0d1b33;
-  }
-  .float-badge svg { flex-shrink: 0; }
-  .fb1 { top: 70px; right: 60px; }
-  .fb2 { bottom: 66px; right: 40px; }
-  .float-badge small { display: block; font-size: 10.5px; color: #4e617e; font-weight: 400; }
+  .bottombar .it { display: flex; flex-direction: column; align-items: center; gap: 3px;
+    font-size: 8.5px; font-weight: 700; color: #7c8ba1; }
+  .bottombar .it.on { color: #0067c8; }
+  .bottombar .ic { width: 20px; height: 20px; border-radius: 6px; background: currentColor; opacity: .85; }
+  .it.on .ic { opacity: 1; }
 
-  /* ============ 2) حوارات Play Protect ============ */
-  .pp-scene {
-    width: 560px; padding: 42px 36px 30px;
-    background:
-      radial-gradient(400px 240px at 90% -10%, rgba(0,103,200,.14), transparent 60%),
-      linear-gradient(165deg, #f6fafe 0%, #eaf3fd 100%);
-    display: flex; flex-direction: column; align-items: center;
+  /* ================= 2) لقطات أندرويد — Play Protect ================= */
+  .pp {
+    width: 560px; background: #f2f5f9; direction: ltr; position: relative; overflow: hidden;
   }
-  .pp-caption {
-    display: flex; align-items: center; gap: 12px; width: 100%;
-    margin-bottom: 26px;
+  .pp .ph {
+    margin: 0 auto; width: 460px; min-height: 720px; background: #0d1b33;
+    border-radius: 34px; padding: 9px; box-shadow: 0 24px 60px rgba(7,20,49,.35);
+    position: relative;
   }
-  .pp-caption .num {
-    width: 40px; height: 40px; border-radius: 13px; flex-shrink: 0;
-    background: linear-gradient(160deg, #071431, #0e3a7c); color: #fff;
-    display: grid; place-items: center; font-size: 19px; font-weight: 900;
-    box-shadow: 0 6px 16px rgba(7,20,49,.28);
+  .pp .scr { width: 100%; height: 100%; border-radius: 27px; overflow: hidden; background: #f8fafd; display: flex; flex-direction: column; }
+  .pp .sb {
+    height: 34px; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 18px; font-size: 11.5px; font-weight: 700; color: #fff; background: #0d1b33; flex: none;
   }
-  .pp-caption .txt b { display: block; font-size: 17px; font-weight: 900; color: #0d1b33; }
-  .pp-caption .txt small { font-size: 12.5px; color: #4e617e; font-weight: 400; }
+  .pp .sb .r { display: flex; gap: 5px; align-items: center; }
+  .pp .content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; background: #f8fafd; }
+  .dlg { width: 100%; max-width: 350px; background: #ffffff; border-radius: 28px; padding: 26px 24px 18px;
+    box-shadow: 0 12px 40px rgba(13,27,51,.16); text-align: center; }
+  .dlg .shield {
+    width: 74px; height: 74px; margin: 0 auto 16px; border-radius: 50%;
+    display: grid; place-items: center;
+  }
+  .dlg h2 { font-size: 17.5px; font-weight: 800; color: #0d1b33; line-height: 1.5; }
+  .dlg .bdy { font-size: 13px; color: #5a6b81; line-height: 1.85; margin-top: 10px; font-weight: 500; }
+  .dlg .brand-row { display: flex; align-items: center; gap: 10px; margin-top: 16px; background: #f2f6fb; border-radius: 14px; padding: 10px 12px; text-align: start; }
+  .dlg .brand-row .icn { width: 38px; height: 38px; border-radius: 11px; flex: none; display: grid; place-items: center; }
+  .dlg .brand-row .nm { font-size: 12.5px; font-weight: 800; color: #0d1b33; }
+  .dlg .brand-row .src { font-size: 10px; color: #7c8ba1; font-weight: 600; margin-top: 1px; }
+  .dlg .note { margin-top: 12px; font-size: 11px; color: #8a97a9; line-height: 1.7; font-weight: 600; }
+  .dlg .actions { display: flex; flex-direction: column; gap: 4px; margin-top: 18px; }
+  .dlg .act { font-size: 13.5px; font-weight: 800; color: #0067c8; padding: 12px; border-radius: 999px; }
+  .dlg .act.ghost { color: #5a6b81; font-weight: 700; }
+  .dlg .act.pill { background: #0067c8; color: #fff; }
 
-  .dialog {
-    width: 400px; background: #ffffff; border-radius: 28px; overflow: hidden;
-    box-shadow: 0 24px 60px rgba(7,20,49,.22);
+  /* شاشة الإعدادات (pp2) */
+  .set-screen { flex: 1; display: flex; flex-direction: column; background: #f8fafd; overflow: hidden; }
+  .set-top { background: #ffffff; padding: 18px 20px 14px; border-bottom: 1px solid #e7edf4; }
+  .set-top .back { font-size: 12px; color: #0067c8; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+  .set-top h3 { font-size: 19px; font-weight: 800; color: #0d1b33; margin-top: 10px; }
+  .set-app { display: flex; align-items: center; gap: 12px; padding: 16px 20px; background: #fff; margin-top: 2px; }
+  .set-app .icn { width: 46px; height: 46px; border-radius: 12px; }
+  .set-app .nm { font-size: 14px; font-weight: 800; color: #0d1b33; }
+  .set-app .src { font-size: 11px; color: #7c8ba1; font-weight: 600; margin-top: 2px; }
+  .toggle-card { margin: 14px 16px; background: #ffffff; border-radius: 20px; padding: 18px;
+    box-shadow: 0 3px 14px rgba(13,27,51,.05); }
+  .toggle-card .row { display: flex; align-items: center; gap: 14px; }
+  .toggle-card .info { flex: 1; }
+  .toggle-card .ti { font-size: 14.5px; font-weight: 800; color: #0d1b33; }
+  .toggle-card .td { font-size: 11.5px; color: #5a6b81; line-height: 1.75; margin-top: 5px; font-weight: 500; }
+  .switch { width: 52px; height: 32px; border-radius: 999px; background: #0067c8; position: relative; flex: none; }
+  .switch::after { content: ""; position: absolute; top: 3px; left: 23px; width: 26px; height: 26px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.25); }
+  .toggle-card .hint { margin-top: 14px; font-size: 11px; color: #8a97a9; line-height: 1.7; font-weight: 600; }
+  .navbar3 { height: 50px; background: #ffffff; border-top: 1px solid #e7edf4; display: flex; align-items: center; justify-content: space-around; flex: none; }
+  .navbar3 .i { width: 18px; height: 18px; border-radius: 5px; background: #b6c2d2; }
+  .navbar3 .i.on { background: #0067c8; }
+
+  /* شاشة الاكتمال (pp3) */
+  .done-hero { padding: 40px 24px 8px; text-align: center; }
+  .done-hero .ring {
+    width: 96px; height: 96px; margin: 0 auto; border-radius: 50%;
+    background: conic-gradient(from 210deg, #0067c8, #00b368, #eda41d, #0067c8);
+    display: grid; place-items: center;
   }
-  .dialog .shield-row { display: flex; flex-direction: column; align-items: center; padding: 30px 24px 8px; }
-  .dialog .shield {
-    width: 62px; height: 62px; border-radius: 50%;
-    display: grid; place-items: center; margin-bottom: 14px;
+  .done-hero .ring::after { content: ""; width: 78px; height: 78px; border-radius: 50%; background: #f8fafd; }
+  .done-hero .chk {
+    position: absolute; margin-top: -66px; margin-left: 33px; width: 30px; height: 30px;
+    border-radius: 50%; background: #00b368; color: #fff; display: grid; place-items: center;
+    font-size: 15px; font-weight: 900; z-index: 3;
   }
-  .dialog h3 { text-align: center; font-size: 17px; font-weight: 900; color: #0d1b33; line-height: 1.7; }
-  .dialog p { text-align: center; font-size: 13px; color: #5f6b7f; line-height: 1.9; padding: 6px 26px 4px; }
-  .dialog .app-row {
-    display: flex; align-items: center; gap: 12px; background: #f4f8fd;
-    margin: 14px 22px 18px; border-radius: 16px; padding: 10px 14px;
+  .app-icon-big {
+    width: 92px; height: 92px; margin: 22px auto 0; border-radius: 24px;
+    background: conic-gradient(from 210deg, #0067c8, #00b368, #eda41d, #0067c8);
+    display: grid; place-items: center; color: #071431; font-weight: 900; font-size: 26px;
+    box-shadow: 0 10px 26px rgba(0,103,200,.30);
   }
-  .dialog .app-row img { width: 38px; height: auto; }
-  .dialog .app-row .a b { display: block; font-size: 13.5px; font-weight: 900; color: #0d1b33; }
-  .dialog .app-row .a small { font-size: 11px; color: #4e617e; }
-  .dialog .acts { display: flex; flex-direction: column; border-top: 1px solid #e8eef7; }
-  .dialog .acts .act {
-    padding: 14px; text-align: center; font-size: 14px; font-weight: 900; color: #0067c8;
-  }
-  .dialog .acts .act + .act { border-top: 1px solid #e8eef7; }
-  .dialog .acts .act.main { background: #0067c8; color: #ffffff; }
-  .dialog .warn-list { padding: 4px 26px 10px; }
-  .dialog .warn-list .w {
-    display: flex; gap: 10px; align-items: flex-start; font-size: 12.5px; color: #5f6b7f;
-    line-height: 1.8; margin-bottom: 7px;
-  }
-  .dialog .warn-list .w b { color: #0d1b33; }
-  .progress-wrap { padding: 22px 26px 26px; }
-  .progress {
-    height: 14px; border-radius: 999px; background: #e3edf9; overflow: hidden; position: relative;
-  }
-  .progress .fill {
-    position: absolute; inset: 0; width: 72%;
-    background: linear-gradient(90deg, #0067c8, #38a6ff); border-radius: 999px;
-  }
-  .progress-label { display: flex; justify-content: space-between; margin-top: 10px; font-size: 12px; color: #4e617e; font-weight: 700; }
-  .done-row { display: flex; align-items: center; gap: 14px; padding: 18px 26px 8px; }
-  .done-row .check {
-    width: 54px; height: 54px; border-radius: 50%; background: #e5f7ee; display: grid; place-items: center; flex-shrink: 0;
-  }
-  .done-row b { font-size: 15.5px; font-weight: 900; color: #0d1b33; display: block; line-height: 1.6; }
-  .done-row small { font-size: 12px; color: #4e617e; }
-  .pp-hint {
-    margin-top: 24px; width: 100%; border-radius: 16px; padding: 12px 16px;
-    background: rgba(237,168,29,.12); border: 1px solid rgba(237,168,29,.4);
-    font-size: 12.5px; color: #7a5607; line-height: 1.8; font-weight: 400;
-    display: flex; gap: 9px; align-items: flex-start;
-  }
+  .done-hero h2 { font-size: 20px; font-weight: 900; color: #0d1b33; margin-top: 16px; }
+  .done-hero .sub { font-size: 12.5px; color: #5a6b81; font-weight: 600; margin-top: 6px; line-height: 1.8; }
+  .done-hero .rowbtns { display: flex; gap: 10px; justify-content: center; margin-top: 22px; }
+  .done-hero .btn { padding: 12px 26px; border-radius: 999px; font-size: 13.5px; font-weight: 800; }
+  .done-hero .btn.primary { background: #0067c8; color: #fff; box-shadow: 0 8px 20px rgba(0,103,200,.30); }
+  .done-hero .btn.ghost { border: 1.5px solid #d7e0ec; color: #5a6b81; }
+  .done-list { margin: 24px 26px 0; background: #fff; border-radius: 18px; padding: 6px 18px; box-shadow: 0 3px 14px rgba(13,27,51,.05); }
+  .done-list .li { display: flex; align-items: center; gap: 12px; padding: 12px 2px; border-bottom: 1px solid #eef3f8; }
+  .done-list .li:last-child { border-bottom: 0; }
+  .done-list .ic { width: 34px; height: 34px; border-radius: 10px; flex: none; display: grid; place-items: center; font-size: 15px; }
+  .done-list .t { font-size: 12.5px; font-weight: 800; color: #0d1b33; }
+  .done-list .s { font-size: 10.5px; color: #7c8ba1; font-weight: 600; margin-top: 1px; }
 </style>
 </head>
 <body>
 
-<!-- ================= 1) موك أب التطبيق ================= -->
+<!-- ============ 1) البطل ============ -->
 <div id="hero-shot">
-  <div class="hero-text">
-    <span class="badge"><span class="dot"></span> التطبيق الرسمي — أندرويد</span>
-    <h1>منصة مامب <span>في جيبكم</span></h1>
-    <p>دليل الجمعيات المغربية، المساعد الجمعوي الذكي، والفعاليات — في تطبيق واحد سريع وآمن.</p>
+  <div class="hero-text" id="hero-text">
+    <span class="badge"><span class="dot"></span><span id="h-badge"></span></span>
+    <h1 id="h-title"></h1>
+    <p id="h-sub"></p>
+    <div class="hero-bubbles">
+      <span class="bubble"><span class="ico" style="background:#e3f2ff;">🏢</span><span id="h-b1"></span></span>
+      <span class="bubble"><span class="ico" style="background:#e3f7ed;">💬</span><span id="h-b2"></span></span>
+      <span class="bubble"><span class="ico" style="background:#fdf3d7;">📅</span><span id="h-b3"></span></span>
+    </div>
   </div>
+
   <div class="phone">
     <div class="screen">
-      <div class="statusbar">
-        <span>09:41</span>
-        <span class="icons"><span class="batt"></span></span>
-      </div>
+      <div class="statusbar"><span>09:41</span><span class="icons"><span>▮▮▮</span><span>ᯤ</span><span>🔋</span></span></div>
       <div class="appbar">
-        <img src="file:///home/z/my-project/public/icon-192.png" alt="">
-        <div class="t"><b>منصة مامب</b><small>MAMP · إدارة الجمعيات</small></div>
-      </div>
-      <div class="mini-hero">
-        <h3>إدارة جمعيتكم <span>باحترافية</span></h3>
-        <p>انخراطات · محاسبة · تبرعات · فعاليات · وثائق رسمية</p>
-        <div class="search">ابحثوا عن جمعية أو خدمة…</div>
-      </div>
-      <div class="grid">
-        <div class="tile">
-          <div class="ic" style="background:#e3f0fd;">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0067c8" stroke-width="2.2" stroke-linecap="round"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg>
-          </div>
-          <b>دليل الجمعيات</b><small>موثقة ورسمية</small>
+        <div class="row1">
+          <div class="logo-mark">M</div>
+          <div><div class="t1">MAMP</div><div class="t2" id="p-tagline"></div></div>
+          <div class="avatar">م</div>
         </div>
-        <div class="tile">
-          <div class="ic" style="background:#fdf3dc;">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#eda81d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 1 4 4c0 1.1-.45 2.1-1.17 2.83L14 9.66V11h-4V9.66l-.83-.83A4 4 0 0 1 12 2z"/><path d="M10 14h4v3h-4zM8 20h8v1H8z"/></svg>
-          </div>
-          <b>المساعد الجمعوي</b><small>إجابات موثقة</small>
+        <div class="search" id="p-search"></div>
+      </div>
+      <div class="app-body">
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="p-s1n"></div><div class="l" id="p-s1l"></div></div>
+          <div class="stat blue"><div class="n" id="p-s2n"></div><div class="l" id="p-s2l"></div></div>
+          <div class="stat gold"><div class="n" id="p-s3n"></div><div class="l" id="p-s3l"></div></div>
+          <div class="stat"><div class="n" id="p-s4n"></div><div class="l" id="p-s4l"></div></div>
         </div>
-        <div class="tile">
-          <div class="ic" style="background:#e5f7ee;">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#00b368" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
+        <div class="sec-title"><span class="a" id="p-sec"></span><span class="b" id="p-seeall"></span></div>
+        <div class="assoc-list">
+          <div class="assoc">
+            <div class="lg" style="background:#e3f2ff; color:#0067c8;">ن</div>
+            <div><div class="nm" id="p-a1n"></div><div class="ct" id="p-a1c"></div></div>
+            <span class="st" id="p-st1"></span>
           </div>
-          <b>الفعاليات</b><small>تسجيل مباشر</small>
-        </div>
-        <div class="tile">
-          <div class="ic" style="background:#e3f0fd;">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0067c8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 7l4-4 4 4M21 17l-4 4-4-4" opacity="0"/><path d="M4 19h16M4 19V8l4 3V8l4 3V8l4 3v8"/></svg>
+          <div class="assoc">
+            <div class="lg" style="background:#e3f7ed; color:#008a52;">م</div>
+            <div><div class="nm" id="p-a2n"></div><div class="ct" id="p-a2c"></div></div>
+            <span class="st" id="p-st2"></span>
           </div>
-          <b>المرجع القانوني</b><small>قانون 75.00</small>
+          <div class="assoc">
+            <div class="lg" style="background:#fdf3d7; color:#c98d10;">أ</div>
+            <div><div class="nm" id="p-a3n"></div><div class="ct" id="p-a3c"></div></div>
+            <span class="st" id="p-st3"></span>
+          </div>
         </div>
       </div>
-      <div class="chat">
-        <img src="file:///home/z/my-project/public/logo.png" alt="">
-        <p>المساعد الجمعوي<small>كيف نؤسس جمعية بالمغرب؟ — إليكم الخطوات…</small></p>
-      </div>
-      <div class="navbar">
-        <span class="n on"></span><span class="n"></span><span class="n"></span><span class="n"></span>
+      <div class="bottombar">
+        <div class="it on"><span class="ic"></span><span id="p-nav1"></span></div>
+        <div class="it"><span class="ic"></span><span id="p-nav2"></span></div>
+        <div class="it"><span class="ic"></span><span id="p-nav3"></span></div>
+        <div class="it"><span class="ic"></span><span id="p-nav4"></span></div>
       </div>
     </div>
-  </div>
-  <div class="float-badge fb1">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00b368" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-    <span>الإصدار الرسمي<small>مباشرة من المنصة</small></span>
-  </div>
-  <div class="float-badge fb2">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0067c8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-    <span>اتصال مشفّر HTTPS<small>حماية كاملة للبيانات</small></span>
   </div>
 </div>
 
-<!-- ================= 2) Play Protect — الخطوة 1 ================= -->
-<div class="pp-scene" id="pp1">
-  <div class="pp-caption">
-    <span class="num">1</span>
-    <span class="txt"><b>رسالة Play Protect عند التثبيت</b><small>اختيار «المزيد من التفاصيل» — لا تقلقوا، الرسالة قياسية</small></span>
-  </div>
-  <div class="dialog">
-    <div class="shield-row">
-      <div class="shield" style="background:#fdf3dc;">
-        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#eda81d" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4M12 15.5v.5"/></svg>
+<!-- ============ 2) Play Protect — الخطوة 1 ============ -->
+<div class="pp" id="pp1">
+  <div class="ph"><div class="scr">
+    <div class="sb"><span>09:41</span><span class="r"><span>▮▮▮</span><span>ᯤ</span><span>🔋</span></span></div>
+    <div class="content">
+      <div class="dlg">
+        <div class="shield" style="background:#fdeeee;">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none"><path d="M12 2L4 5v6c0 5 3.4 9.3 8 10.6 4.6-1.3 8-5.6 8-10.6V5l-8-3z" fill="#d93025"/><path d="M12 7.5l-1 4.2 1 .8 1-.8-1-4.2z" fill="#fff" opacity=".0"/><path d="M8.6 12.1l2.6 2.6 4.2-4.9" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <h2 id="pp1-title"></h2>
+        <div class="bdy" id="pp1-body"></div>
+        <div class="brand-row">
+          <div class="icn" style="background: conic-gradient(from 210deg, #0067c8, #00b368, #eda41d, #0067c8); display:grid; place-items:center; color:#071431; font-weight:900; font-size:15px;">M</div>
+          <div><div class="nm" id="pp1-app"></div><div class="src" id="pp1-src"></div></div>
+        </div>
+        <div class="actions">
+          <span class="act" id="pp1-more"></span>
+          <span class="act ghost" id="pp1-cancel"></span>
+        </div>
       </div>
-      <h3>لم يتم فحص هذا التطبيق</h3>
     </div>
-    <p>لتتم حمايتكم، يراجع Google Play Protect التطبيقات قبل تثبيتها. لم يُفحص هذا التطبيق لأنه لم يُنشر على متجر Play.</p>
-    <div class="app-row">
-      <img src="file:///home/z/my-project/public/icon-192.png" alt="">
-      <span class="a"><b>منصة مامب</b><small>ma.mamp.app</small></span>
-    </div>
-    <div class="acts">
-      <div class="act">إلغاء</div>
-      <div class="act main">المزيد من التفاصيل</div>
-    </div>
-  </div>
-  <div class="pp-hint">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b5810e" stroke-width="2.2" stroke-linecap="round" style="flex-shrink:0;margin-top:2px"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16.5v.5"/></svg>
-    <span>اضغطوا زر «المزيد من التفاصيل» بالأسفل — لا تختاروا «إلغاء».</span>
-  </div>
+  </div></div>
 </div>
 
-<!-- ================= 3) Play Protect — الخطوة 2 ================= -->
-<div class="pp-scene" id="pp2">
-  <div class="pp-caption">
-    <span class="num">2</span>
-    <span class="txt"><b>تفاصيل التحذير</b><small>الضغط على «التثبيت على أي حال» للمتابعة</small></span>
-  </div>
-  <div class="dialog">
-    <div class="shield-row">
-      <div class="shield" style="background:#e3f0fd;">
-        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#0067c8" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8v.5"/></svg>
+<!-- ============ 3) الخطوة 2 — التثبيت على أي حال ============ -->
+<div class="pp" id="pp2">
+  <div class="ph"><div class="scr">
+    <div class="sb"><span>09:41</span><span class="r"><span>▮▮▮</span><span>ᯤ</span><span>🔋</span></span></div>
+    <div class="set-screen">
+      <div class="set-top">
+        <div class="back">‹ <span id="pp2-back"></span></div>
+        <h3 id="pp2-title"></h3>
       </div>
-      <h3>تثبيت تطبيق غير معروف</h3>
-    </div>
-    <div class="warn-list">
-      <div class="w">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#c0332b" stroke-width="2.3" stroke-linecap="round" style="flex-shrink:0;margin-top:4px"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
-        <span><b>قد يشكّل خطراً على بياناتكم</b> — تطبيقات غير معروفة قد تسرق معطياتكم.</span>
+      <div class="set-app">
+        <div class="icn" style="background: conic-gradient(from 210deg, #0067c8, #00b368, #eda41d, #0067c8); display:grid; place-items:center; color:#071431; font-weight:900; font-size:17px;">M</div>
+        <div><div class="nm" id="pp2-app"></div><div class="src" id="pp2-src"></div></div>
       </div>
-      <div class="w">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5f6b7f" stroke-width="2.3" stroke-linecap="round" style="flex-shrink:0;margin-top:4px"><circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8v.5"/></svg>
-        <span>هذا التحذير يظهر لكل التطبيقات الموزعة خارج متجر Play، حتى الرسمية منها.</span>
+      <div class="toggle-card">
+        <div class="row">
+          <div class="info">
+            <div class="ti" id="pp2-toggle"></div>
+            <div class="td" id="pp2-desc"></div>
+          </div>
+          <div class="switch"></div>
+        </div>
+        <div class="hint" id="pp2-note"></div>
       </div>
+      <div class="navbar3"><span class="i"></span><span class="i on"></span><span class="i"></span><span class="i"></span><span class="i"></span></div>
     </div>
-    <div class="app-row">
-      <img src="file:///home/z/my-project/public/icon-192.png" alt="">
-      <span class="a"><b>منصة مامب</b><small>مصدر: mamp.pages.dev</small></span>
-    </div>
-    <div class="acts">
-      <div class="act">رجوع</div>
-      <div class="act main">التثبيت على أي حال</div>
-    </div>
-  </div>
-  <div class="pp-hint">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b5810e" stroke-width="2.2" stroke-linecap="round" style="flex-shrink:0;margin-top:2px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-    <span>تطبيق منصة مامب رسمي وموزع مباشرة من الموقع الرسمي للمنصة — اضغطوا «التثبيت على أي حال».</span>
-  </div>
+  </div></div>
 </div>
 
-<!-- ================= 4) Play Protect — الخطوة 3 ================= -->
-<div class="pp-scene" id="pp3">
-  <div class="pp-caption">
-    <span class="num">3</span>
-    <span class="txt"><b>اكتمال التثبيت</b><small>فتح التطبيق والاستعمال مباشرة</small></span>
-  </div>
-  <div class="dialog">
-    <div class="done-row">
-      <span class="check">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00b368" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-      </span>
-      <span><b>تم تثبيت التطبيق</b><small>منصة مامب — جاهز للاستعمال</small></span>
+<!-- ============ 4) الخطوة 3 — اكتمال التثبيت ============ -->
+<div class="pp" id="pp3">
+  <div class="ph"><div class="scr">
+    <div class="sb"><span>09:41</span><span class="r"><span>▮▮▮</span><span>ᯤ</span><span>🔋</span></span></div>
+    <div class="set-screen" style="background:#f8fafd;">
+      <div class="done-hero">
+        <div style="position:relative; width:96px; margin:0 auto;">
+          <div class="ring"></div>
+          <div class="chk">✓</div>
+        </div>
+        <div class="app-icon-big">M</div>
+        <h2 id="pp3-title"></h2>
+        <div class="sub" id="pp3-sub"></div>
+        <div class="rowbtns">
+          <span class="btn ghost" id="pp3-done"></span>
+          <span class="btn primary" id="pp3-open"></span>
+        </div>
+      </div>
+      <div class="done-list">
+        <div class="li">
+          <div class="ic" style="background:#e3f2ff;">🏢</div>
+          <div><div class="t" id="pp3-f1t"></div><div class="s" id="pp3-f1s"></div></div>
+        </div>
+        <div class="li">
+          <div class="ic" style="background:#e3f7ed;">💬</div>
+          <div><div class="t" id="pp3-f2t"></div><div class="s" id="pp3-f2s"></div></div>
+        </div>
+        <div class="li">
+          <div class="ic" style="background:#fdf3d7;">📅</div>
+          <div><div class="t" id="pp3-f3t"></div><div class="s" id="pp3-f3s"></div></div>
+        </div>
+      </div>
+      <div style="flex:1"></div>
     </div>
-    <div class="progress-wrap">
-      <div class="progress"><span class="fill"></span></div>
-      <div class="progress-label"><span>تم التنزيل</span><span>التثبيت مكتمل ✓</span></div>
-    </div>
-    <div class="app-row" style="margin-top:2px;">
-      <img src="file:///home/z/my-project/public/icon-192.png" alt="">
-      <span class="a"><b>منصة مامب</b><small>افتحوا التطبيق من القائمة الرئيسية</small></span>
-    </div>
-    <div class="acts" style="margin-top:14px;border-radius:0;">
-      <div class="act main">فتح التطبيق</div>
-    </div>
-  </div>
-  <div class="pp-hint">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b5810e" stroke-width="2.2" stroke-linecap="round" style="flex-shrink:0;margin-top:2px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-    <span>ملاحظة: تُطلب هذه الخطوات مرة واحدة فقط — التحديثات القادمة تمر بسلاسة.</span>
-  </div>
+  </div></div>
 </div>
 
+<script>
+/* ===== النصوص الثماني اللغات — تُحقن عبر معامل ?lang= ===== */
+const T = {
+  ar: {
+    dir: "rtl", latn: false,
+    hero: { badge: "التطبيق الرسمي — أندرويد", title: "منصة مامب", titleAccent: "في جيبكم", sub: "دليل الجمعيات المغربية، المساعد الجمعوي، والفعاليات — في تطبيق واحد رسمي ومجاني.", b1: "دليل الجمعيات", b2: "مساعد جمعوي ذكي", b3: "فعاليات وتسجيل" },
+    phone: { tagline: "إدارة الجمعيات", search: "ابحثوا عن جمعية أو مدينة…", s1n: "٨٤", s1l: "جمعية موثقة", s2n: "١٢", s2l: "فعالية قادمة", s3n: "٦", s3l: "مشاريع مشتركة", s4n: "٨", s4l: "لغات رسمية", sec: "جمعيات مقترحة", seeall: "الكل", a1n: "جمعية ندوة", a1c: "الدار البيضاء", a2n: "ميدو للبيئة", a2c: "أكادير", a3n: "المشرق الثقافي", a3c: "الرباط", st: "موثقة", nav: ["الرئيسية", "الجمعيات", "المشاريع", "الحساب"] },
+    pp1: { title: "لم يتم فحص هذا التطبيق", body: "لم يتم فحص التطبيق بواسطة Play Protect لأنه غير متوفر في متجر Google Play.", app: "منصة مامب", src: "المصدر: mamp.pages.dev", more: "المزيد من التفاصيل", cancel: "إلغاء" },
+    pp2: { back: "رجوع", title: "تثبيت تطبيقات غير معروفة", app: "منصة مامب", src: "mamp.pages.dev", toggle: "السماح من هذا المصدر", desc: "اسمحوا لهذا المصدر بتثبيت تطبيقات غير معروفة على جهازكم. التطبيق موقّع وموزع رسمياً من منصة مامب.", note: "تُطلب الموافقة مرة واحدة فقط — التحديثات القادمة تمر تلقائياً." },
+    pp3: { title: "تم تثبيت التطبيق", sub: "منصة مامب — جاهز للاستعمال", done: "إنهاء", open: "فتح التطبيق", f1t: "دليل الجمعيات", f1s: "تصفحوا الجمعيات الموثقة", f2t: "المساعد الجمعوي", f2s: "إجابات فورية بثماني لغات", f3t: "الفعاليات", f3s: "تسجيل مباشر من التطبيق" },
+  },
+  fr: {
+    dir: "ltr", latn: true,
+    hero: { badge: "Application officielle — Android", title: "La plateforme MAMP", titleAccent: "dans votre poche", sub: "L'annuaire des associations, l'Assistant Associatif et les événements — dans une seule application officielle et gratuite.", b1: "Annuaire des associations", b2: "Assistant intelligent", b3: "Événements & inscription" },
+    phone: { tagline: "Gestion des associations", search: "Rechercher une association ou une ville…", s1n: "84", s1l: "associations vérifiées", s2n: "12", s2l: "événements à venir", s3n: "6", s3l: "projets partagés", s4n: "8", s4l: "langues officielles", sec: "Associations suggérées", seeall: "Tout", a1n: "Association Nadwa", a1c: "Casablanca", a2n: "Mido Environnement", a2c: "Agadir", a3n: "Al-Machriq Culturel", a3c: "Rabat", st: "Vérifiée", nav: ["Accueil", "Associations", "Projets", "Compte"] },
+    pp1: { title: "Application non vérifiée", body: "Cette application n'a pas été analysée par Play Protect car elle n'est pas disponible sur Google Play.", app: "Plateforme MAMP", src: "Source : mamp.pages.dev", more: "Plus de détails", cancel: "Annuler" },
+    pp2: { back: "Retour", title: "Installer des applications inconnues", app: "Plateforme MAMP", src: "mamp.pages.dev", toggle: "Autoriser depuis cette source", desc: "Autorisez cette source à installer des applications inconnues sur votre appareil. L'application est signée et distribuée officiellement par la plateforme MAMP.", note: "Autorisation demandée une seule fois — les mises à jour suivantes sont automatiques." },
+    pp3: { title: "Application installée", sub: "Plateforme MAMP — prête à l'emploi", done: "Terminer", open: "Ouvrir l'application", f1t: "Annuaire des associations", f1s: "Parcourez les associations vérifiées", f2t: "Assistant Associatif", f2s: "Réponses instantanées en 8 langues", f3t: "Événements", f3s: "Inscription directe depuis l'application" },
+  },
+  en: {
+    dir: "ltr", latn: true,
+    hero: { badge: "Official app — Android", title: "The MAMP platform", titleAccent: "in your pocket", sub: "The associations directory, the Association Assistant and events — in one official, free application.", b1: "Associations directory", b2: "Smart assistant", b3: "Events & signup" },
+    phone: { tagline: "Association management", search: "Search for an association or city…", s1n: "84", s1l: "verified associations", s2n: "12", s2l: "upcoming events", s3n: "6", s3l: "shared projects", s4n: "8", s4l: "official languages", sec: "Suggested associations", seeall: "All", a1n: "Nadwa Association", a1c: "Casablanca", a2n: "Mido Environment", a2c: "Agadir", a3n: "Al-Machriq Cultural", a3c: "Rabat", st: "Verified", nav: ["Home", "Associations", "Projects", "Account"] },
+    pp1: { title: "App not scanned", body: "This app hasn't been scanned by Play Protect because it isn't available on Google Play.", app: "MAMP Platform", src: "Source: mamp.pages.dev", more: "More details", cancel: "Cancel" },
+    pp2: { back: "Back", title: "Install unknown apps", app: "MAMP Platform", src: "mamp.pages.dev", toggle: "Allow from this source", desc: "Allow this source to install unknown apps on your device. The app is signed and officially distributed by the MAMP platform.", note: "Permission is requested only once — future updates install automatically." },
+    pp3: { title: "App installed", sub: "MAMP Platform — ready to use", done: "Done", open: "Open app", f1t: "Associations directory", f1s: "Browse verified associations", f2t: "Association Assistant", f2s: "Instant answers in 8 languages", f3t: "Events", f3s: "Sign up directly from the app" },
+  },
+  es: {
+    dir: "ltr", latn: true,
+    hero: { badge: "App oficial — Android", title: "La plataforma MAMP", titleAccent: "en su bolsillo", sub: "El directorio de asociaciones, el Asistente Asociativo y los eventos — en una sola aplicación oficial y gratuita.", b1: "Directorio de asociaciones", b2: "Asistente inteligente", b3: "Eventos e inscripción" },
+    phone: { tagline: "Gestión de asociaciones", search: "Busque una asociación o ciudad…", s1n: "84", s1l: "asociaciones verificadas", s2n: "12", s2l: "próximos eventos", s3n: "6", s3l: "proyectos compartidos", s4n: "8", s4l: "idiomas oficiales", sec: "Asociaciones sugeridas", seeall: "Todo", a1n: "Asociación Nadwa", a1c: "Casablanca", a2n: "Mido Medio Ambiente", a2c: "Agadir", a3n: "Al-Machriq Cultural", a3c: "Rabat", st: "Verificada", nav: ["Inicio", "Asociaciones", "Proyectos", "Cuenta"] },
+    pp1: { title: "Aplicación no analizada", body: "Play Protect no ha analizado esta aplicación porque no está disponible en Google Play.", app: "Plataforma MAMP", src: "Fuente: mamp.pages.dev", more: "Más detalles", cancel: "Cancelar" },
+    pp2: { back: "Atrás", title: "Instalar aplicaciones desconocidas", app: "Plataforma MAMP", src: "mamp.pages.dev", toggle: "Permitir de esta fuente", desc: "Permita que esta fuente instale aplicaciones desconocidas en su dispositivo. La aplicación está firmada y distribuida oficialmente por la plataforma MAMP.", note: "El permiso se solicita una sola vez — las actualizaciones se instalan automáticamente." },
+    pp3: { title: "Aplicación instalada", sub: "Plataforma MAMP — lista para usar", done: "Hecho", open: "Abrir aplicación", f1t: "Directorio de asociaciones", f1s: "Explore asociaciones verificadas", f2t: "Asistente Asociativo", f2s: "Respuestas instantáneas en 8 idiomas", f3t: "Eventos", f3s: "Inscripción directa desde la app" },
+  },
+  it: {
+    dir: "ltr", latn: true,
+    hero: { badge: "App ufficiale — Android", title: "La piattaforma MAMP", titleAccent: "in tasca", sub: "L'elenco delle associazioni, l'Assistente Associativo e gli eventi — in un'unica app ufficiale e gratuita.", b1: "Elenco associazioni", b2: "Assistente intelligente", b3: "Eventi e iscrizione" },
+    phone: { tagline: "Gestione delle associazioni", search: "Cerca un'associazione o una città…", s1n: "84", s1l: "associazioni verificate", s2n: "12", s2l: "prossimi eventi", s3n: "6", s3l: "progetti condivisi", s4n: "8", s4l: "lingue ufficiali", sec: "Associazioni consigliate", seeall: "Tutte", a1n: "Associazione Nadwa", a1c: "Casablanca", a2n: "Mido Ambiente", a2c: "Agadir", a3n: "Al-Machriq Culturale", a3c: "Rabat", st: "Verificata", nav: ["Home", "Associazioni", "Progetti", "Account"] },
+    pp1: { title: "App non analizzata", body: "Questa app non è stata analizzata da Play Protect perché non è disponibile su Google Play.", app: "Piattaforma MAMP", src: "Fonte: mamp.pages.dev", more: "Più dettagli", cancel: "Annulla" },
+    pp2: { back: "Indietro", title: "Installa app sconosciute", app: "Piattaforma MAMP", src: "mamp.pages.dev", toggle: "Consenti da questa fonte", desc: "Consentire a questa fonte di installare app sconosciute sul dispositivo. L'app è firmata e distribuita ufficialmente dalla piattaforma MAMP.", note: "L'autorizzazione viene richiesta una sola volta — gli aggiornamenti successivi sono automatici." },
+    pp3: { title: "App installata", sub: "Piattaforma MAMP — pronta all'uso", done: "Fine", open: "Apri app", f1t: "Elenco associazioni", f1s: "Sfoglia le associazioni verificate", f2t: "Assistente Associativo", f2s: "Risposte immediate in 8 lingue", f3t: "Eventi", f3s: "Iscrizione diretta dall'app" },
+  },
+  de: {
+    dir: "ltr", latn: true,
+    hero: { badge: "Offizielle App — Android", title: "Die MAMP-Plattform", titleAccent: "in Ihrer Tasche", sub: "Das Vereinsverzeichnis, der Vereinsassistent und Veranstaltungen — in einer einzigen offiziellen, kostenlosen App.", b1: "Vereinsverzeichnis", b2: "Intelligenter Assistent", b3: "Veranstaltungen & Anmeldung" },
+    phone: { tagline: "Vereinsverwaltung", search: "Verein oder Stadt suchen…", s1n: "84", s1l: "geprüfte Vereine", s2n: "12", s2l: "kommende Veranstaltungen", s3n: "6", s3l: "gemeinsame Projekte", s4n: "8", s4l: "offizielle Sprachen", sec: "Empfohlene Vereine", seeall: "Alle", a1n: "Verein Nadwa", a1c: "Casablanca", a2n: "Mido Umwelt", a2c: "Agadir", a3n: "Al-Machriq Kultur", a3c: "Rabat", st: "Geprüft", nav: ["Start", "Vereine", "Projekte", "Konto"] },
+    pp1: { title: "App nicht geprüft", body: "Diese App wurde nicht von Play Protect geprüft, da sie nicht bei Google Play verfügbar ist.", app: "MAMP-Plattform", src: "Quelle: mamp.pages.dev", more: "Weitere Details", cancel: "Abbrechen" },
+    pp2: { back: "Zurück", title: "Unbekannte Apps installieren", app: "MAMP-Plattform", src: "mamp.pages.dev", toggle: "Aus dieser Quelle erlauben", desc: "Erlauben Sie dieser Quelle, unbekannte Apps auf Ihrem Gerät zu installieren. Die App ist von der MAMP-Plattform signiert und wird offiziell vertrieben.", note: "Die Berechtigung wird nur einmal abgefragt — künftige Updates erfolgen automatisch." },
+    pp3: { title: "App installiert", sub: "MAMP-Plattform — einsatzbereit", done: "Fertig", open: "App öffnen", f1t: "Vereinsverzeichnis", f1s: "Durchsuchen Sie geprüfte Vereine", f2t: "Vereinsassistent", f2s: "Sofortige Antworten in 8 Sprachen", f3t: "Veranstaltungen", f3s: "Direkte Anmeldung aus der App" },
+  },
+  nl: {
+    dir: "ltr", latn: true,
+    hero: { badge: "Officiële app — Android", title: "Het MAMP-platform", titleAccent: "in uw broekzak", sub: "De verenigingsgids, de Verenigingsassistent en evenementen — in één officiële, gratis applicatie.", b1: "Verenigingsgids", b2: "Slimme assistent", b3: "Evenementen & inschrijving" },
+    phone: { tagline: "Verenigingsbeheer", search: "Zoek een vereniging of stad…", s1n: "84", s1l: "geverifieerde verenigingen", s2n: "12", s2l: "aankomende evenementen", s3n: "6", s3l: "gedeelde projecten", s4n: "8", s4l: "officiële talen", sec: "Voorgestelde verenigingen", seeall: "Alles", a1n: "Vereniging Nadwa", a1c: "Casablanca", a2n: "Mido Milieu", a2c: "Agadir", a3n: "Al-Machriq Cultuur", a3c: "Rabat", st: "Geverifieerd", nav: ["Home", "Verenigingen", "Projecten", "Account"] },
+    pp1: { title: "App niet gescand", body: "Deze app is niet gescand door Play Protect omdat deze niet beschikbaar is in Google Play.", app: "MAMP-platform", src: "Bron: mamp.pages.dev", more: "Meer details", cancel: "Annuleren" },
+    pp2: { back: "Terug", title: "Onbekende apps installeren", app: "MAMP-platform", src: "mamp.pages.dev", toggle: "Toestaan vanaf deze bron", desc: "Sta deze bron toe om onbekende apps op uw apparaat te installeren. De app is ondertekend en wordt officieel gedistribueerd door het MAMP-platform.", note: "De toestemming wordt slechts eenmaal gevraagd — toekomstige updates verlopen automatisch." },
+    pp3: { title: "App geïnstalleerd", sub: "MAMP-platform — klaar voor gebruik", done: "Klaar", open: "App openen", f1t: "Verenigingsgids", f1s: "Blader door geverifieerde verenigingen", f2t: "Verenigingsassistent", f2s: "Directe antwoorden in 8 talen", f3t: "Evenementen", f3s: "Rechtstreeks inschrijven vanuit de app" },
+  },
+  ru: {
+    dir: "ltr", latn: true,
+    hero: { badge: "Официальное приложение — Android", title: "Платформа MAMP", titleAccent: "в вашем кармане", sub: "Каталог ассоциаций, Ассоциативный помощник и мероприятия — в одном официальном бесплатном приложении.", b1: "Каталог ассоциаций", b2: "Умный помощник", b3: "Мероприятия и запись" },
+    phone: { tagline: "Управление ассоциациями", search: "Поиск ассоциации или города…", s1n: "84", s1l: "проверенных ассоциаций", s2n: "12", s2l: "предстоящих мероприятий", s3n: "6", s3l: "совместных проектов", s4n: "8", s4l: "официальных языков", sec: "Рекомендуемые ассоциации", seeall: "Все", a1n: "Ассоциация Надва", a1c: "Касабланка", a2n: "Мидо Экология", a2c: "Агадир", a3n: "Аль-Машрик Культура", a3c: "Рабат", st: "Проверена", nav: ["Главная", "Ассоциации", "Проекты", "Аккаунт"] },
+    pp1: { title: "Приложение не проверено", body: "Это приложение не было проверено Play Protect, поскольку оно недоступно в Google Play.", app: "Платформа MAMP", src: "Источник: mamp.pages.dev", more: "Подробнее", cancel: "Отмена" },
+    pp2: { back: "Назад", title: "Установка неизвестных приложений", app: "Платформа MAMP", src: "mamp.pages.dev", toggle: "Разрешить из этого источника", desc: "Разрешите этому источнику устанавливать неизвестные приложения на ваше устройство. Приложение подписано и официально распространяется платформой MAMP.", note: "Разрешение запрашивается только один раз — дальнейшие обновления устанавливаются автоматически." },
+    pp3: { title: "Приложение установлено", sub: "Платформа MAMP — готова к работе", done: "Готово", open: "Открыть приложение", f1t: "Каталог ассоциаций", f1s: "Просматривайте проверенные ассоциации", f2t: "Ассоциативный помощник", f2s: "Мгновенные ответы на 8 языках", f3t: "Мероприятия", f3s: "Прямая запись из приложения" },
+  },
+};
+
+const params = new URLSearchParams(location.search);
+const lang = params.get("lang") || "ar";
+const t = T[lang] || T.ar;
+
+/* اتجاه الصفحة والخط */
+document.documentElement.lang = lang;
+document.documentElement.dir = t.dir;
+if (t.latn) document.documentElement.classList.add("latn");
+document.documentElement.classList.remove("ltr");
+if (t.dir === "ltr") document.documentElement.classList.add("ltr");
+document.getElementById("hero-text").style.setProperty("--hero-dir", t.dir);
+
+/* حقن نصوص البطل */
+const h = t.hero, p = t.phone;
+document.getElementById("h-badge").textContent = h.badge;
+document.getElementById("h-title").innerHTML =
+  document.dir === "rtl" || t.dir === "rtl"
+    ? `${h.title} <span>${h.titleAccent}</span>`
+    : `${h.title} <span>${h.titleAccent}</span>`;
+document.getElementById("h-sub").textContent = h.sub;
+document.getElementById("h-b1").textContent = h.b1;
+document.getElementById("h-b2").textContent = h.b2;
+document.getElementById("h-b3").textContent = h.b3;
+
+/* حقن نصوص الهاتف */
+document.getElementById("p-tagline").textContent = p.tagline;
+document.getElementById("p-search").textContent = p.search;
+document.getElementById("p-s1n").textContent = p.s1n; document.getElementById("p-s1l").textContent = p.s1l;
+document.getElementById("p-s2n").textContent = p.s2n; document.getElementById("p-s2l").textContent = p.s2l;
+document.getElementById("p-s3n").textContent = p.s3n; document.getElementById("p-s3l").textContent = p.s3l;
+document.getElementById("p-s4n").textContent = p.s4n; document.getElementById("p-s4l").textContent = p.s4l;
+document.getElementById("p-sec").textContent = p.sec;
+document.getElementById("p-seeall").textContent = p.seeall;
+document.getElementById("p-a1n").textContent = p.a1n; document.getElementById("p-a1c").textContent = p.a1c;
+document.getElementById("p-a2n").textContent = p.a2n; document.getElementById("p-a2c").textContent = p.a2c;
+document.getElementById("p-a3n").textContent = p.a3n; document.getElementById("p-a3c").textContent = p.a3c;
+document.getElementById("p-st1").textContent = p.st;
+document.getElementById("p-st2").textContent = p.st;
+document.getElementById("p-st3").textContent = p.st;
+document.getElementById("p-nav1").textContent = p.nav[0];
+document.getElementById("p-nav2").textContent = p.nav[1];
+document.getElementById("p-nav3").textContent = p.nav[2];
+document.getElementById("p-nav4").textContent = p.nav[3];
+
+/* حقن نصوص Play Protect */
+for (const n of ["pp1", "pp2", "pp3"]) {
+  const d = t[n];
+  for (const [k, v] of Object.entries(d)) {
+    const el = document.getElementById(`${n}-${k}`);
+    if (el) el.textContent = v;
+  }
+}
+</script>
 </body>
 </html>

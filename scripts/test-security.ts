@@ -7,6 +7,8 @@
  * حقن التعليمات في المساعد، التحقق من المدخلات.
  *
  * الاستعمال: bun scripts/test-security.ts [BASE_URL]
+ *
+ * المتطلب: بذرة التطوير التجريبية أولاً — bun run db:seed:demo
  */
 const BASE = process.argv[2] ?? "http://localhost:3100";
 

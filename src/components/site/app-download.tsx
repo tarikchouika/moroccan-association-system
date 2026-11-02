@@ -14,15 +14,17 @@ import { useI18n, useDocumentTitle } from "@/lib/i18n/provider";
 
 /** رابط ZIP نسخة الويب الكاملة — يولد آلياً مع كل نشر على كلاودفلير */
 const SITE_ZIP_URL = "https://mamp.pages.dev/mamp-site-latest.zip";
-
 const STEP_ICONS = [Download, MousePointerClick, PackageCheck, Rocket];
 const FEATURE_ICONS = [BadgeCheck, Lock, Wifi, CheckCircle2, TabletSmartphone];
 
 /** جسم صفحة التطبيق — مكون عميل متعدد اللغات */
 export function AppDownloadBody() {
-  const { d } = useI18n();
+  const { d, lang } = useI18n();
   useDocumentTitle(d.meta.pages.app);
   const t = d.app;
+  // الصور التوضيحية مولدة مسبقاً بكل لغة (scripts/shoot-mockups.js)
+  const heroSrc = `/app-hero-${lang}.png`;
+  const ppSrc = (i: number) => `/playprotect-${i + 1}-${lang}.png`;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
@@ -43,7 +45,7 @@ export function AppDownloadBody() {
         </div>
         <div className="mx-auto max-w-4xl overflow-hidden rounded-3xl border border-border shadow-xl shadow-primary/5">
           <Image
-            src="/app-hero.png"
+            src={heroSrc}
             alt={t.heroImageAlt}
             width={960}
             height={640}
@@ -99,7 +101,7 @@ export function AppDownloadBody() {
               <Card key={p.title} className="overflow-hidden">
                 <div className="relative bg-muted/40">
                   <Image
-                    src={`/playprotect-${i + 1}.png`}
+                    src={ppSrc(i)}
                     alt={p.alt}
                     width={560}
                     height={560}

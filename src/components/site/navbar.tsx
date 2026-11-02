@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { Logo } from "@/components/site/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { LanguageSwitcher, LanguageChips } from "@/components/i18n/language-switcher";
+import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n/provider";
@@ -122,7 +122,6 @@ export function Navbar() {
                 <Link href="/register">{d.nav.register}</Link>
               </Button>
             </div>
-            <LanguageChips />
           </nav>
         </div>
       )}

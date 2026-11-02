@@ -49,6 +49,8 @@ const nextConfig: NextConfig = isStaticExport
       output: "standalone",
       typescript: { ignoreBuildErrors: true },
       reactStrictMode: false,
+      // تحسين صور next/image غير متاح على Workers — نفس سلوك الوضع الثابت
+      images: { unoptimized: true },
       async headers() {
         return [
           {

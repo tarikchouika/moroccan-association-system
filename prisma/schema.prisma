@@ -6,7 +6,17 @@
 // ملاحظة: SQLite لا يدعم enum، لذلك تُستخدم حقول String مع تدقيق على مستوى التطبيق
 // ============================================================================
 
+// عميلان من المخطط نفسه:
+//  • client    — عامل workerd (تشغيل WASM + محوّل D1) للنشر على Cloudflare Workers
+//  • clientJs  — العميل الكلاسيكي (محرك المكتبة + ملف SQLite عبر DATABASE_URL)
+//                للتطوير المحلي والخادم المستقل — كما كان قبل الترحيل
 generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+  runtime  = "workerd"
+}
+
+generator clientJs {
   provider = "prisma-client-js"
 }
 

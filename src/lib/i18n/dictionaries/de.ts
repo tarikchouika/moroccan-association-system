@@ -317,15 +317,6 @@ export const de: Dict = {
       errorNetwork: "Verbindung zum Server fehlgeschlagen. Bitte prüfen Sie Ihre Netzwerkverbindung.",
       noAccount: "Noch kein Konto?",
       createAccount: "Kostenloses Konto erstellen",
-      demoTitle: "Testkonten für die lokale Version (Passwort: Mamp@2026)",
-      demoAccounts: [
-        { email: "admin@mamp.ma", role: "Super-Admin" },
-        { email: "user1@mamp.ma", role: "Vereinsvorsitzende" },
-        { email: "user2@mamp.ma", role: "Schatzmeister" },
-        { email: "partenaire@mamp.ma", role: "Partnerstelle" },
-      ],
-      demoNote:
-        "Auf der veröffentlichten Version (mamp.pages.dev) laufen die Demo-Dashboards mit Testdaten ohne Anmeldung.",
     },
     register: {
       title: "Neues Konto erstellen",

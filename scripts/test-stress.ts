@@ -5,6 +5,8 @@
  * واختبار سباقات: إضافة منخرطين متزامنين لنفس الجمعية (توليد الأرقام الفريدة).
  *
  * الاستعمال: bun scripts/test-stress.ts [BASE_URL] [CONCURRENCY] [TOTAL]
+ *
+ * المتطلب: بذرة التطوير التجريبية أولاً — bun run db:seed:demo
  */
 const BASE = process.argv[2] ?? "http://localhost:3100";
 const CONCURRENCY = Number(process.argv[3] ?? 50);

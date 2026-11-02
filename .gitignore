@@ -75,3 +75,13 @@ app-android/local.properties
 # ملفات محلية مؤقتة
 /upload/
 /tmp-shots/
+
+# Prisma client (runtime=workerd) — يولَّد آلياً عبر prisma generate
+src/generated/prisma/
+
+# مخرجات بناء OpenNext/Workers (تولَّد آلياً)
+.open-next/
+.wrangler/
+
+# بذرة D1 — تحتوي مدفأة كلمة سر الإنتاج (تولَّد عند الحاجة عبر gen-d1-seed.ts)
+d1/seed.sql

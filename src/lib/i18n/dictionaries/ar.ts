@@ -307,14 +307,6 @@ export const ar: Dict = {
       errorNetwork: "تعذر الاتصال بالخادم. تحققوا من الشبكة.",
       noAccount: "ليست لديكم حساب؟",
       createAccount: "أنشئوا حساباً مجانياً",
-      demoTitle: "حسابات تجريبية للنسخة المحلية (كلمة السر: Mamp@2026)",
-      demoAccounts: [
-        { email: "admin@mamp.ma", role: "سوبر أدمين" },
-        { email: "user1@mamp.ma", role: "رئيسة جمعية" },
-        { email: "user2@mamp.ma", role: "أمين مال" },
-        { email: "partenaire@mamp.ma", role: "جهة شريكة" },
-      ],
-      demoNote: "على النسخة المنشورة (mamp.pages.dev) تعمل لوحات العرض ببيانات تجريبية دون تسجيل دخول.",
     },
     register: {
       title: "إنشاء حساب جديد",

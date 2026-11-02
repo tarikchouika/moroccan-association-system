@@ -1,11 +1,11 @@
 "use client";
 
 /**
- * مبدل اللغة — ثماني لغات رسمية.
- * سطح المكتب: زر كرة أرضية مع قائمة منسدلة.
- * الجوال: نسخة مدمجة (أيقونة فقط) في الشريط + شرائح داخل القائمة.
+ * مبدّل اللغة — ثماني لغات رسمية.
+ * سطح المكتب والجوال: زر كرة أرضية (نسخة compact في أشرطة الجوال) مع قائمة منسدلة.
+ * هو الأداة الوحيدة لتغيير اللغة في الهيدر — لا شرائح مكررة داخل القوائم.
  */
-import { Check, Globe, Languages } from "lucide-react";
+import { Check, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -66,34 +66,5 @@ export function LanguageSwitcher({
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
-  );
-}
-
-/** نسخة الجوال — شرائح أفقية */
-export function LanguageChips() {
-  const { lang, setLang } = useI18n();
-  return (
-    <div className="mt-3 border-t border-border pt-3">
-      <p className="mb-2 flex items-center gap-1.5 text-[11px] font-black text-muted-foreground">
-        <Languages className="size-3.5" />
-        {LANGUAGES[lang].nativeName} · 8
-      </p>
-      <div className="flex flex-wrap gap-1.5">
-        {LANG_ORDER.map((l) => (
-          <button
-            key={l}
-            onClick={() => setLang(l as Lang)}
-            className={cn(
-              "rounded-full border px-3 py-1.5 text-[12px] font-bold transition-colors",
-              l === lang
-                ? "border-primary bg-secondary text-primary"
-                : "border-border text-muted-foreground hover:border-primary/40 hover:text-primary"
-            )}
-          >
-            {LANGUAGES[l].nativeName}
-          </button>
-        ))}
-      </div>
-    </div>
   );
 }

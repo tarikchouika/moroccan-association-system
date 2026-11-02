@@ -29,11 +29,13 @@ restore() {
 }
 trap restore EXIT
 
-echo "==> [2/5] توليد البيانات العمومية من قاعدة SQLite المحلية"
-# مسار قاعدة بيانات مطلق محسوب عند البناء — يعمل محلياً وعلى Vercel/CI
+echo "==> [2/5] توليد عميل Prisma (بيانات العرض العمومية مثبتة في src/generated)"
+# ملاحظة: بيانات العرض (الجمعيات/الفعاليات/المشاريع) للواجهة العمومية مثبتة
+# في src/generated/demo-data.ts — لا تُعاد توليدها من قاعدة محلية متغيرة.
+# لتحديثها يدوياً بعد بذر تجريبي محلي: bun run demo:generate
 export DATABASE_URL="file:$(pwd)/db/custom.db"
 bunx prisma generate --schema prisma/schema.prisma
-bun run demo:generate
+bash scripts/fix-prisma-external.sh
 
 echo "==> [2b/5] فحص الترجمات الثماني (تطابق المفاتيح + حفظ الأرقام والروابط)"
 bun scripts/check-i18n.ts
@@ -70,9 +72,12 @@ with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as z:
     for root, dirs, files in os.walk(OUT):
         for f in sorted(files):
             p = os.path.join(root, f)
+            rel = os.path.relpath(p, OUT)
             if os.path.abspath(p) == os.path.abspath(zpath):
                 continue
-            z.write(p, os.path.relpath(p, OUT))
+            if rel == "_worker.js":
+                continue  # ملف نشر كلاودفلير — لا مكان له في نسخة العمل دون اتصال
+            z.write(p, rel)
             count += 1
 size_mb = os.path.getsize(zpath) / (1024 * 1024)
 print(f"    ملفات مضغوطة: {count}")

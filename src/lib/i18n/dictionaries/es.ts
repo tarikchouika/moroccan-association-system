@@ -317,15 +317,6 @@ export const es: Dict = {
       errorNetwork: "No se pudo conectar con el servidor. Comprueben la red.",
       noAccount: "¿No tienen cuenta?",
       createAccount: "Creen una cuenta gratuita",
-      demoTitle: "Cuentas de demostración de la versión local (contraseña: Mamp@2026)",
-      demoAccounts: [
-        { email: "admin@mamp.ma", role: "Superadministrador" },
-        { email: "user1@mamp.ma", role: "Presidenta de asociación" },
-        { email: "user2@mamp.ma", role: "Tesorero" },
-        { email: "partenaire@mamp.ma", role: "Entidad asociada" },
-      ],
-      demoNote:
-        "En la versión publicada (mamp.pages.dev), los paneles de demostración funcionan con datos de prueba sin necesidad de iniciar sesión.",
     },
     register: {
       title: "Crear una cuenta nueva",

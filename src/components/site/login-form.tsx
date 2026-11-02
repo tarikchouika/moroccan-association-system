@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LogIn, Mail, Lock, AlertCircle, Info } from "lucide-react";
+import { LogIn, Mail, Lock, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -126,22 +126,6 @@ export function LoginForm() {
           </p>
         </CardContent>
       </Card>
-
-      {/* حسابات تجريبية */}
-      <div className="mt-6 rounded-xl border border-dashed border-primary/30 bg-secondary/50 p-4 text-[12px] leading-6">
-        <p className="mb-2 flex items-center gap-1.5 font-extrabold text-primary">
-          <Info className="size-4" />
-          {t.demoTitle}
-        </p>
-        <ul className="grid grid-cols-1 gap-1 text-muted-foreground sm:grid-cols-2" dir="ltr">
-          {t.demoAccounts.map((a) => (
-            <li key={a.email}>{a.email} — {a.role}</li>
-          ))}
-        </ul>
-        <p className="mt-2 text-[11px] text-muted-foreground/80">
-          {t.demoNote}
-        </p>
-      </div>
     </div>
   );
 }
