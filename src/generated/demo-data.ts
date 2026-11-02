@@ -2,14 +2,14 @@
 import type { DemoData } from "./types";
 
 export const DEMO_DATA: DemoData = {
-  "generatedAt": "2026-11-02T00:34:16.623Z",
+  "generatedAt": "2026-11-02T01:33:05.917Z",
   "stats": {
     "users": 20,
     "associations": 4,
     "activeMembers": 15,
-    "transactions": 20,
+    "transactions": 22,
     "donations": 7,
-    "managedAmount": 290260
+    "managedAmount": 290271
   },
   "associations": [
     {
@@ -66,10 +66,10 @@ export const DEMO_DATA: DemoData = {
   ],
   "events": [
     {
-      "id": "cmvxdxxrf0046q26lhegklmhu",
+      "id": "cmvykyogz0040rfxqe69g4wep",
       "title": "الدورة التكوينية السابعة في تطوير الويب",
       "category": "تكوينية",
-      "startDate": "2026-11-22T05:24:24.745Z",
+      "startDate": "2026-11-23T01:28:42.850Z",
       "location": "مقر الجمعية، الدار البيضاء",
       "city": "الدار البيضاء",
       "maxParticipants": 30,
@@ -77,10 +77,10 @@ export const DEMO_DATA: DemoData = {
       "associationSlug": "association-nadwa-tanmiya"
     },
     {
-      "id": "cmvxdxxre0040q26l32fhyxih",
+      "id": "cmvykyogz0042rfxqda2o04ci",
       "title": "ملتقى المقاولاتية الشابة",
       "category": "تحسيسة",
-      "startDate": "2026-12-16T05:24:24.745Z",
+      "startDate": "2026-12-17T01:28:42.850Z",
       "location": "قاعة المؤتمرات، الدار البيضاء",
       "city": "الدار البيضاء",
       "maxParticipants": 120,
