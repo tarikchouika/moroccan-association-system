@@ -105,7 +105,7 @@ jobs:
           APKSIGNER=$(find "$ANDROID_HOME/build-tools" /usr/local/lib/android/sdk/build-tools -name apksigner 2>/dev/null | sort -V | tail -1 || true)
           if [ -n "$APKSIGNER" ] && [ -x "$APKSIGNER" ]; then
             echo "استعمال apksigner: $APKSIGNER"
-            SCHEMES=$("$APKSIGNER" verify --verbose mamp.apk 2>/dev/null | grep -E "^Verified using v[12] \(.*\): true" | cut -d: -f1 | sed 's/^/  - /' || true)
+            SCHEMES=$("$APKSIGNER" verify --verbose mamp.apk 2>/dev/null | grep -E "^Verified using v[0-9].*true$" | sed 's/^/  - /' || true)
           else
             echo "⚠️ apksigner غير متاح — تُعرض معلومات الشهادة من المخزن"
           fi
