@@ -3,7 +3,7 @@
 /**
  * مبدل اللغة — ثماني لغات رسمية.
  * سطح المكتب: زر كرة أرضية مع قائمة منسدلة.
- * الجوال: صف شرائح أفقي داخل القائمة.
+ * الجوال: نسخة مدمجة (أيقونة فقط) في الشريط + شرائح داخل القائمة.
  */
 import { Check, Globe, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,14 @@ import { useI18n } from "@/lib/i18n/provider";
 import { LANGUAGES, LANG_ORDER, type Lang } from "@/lib/i18n/config";
 import { cn } from "@/lib/utils";
 
-export function LanguageSwitcher({ className }: { className?: string }) {
+export function LanguageSwitcher({
+  className,
+  compact = false,
+}: {
+  className?: string;
+  /** نسخة مضغوطة لأشرطة الجوال: أيقونة + رمز اللغة فقط */
+  compact?: boolean;
+}) {
   const { lang, setLang } = useI18n();
   const meta = LANGUAGES[lang];
 
@@ -27,11 +34,15 @@ export function LanguageSwitcher({ className }: { className?: string }) {
         <Button
           variant="ghost"
           size="sm"
-          className={cn("h-9 gap-1.5 rounded-lg px-2.5 font-bold", className)}
+          className={cn(
+            "h-9 gap-1.5 rounded-lg px-2.5 font-bold",
+            compact && "px-2",
+            className
+          )}
           aria-label={meta.nativeName}
           title={meta.nativeName}
         >
-          <Globe className="size-4" />
+          <Globe className="size-4 shrink-0" />
           <span className="text-[12px] tracking-wide">{meta.short}</span>
         </Button>
       </DropdownMenuTrigger>

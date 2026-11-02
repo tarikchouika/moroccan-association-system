@@ -230,7 +230,7 @@ export function ChatbotWidget() {
                 <button
                   key={s}
                   onClick={() => send(s)}
-                  className="whitespace-nowrap text-[11px] font-semibold rounded-full border border-border bg-card px-3 py-1.5 text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+                  className="shrink-0 whitespace-nowrap text-[11px] font-semibold rounded-full border border-border bg-card px-3 py-1.5 text-muted-foreground hover:border-primary hover:text-primary transition-colors"
                 >
                   {s}
                 </button>

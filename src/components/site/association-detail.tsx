@@ -29,9 +29,18 @@ export function AssociationDetailBody({
       <div className="gradient-dark zellige-pattern mb-8 overflow-hidden rounded-3xl p-8 text-white sm:p-10">
         <div className="flex flex-wrap items-start justify-between gap-6">
           <div className="flex items-start gap-5">
-            <span className="grid size-20 shrink-0 place-items-center rounded-2xl border border-white/15 bg-white/10 text-2xl font-black text-gold">
-              {demo.assocAcronym(a)?.slice(0, 2) || a.name.slice(0, 2)}
-            </span>
+            {a.logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element -- لوغو data URL من قاعدة البيانات
+              <img
+                src={a.logoUrl}
+                alt={demo.assocName(a)}
+                className="size-20 shrink-0 rounded-2xl border border-white/15 bg-white/95 object-contain p-1.5"
+              />
+            ) : (
+              <span className="grid size-20 shrink-0 place-items-center rounded-2xl border border-white/15 bg-white/10 text-2xl font-black text-gold">
+                {demo.assocAcronym(a)?.slice(0, 2) || a.name.slice(0, 2)}
+              </span>
+            )}
             <div>
               <div className="mb-2 flex flex-wrap items-center gap-2">
                 {a.isVerified && (

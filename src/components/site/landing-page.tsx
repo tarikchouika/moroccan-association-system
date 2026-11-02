@@ -404,9 +404,19 @@ function AssociationsPreview({ associations }: { associations: DemoData["associa
                 <Card className="h-full transition-all duration-300 group-hover:-translate-y-1.5 group-hover:border-primary/30 group-hover:shadow-xl">
                   <CardContent className="p-6">
                     <div className="mb-4 flex items-start justify-between">
-                      <span className="grid size-12 place-items-center rounded-xl bg-secondary text-lg font-black text-primary">
-                        {demo.assocAcronym(a)?.slice(0, 2) || a.name.slice(0, 2)}
-                      </span>
+                      {a.logoUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element -- لوغو data URL من قاعدة البيانات
+                        <img
+                          src={a.logoUrl}
+                          alt={demo.assocName(a)}
+                          className="size-12 rounded-xl border border-border bg-white object-contain p-1"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <span className="grid size-12 place-items-center rounded-xl bg-secondary text-lg font-black text-primary">
+                          {demo.assocAcronym(a)?.slice(0, 2) || a.name.slice(0, 2)}
+                        </span>
+                      )}
                       <div className="flex flex-col items-end gap-1.5">
                         {a.isVerified && (
                           <Badge className="gap-1 border-primary/25 bg-secondary px-2 py-0.5 text-[10px] font-bold text-primary">

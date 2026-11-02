@@ -61,6 +61,11 @@ const createSchema = z.object({
   presidentName: z.string().min(3, "اسم الرئيس/ة مطلوب"),
   presidentEmail: z.string().email("بريد الرئيس/ة غير صالح"),
   presidentPassword: z.string().min(8, "كلمة سر الحساب (8 أحرف على الأقل)"),
+  logoUrl: z
+    .string()
+    .regex(/^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/, "صيغة اللوغو غير مدعومة")
+    .optional()
+    .or(z.literal("")),
 });
 
 /** POST — تسجيل جمعية جديدة (تأسيس رقمي لملفها على المنصة) */
@@ -118,6 +123,11 @@ export async function POST(req: NextRequest) {
       legalStatus: d.legalStatus,
       iceNumber: d.iceNumber || null,
       taxId: d.taxId || null,
+      logoUrl: (() => {
+        if (!d.logoUrl) return null;
+        const b64 = d.logoUrl.split(",")[1] ?? "";
+        return Math.floor((b64.length * 3) / 4) <= 300 * 1024 ? d.logoUrl : null;
+      })(),
       status: "PENDING",
       createdBy: user.id,
     },

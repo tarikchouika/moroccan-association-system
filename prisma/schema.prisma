@@ -27,6 +27,7 @@ model User {
   phone        String?
   nationalId   String? // رقم البطاقة الوطنية (اختياري، بموافقة CNDP)
   nationality  String    @default("MA") // MA للمواطنين، ورموز أخرى للأجانب
+  avatarUrl    String? // صورة المستخدم (data URL مضغوطة)
   // دور المستخدم على مستوى المنصة:
   // SUPER_ADMIN (مالك المنصة) | ASSOCIATION_ADMIN (أدمين جمعية)
   // CO_ADMIN (منخرط/متطوع بصلاحيات) | PARTNER (جهة حكومية أو خاصة)
@@ -41,14 +42,37 @@ model User {
   donations        Donation[]
   eventRegistrations EventRegistration[]
   documents        Document[]   @relation("UploadedDocs")
+  identityDocs     UserDocument[] @relation("UserDocs")
   auditLogs        AuditLog[]
   notifications    Notification[]
   chatMessages     ChatMessage[]
   createdEvents    Event[]      @relation("EventCreator")
   approvedTx       Transaction[] @relation("TxApprover")
+  createdProjects  CollaborativeProject[] @relation("ProjectCreator")
 
   @@index([role])
   @@index([email])
+}
+
+// ============================================================================
+// وثائق هوية المستخدم (بطاقة وطنية / جواز سفر / رخصة السياقة)
+// تُخزن مضغوطة (data URL) ولا يطلع عليها إلا صاحبها والسوبر أدمين — قانون 09.08
+// ============================================================================
+
+model UserDocument {
+  id        String   @id @default(cuid())
+  // NATIONAL_ID (البطاقة الوطنية) | PASSPORT (جواز السفر) | DRIVERS_LICENSE (رخصة السياقة)
+  docType   String
+  label     String? // وصف اختياري (مثال: بطاقة وطنية إلكترونية)
+  dataUrl   String // الصورة المضغوطة data:image/...;base64
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation("UserDocs", fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@unique([userId, docType])
+  @@index([userId])
 }
 
 // ============================================================================
@@ -97,6 +121,8 @@ model Association {
   budgets        Budget[]
   notifications  Notification[]
   chatMessages   ChatMessage[]
+  ledProjects        CollaborativeProject[] @relation("ProjectLead")
+  projectParticipations ProjectParticipant[]
 
   @@index([status])
   @@index([category])
@@ -136,6 +162,63 @@ model Membership {
   @@index([associationId])
   @@index([userId])
   @@index([status])
+}
+
+// ============================================================================
+// المشاريع المشتركة — فعاليات وبرامج ومشاريع بين الجمعيات والجهات
+// ============================================================================
+
+model CollaborativeProject {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  // نوع العمل المشترك: EVENT (فعالية) | PROGRAM (برنامج) | PROJECT (مشروع)
+  kind        String    @default("PROJECT")
+  // نفس فئات الجمعيات: تنموية | ثقافية | رياضية | بيئية | اجتماعية | صحية...
+  category    String    @default("تنموية")
+  objectives  String? // الأهداف المتوقعة
+  startDate   DateTime?
+  endDate     DateTime?
+  location    String?
+  city        String?
+  isPublic    Boolean   @default(true)
+  // DRAFT | PUBLISHED | IN_PROGRESS | COMPLETED | CANCELLED
+  status      String    @default("PUBLISHED")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  leadAssociation   Association @relation("ProjectLead", fields: [leadAssociationId], references: [id])
+  leadAssociationId String
+  createdBy         User?       @relation("ProjectCreator", fields: [createdById], references: [id])
+  createdById       String?
+
+  participants  ProjectParticipant[]
+
+  @@index([kind])
+  @@index([status])
+  @@index([leadAssociationId])
+}
+
+model ProjectParticipant {
+  id    String @id @default(cuid())
+  // الجهة المشاركة إما جمعية على المنصة أو جهة خارجية (اسم حر)
+  associationId String?
+  association   Association? @relation(fields: [associationId], references: [id], onDelete: Cascade)
+  partnerName   String?
+  // GOVERNMENT (جهة حكومية) | PRIVATE (قطاع خاص) | NGO (منظمة) | INTERNATIONAL (جهة دولية)
+  partnerType   String   @default("GOVERNMENT")
+  // دور الجهة: COORDINATION (تنسيق) | FUNDING (تمويل) | EXECUTION (تنفيذ) | SUPPORT (دعم)
+  partnerRole   String   @default("EXECUTION")
+  // PENDING (بانتظار قبول الجهة) | ACTIVE (مشاركة فاعلة) | DECLINED (اعتذار)
+  status        String   @default("ACTIVE")
+  joinedAt      DateTime @default(now())
+
+  project CollaborativeProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String
+
+  @@unique([projectId, associationId])
+  @@index([projectId])
+  @@index([associationId])
 }
 
 // ============================================================================

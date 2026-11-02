@@ -136,6 +136,15 @@
     font-family: "Cairo", "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
     letter-spacing: -0.005em;
   }
+  /* شبكة أمان تعدد اللغات: الكلمات المركبة الطويلة (ألمانية/روسية...) تكسر عند الحاجة
+     دون أن تتمدد الحاويات المرنة أو الشبكية وتسبب فيضاً أفقياً */
+  h1, h2, h3, h4, h5, h6, p, li, a, button, label, span, dt, dd, th, td, summary {
+    overflow-wrap: break-word;
+  }
+  /* الأزرار والشرائح داخل الحاويات المرنة تنكمش بدل دفع العناصر خارج الشاشة */
+  .flex > *, .grid > * {
+    min-width: 0;
+  }
   ::selection {
     background: color-mix(in srgb, var(--gold) 35%, transparent);
   }

@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
-import { Menu, X, LayoutDashboard, LogIn } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Logo } from "@/components/site/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageSwitcher, LanguageChips } from "@/components/i18n/language-switcher";
@@ -21,6 +21,7 @@ export function Navbar() {
   const NAV_LINKS = [
     { href: "/", label: d.nav.home },
     { href: "/associations", label: d.nav.associations },
+    { href: "/projects", label: d.nav.projects },
     { href: "/legal", label: d.nav.legal },
     { href: "/assistant", label: d.nav.assistant },
   ];
@@ -44,19 +45,19 @@ export function Navbar() {
         scrolled ? "glass border-b border-border shadow-sm" : "bg-transparent"
       )}
     >
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6">
         <Link href="/" aria-label={d.nav.homeAria}>
-          <Logo />
+          <Logo taglineClassName="hidden 2xl:block" />
         </Link>
 
-        {/* روابط سطح المكتب */}
-        <nav className="hidden md:flex items-center gap-1" aria-label={d.nav.mainNavAria}>
+        {/* روابط سطح المكتب — من xl ففقط: أوسع تسمية (الروسية) تتطلب ~1250px */}
+        <nav className="hidden min-w-0 items-center gap-1 xl:flex" aria-label={d.nav.mainNavAria}>
           {NAV_LINKS.map((l) => (
             <Link
               key={l.href}
               href={l.href}
               className={cn(
-                "rounded-lg px-3.5 py-2 text-sm font-bold transition-colors",
+                "rounded-lg px-2.5 py-2 text-[13px] font-bold transition-colors",
                 pathname === l.href
                   ? "text-primary bg-secondary"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -67,25 +68,24 @@ export function Navbar() {
           ))}
         </nav>
 
-        <div className="hidden md:flex items-center gap-2">
+        <div className="hidden items-center gap-1 xl:flex">
           <ThemeToggle />
           <LanguageSwitcher />
-          <Button asChild variant="ghost" className="font-bold">
+          <Button asChild variant="ghost" className="px-3 text-[13px] font-bold">
             <Link href="/login">
-              <LogIn className="size-4" />
               {d.nav.login}
             </Link>
           </Button>
-          <Button asChild className="font-bold bg-primary hover:bg-primary/90">
+          <Button asChild className="bg-primary px-3 text-[13px] font-bold hover:bg-primary/90">
             <Link href="/register">
-              <LayoutDashboard className="size-4" />
               {d.nav.register}
             </Link>
           </Button>
         </div>
 
-        {/* زر الجوال */}
-        <div className="flex items-center gap-1.5 md:hidden">
+        {/* زر الجوال — مبدل اللغة + السمة + القائمة */}
+        <div className="flex items-center gap-1 xl:hidden">
+          <LanguageSwitcher compact />
           <ThemeToggle />
           <button
             className="rounded-lg p-2 hover:bg-muted"
@@ -100,7 +100,7 @@ export function Navbar() {
 
       {/* قائمة الجوال */}
       {open && (
-        <div className="md:hidden msg-in border-t border-border bg-card px-4 pb-4 pt-2 shadow-lg">
+        <div className="msg-in border-t border-border bg-card px-4 pb-4 pt-2 shadow-lg xl:hidden">
           <nav className="flex flex-col gap-1" aria-label={d.nav.mainNavAria}>
             {NAV_LINKS.map((l) => (
               <Link

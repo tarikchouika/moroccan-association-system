@@ -15,10 +15,13 @@ export function Logo({
   className,
   light = false,
   compact = false,
+  taglineClassName,
 }: {
   className?: string;
   light?: boolean;
   compact?: boolean;
+  /** أصناف إضافية لسطر الشعار الصغير (مثال: إخفاؤه تحت 2xl في الشريط الضيق) */
+  taglineClassName?: string;
 }) {
   const { d, lang } = useI18n();
   return (
@@ -67,7 +70,8 @@ export function Logo({
           <span
             className={cn(
               "mt-1 text-[10px] font-semibold",
-              light ? "text-[#8fc7ff]" : "text-primary"
+              light ? "text-[#8fc7ff]" : "text-primary",
+              taglineClassName
             )}
           >
             {d.common.brandTagline}

@@ -181,7 +181,7 @@ export function AssistantChat() {
               <button
                 key={s}
                 onClick={() => send(s)}
-                className="whitespace-nowrap rounded-full border border-border bg-background px-3.5 py-1.5 text-[12px] font-bold text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+                className="shrink-0 whitespace-nowrap rounded-full border border-border bg-background px-3.5 py-1.5 text-[12px] font-bold text-muted-foreground transition-colors hover:border-primary hover:text-primary"
               >
                 {s}
               </button>

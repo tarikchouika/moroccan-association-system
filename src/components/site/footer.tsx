@@ -55,6 +55,7 @@ export function Footer() {
             <h3 className="mb-4 text-sm font-extrabold text-gold">{d.footer.platformTitle}</h3>
             <ul className="space-y-2.5 text-sm text-white/70">
               <li><Link className="hover:text-white transition-colors" href="/associations">{d.nav.associations}</Link></li>
+              <li><Link className="hover:text-white transition-colors" href="/projects">{d.nav.projects}</Link></li>
               <li><Link className="hover:text-white transition-colors" href="/legal">{d.nav.legal}</Link></li>
               <li><Link className="hover:text-white transition-colors" href="/assistant">{d.nav.assistant}</Link></li>
               <li><Link className="hover:text-white transition-colors" href="/login">{d.footer.membersLogin}</Link></li>

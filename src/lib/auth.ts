@@ -137,7 +137,7 @@ export async function getCurrentUser() {
     where: { id: session.sub },
     include: {
       memberships: {
-        include: { association: { select: { id: true, name: true, slug: true, status: true } } },
+        include: { association: { select: { id: true, name: true, slug: true, status: true, isVerified: true } } },
       },
     },
   });

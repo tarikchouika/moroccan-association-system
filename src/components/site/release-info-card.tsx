@@ -112,9 +112,9 @@ export function ReleaseInfoCard() {
         <dl className="grid grid-cols-3 gap-3">
           {rows.map(({ icon: Icon, label, value }) => (
             <div key={label} className="rounded-xl bg-muted/50 p-3 text-center">
-              <dt className="mb-1 flex items-center justify-center gap-1 text-[11px] font-bold text-muted-foreground">
-                <Icon className="size-3" />
-                {label}
+              <dt className="mb-1 text-center text-[11px] font-bold leading-4 text-muted-foreground">
+                <Icon className="me-1 inline size-3 shrink-0 align-[-1px]" />
+                <span className="break-words">{label}</span>
               </dt>
               <dd className="text-sm font-extrabold">{value}</dd>
             </div>

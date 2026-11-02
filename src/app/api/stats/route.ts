@@ -60,7 +60,7 @@ export async function GET(req: NextRequest) {
   const startOfYear = new Date(year, 0, 1);
   const endOfYear = new Date(year + 1, 0, 1);
 
-  const [members, pendingMembers, income, expense, donationsAgg, donationCount, events, upcomingEvents, docs, budget] =
+  const [members, pendingMembers, income, expense, donationsAgg, donationCount, events, upcomingEvents, docs, budget, assocInfo] =
     await Promise.all([
       db.membership.count({ where: { associationId, status: "ACTIVE" } }),
       db.membership.count({ where: { associationId, status: "PENDING" } }),
@@ -83,6 +83,7 @@ export async function GET(req: NextRequest) {
       }),
       db.document.count({ where: { associationId } }),
       db.budget.findFirst({ where: { associationId, fiscalYear: year } }),
+      db.association.findUnique({ where: { id: associationId }, select: { name: true, logoUrl: true } }),
     ]);
 
   // تطور شهري
@@ -112,6 +113,8 @@ export async function GET(req: NextRequest) {
 
   return Response.json({
     association: {
+      name: assocInfo?.name ?? "",
+      logoUrl: assocInfo?.logoUrl ?? null,
       members,
       pendingMembers,
       incomeTotal,

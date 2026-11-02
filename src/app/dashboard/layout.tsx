@@ -29,7 +29,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       user={{ id: user.id, name: user.fullName, email: user.email, role: user.role }}
       associations={associations}
     >
-      <DashboardChrome>{children}</DashboardChrome>
+      <DashboardChrome avatarUrl={user.avatarUrl}>{children}</DashboardChrome>
     </DashboardShell>
   );
 }

@@ -51,7 +51,7 @@ PAGES=$(find "$OUT_DIR" -name "*.html" | wc -l)
 echo "    عدد الصفحات المولدة: $PAGES"
 
 # صفحات وملفات مطلوبة يجب أن تتوفر
-for p in index.html associations/index.html legal/index.html legal/terms/index.html legal/privacy/index.html legal/cookies/index.html assistant/index.html app/index.html login/index.html register/index.html sitemap.xml robots.txt manifest.webmanifest; do
+for p in index.html associations/index.html projects/index.html legal/index.html legal/terms/index.html legal/privacy/index.html legal/cookies/index.html assistant/index.html app/index.html login/index.html register/index.html sitemap.xml robots.txt manifest.webmanifest; do
   if [ ! -f "$OUT_DIR/$p" ]; then
     echo "❌ ملف مفقود: $p" >&2
     exit 1

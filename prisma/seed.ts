@@ -34,6 +34,8 @@ async function main() {
   // تفريغ الجداول
   await prisma.chatMessage.deleteMany();
   await prisma.auditLog.deleteMany()
+  await prisma.projectParticipant.deleteMany()
+  await prisma.collaborativeProject.deleteMany()
   await prisma.notification.deleteMany()
   await prisma.eventRegistration.deleteMany()
   await prisma.event.deleteMany()
@@ -443,6 +445,76 @@ async function main() {
       { action: "MODERATION", entity: "Association", entityId: nadwa.id, details: "توثيق الجمعية ومنح صفة المنفعة العامة", userId: superAdmin.id },
       { action: "CREATE", entity: "Association", entityId: amal.id, details: "طلب تسجيل جمعية أمل للعمل الاجتماعي — في انتظار المصادقة", userId: superAdmin.id },
       { action: "LOGIN", entity: "User", entityId: u1.id, details: "تسجيل دخول رئيسة الجمعية", userId: u1.id },
+    ],
+  });
+
+  // ============================================================
+  // 10) مشاريع وبرامج مشتركة (بين الجمعيات والجهات)
+  // ============================================================
+  await prisma.collaborativeProject.createMany({
+    data: [
+      {
+        title: "برنامج محو الأمية الرقمية بالعالم القروي",
+        description:
+          "برنامج تكويني مشترك يستهدف 300 مستفيد بالعالم القروي في مجالات المهارات الرقمية الأساسية والبحث عن العمل إلكترونياً.",
+        objectives: "تكوين 300 مستفيد · تجهيز 3 قاعات · تكوين 12 مكوّناً محلياً",
+        kind: "PROGRAM",
+        category: "تعليمية",
+        startDate: daysFromNow(14),
+        endDate: daysFromNow(120),
+        location: "دار الشباب المركزية",
+        city: "الجديدة",
+        isPublic: true,
+        status: "IN_PROGRESS",
+        leadAssociationId: nadwa.id,
+        createdById: superAdmin.id,
+      },
+      {
+        title: "ملتقى الشباب للمبادرات البيئية",
+        description:
+          "فعالية مشتركة تجمع شباب الجمعيات لبلورة مبادرات بيئية قابلة للتمويل مع ورشات التدبير المستدام للماء والطاقة.",
+        objectives: "بلورة 10 مبادرات · تشجير 3 أحياء · تحسيس 500 تلميذ",
+        kind: "EVENT",
+        category: "بيئية",
+        startDate: daysFromNow(30),
+        isPublic: true,
+        status: "PUBLISHED",
+        leadAssociationId: mido.id,
+        createdById: superAdmin.id,
+      },
+      {
+        title: "مشروع القوافل الطبية للتغطية الصحية بالمناطق النائية",
+        description:
+          "مشروع صحي مشترك لتنظيم قوافل طبية مجانية بالمناطق النائية مع توزيع أدوية أساسية بشراكة مع المختبرات الوطنية.",
+        objectives: "6 قوافل · 2400 فحص طبي · توزيع 3000 وحدة دوائية",
+        kind: "PROJECT",
+        category: "صحية",
+        startDate: daysFromNow(45),
+        endDate: daysFromNow(220),
+        location: "جوائع إقليمية متعددة",
+        city: "بني ملال",
+        isPublic: true,
+        status: "PUBLISHED",
+        leadAssociationId: amal.id,
+        createdById: superAdmin.id,
+      },
+    ],
+  });
+
+  const seededProjects = await prisma.collaborativeProject.findMany({ select: { id: true, title: true } });
+  const projByTitle = Object.fromEntries(seededProjects.map((p) => [p.title, p.id]));
+
+  await prisma.projectParticipant.createMany({
+    data: [
+      { projectId: projByTitle["برنامج محو الأمية الرقمية بالعالم القروي"], associationId: alMashriq.id, status: "ACTIVE", partnerRole: "EXECUTION" },
+      { projectId: projByTitle["برنامج محو الأمية الرقمية بالعالم القروي"], associationId: mido.id, status: "ACTIVE", partnerRole: "SUPPORT" },
+      { projectId: projByTitle["برنامج محو الأمية الرقمية بالعالم القروي"], partnerName: "المديرية الإقليمية للتربية الوطنية", partnerType: "GOVERNMENT", partnerRole: "COORDINATION", status: "ACTIVE" },
+      { projectId: projByTitle["برنامج محو الأمية الرقمية بالعالم القروي"], partnerName: "مؤسسة الأطلس للتنمية الرقمية", partnerType: "PRIVATE", partnerRole: "FUNDING", status: "ACTIVE" },
+      { projectId: projByTitle["ملتقى الشباب للمبادرات البيئية"], associationId: amal.id, status: "ACTIVE", partnerRole: "EXECUTION" },
+      { projectId: projByTitle["ملتقى الشباب للمبادرات البيئية"], partnerName: "المندوبية السامية للمياه والغابات", partnerType: "GOVERNMENT", partnerRole: "COORDINATION", status: "ACTIVE" },
+      { projectId: projByTitle["ملتقى الشباب للمبادرات البيئية"], partnerName: "الشبكة المتوسطية للتنمية المستدامة", partnerType: "INTERNATIONAL", partnerRole: "SUPPORT", status: "ACTIVE" },
+      { projectId: projByTitle["مشروع القوافل الطبية للتغطية الصحية بالمناطق النائية"], associationId: nadwa.id, status: "ACTIVE", partnerRole: "FUNDING" },
+      { projectId: projByTitle["مشروع القوافل الطبية للتغطية الصحية بالمناطق النائية"], partnerName: "المديرية الجهوية للصحة", partnerType: "GOVERNMENT", partnerRole: "COORDINATION", status: "ACTIVE" },
     ],
   });
 

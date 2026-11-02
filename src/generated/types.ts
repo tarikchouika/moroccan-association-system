@@ -16,6 +16,7 @@ export interface DemoAssociation {
   memberCount: number;
   donationCount: number;
   iceNumber: string | null;
+  logoUrl?: string | null;
 }
 
 export interface DemoEvent {
@@ -30,6 +31,32 @@ export interface DemoEvent {
   associationSlug: string;
 }
 
+export interface DemoProjectParticipant {
+  name: string;
+  /** ASSOCIATION (جمعية على المنصة) أو نوع الجهة الخارجية */
+  type: string;
+  role: string;
+  status: string;
+}
+
+export interface DemoProject {
+  id: string;
+  title: string;
+  description: string;
+  objectives: string;
+  /** EVENT | PROGRAM | PROJECT */
+  kind: string;
+  category: string;
+  startDate: string | null;
+  endDate: string | null;
+  location: string;
+  city: string;
+  status: string;
+  leadName: string;
+  leadSlug: string;
+  participants: DemoProjectParticipant[];
+}
+
 export interface DemoData {
   generatedAt: string;
   stats: {
@@ -42,6 +69,7 @@ export interface DemoData {
   };
   associations: DemoAssociation[];
   events: DemoEvent[];
+  projects: DemoProject[];
 }
 
 export type DemoStats = DemoData["stats"];
