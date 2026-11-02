@@ -1,0 +1,23 @@
+name: cf-inspect
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inspect zones and pages projects
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          echo "account=$CLOUDFLARE_ACCOUNT_ID"
+          echo "--- zones ---"
+          curl -s -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/zones?account.id=$CLOUDFLARE_ACCOUNT_ID&per_page=50" \
+            | jq -r 'if .success then (.result[]? | "ZONE \(.name) \(.id) \(.status)") else "ERR \(.errors)" end'
+          echo "--- pages ---"
+          curl -s -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects?per_page=50" \
+            | jq -r 'if .success then (.result[]? | "PROJECT \(.name) \(.subdomain) \(.domains|join(","))") else "ERR \(.errors)" end'
