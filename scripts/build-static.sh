@@ -35,7 +35,6 @@ echo "==> [2/5] توليد عميل Prisma (بيانات العرض العموم
 # لتحديثها يدوياً بعد بذر تجريبي محلي: bun run demo:generate
 export DATABASE_URL="file:$(pwd)/db/custom.db"
 bunx prisma generate --schema prisma/schema.prisma
-bash scripts/fix-prisma-external.sh
 
 echo "==> [2b/5] فحص الترجمات الثماني (تطابق المفاتيح + حفظ الأرقام والروابط)"
 bun scripts/check-i18n.ts
@@ -76,7 +75,7 @@ with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as z:
             if os.path.abspath(p) == os.path.abspath(zpath):
                 continue
             if rel == "_worker.js":
-                continue  # ملف نشر كلاودفلير — لا مكان له في نسخة العمل دون اتصال
+                continue  # دفاعي: لا يوجد _worker.js منذ v1.6.1 (أزيل وكيل العامل)
             z.write(p, rel)
             count += 1
 size_mb = os.path.getsize(zpath) / (1024 * 1024)

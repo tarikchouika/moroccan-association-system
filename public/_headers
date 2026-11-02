@@ -1,5 +1,11 @@
 # ترويسات الأمان للنشر الثابت على كلاودفلير بيدجيز — منصة مامب
 # (تقرأها كلاودفلير تلقائياً من جذر النشر — راجعة في تجارب الاختراق)
+#
+# درع ضد النسخ العالقة (درس v1.6.0): صفحات HTML تخرج بلا تخزين مؤقت
+# (إعادة تحقق دائمة عبر etag) — كي لا تعلق نسخة قديمة في الوسائط المشتركة
+# وذاكرة WebView للتطبيق فيتعذر الدخول أو يظهر الداشبورد مشوهاً.
+# الأصول المطفأة (أسماء فريدة) تحتفظ بتخزينها الأيدي في القاعدة أدناه.
+
 /*
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
@@ -9,7 +15,29 @@
   Strict-Transport-Security: max-age=31536000; includeSubDomains
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
 
-# تخزين مؤقت طويل للأصول المثبتة بالبصمة
+# الصفحات العمومية — دائماً بأحدث نسخة
+/
+  Cache-Control: public, max-age=0, must-revalidate
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+/login/*
+  Cache-Control: public, max-age=0, must-revalidate
+/register/*
+  Cache-Control: public, max-age=0, must-revalidate
+/app/*
+  Cache-Control: public, max-age=0, must-revalidate
+/assistant/*
+  Cache-Control: public, max-age=0, must-revalidate
+/associations/*
+  Cache-Control: public, max-age=0, must-revalidate
+/projects/*
+  Cache-Control: public, max-age=0, must-revalidate
+/legal/*
+  Cache-Control: public, max-age=0, must-revalidate
+/404.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+# الأصول المثبتة بالبصمة — تخزين سنة كاملة (أسماء فريدة لا تتكرر)
 /_next/static/*
   Cache-Control: public, max-age=31536000, immutable
 
