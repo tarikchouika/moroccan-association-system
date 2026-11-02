@@ -196,7 +196,7 @@ export default function MembersPage() {
                         <SelectItem value="SECRETARY">الكاتب/ة العام</SelectItem>
                         <SelectItem value="TREASURER">أمين/ة المال</SelectItem>
                         <SelectItem value="VICE_PRESIDENT">نائب/ة الرئيس</SelectItem>
-                      </SelectItem>
+                      </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-1.5">
