@@ -44,4 +44,4 @@ export interface DemoData {
   events: DemoEvent[];
 }
 
-export interface DemoStats extends DemoData["stats"] {}
+export type DemoStats = DemoData["stats"];

@@ -45,15 +45,6 @@ export function useSelectedAssociation() {
   return associations.find((a) => a.id === associationId) ?? null;
 }
 
-const [queryClient] = useState(
-  () =>
-    new QueryClient({
-      defaultOptions: {
-        queries: { staleTime: 15_000, retry: 1, refetchOnWindowFocus: false },
-      },
-    })
-);
-
 export function DashboardShell({
   user,
   associations,
@@ -63,6 +54,15 @@ export function DashboardShell({
   associations: DashAssociation[];
   children: React.ReactNode;
 }) {
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: { staleTime: 15_000, retry: 1, refetchOnWindowFocus: false },
+        },
+      })
+  );
+
   const [associationId, setAssociationIdState] = useState<string | null>(
     associations[0]?.id ?? null
   );
@@ -78,6 +78,7 @@ export function DashboardShell({
     try {
       const saved = localStorage.getItem("mamp_assoc");
       if (saved && associations.some((a) => a.id === saved)) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- restore the saved association after mount
         setAssociationIdState(saved);
       }
     } catch {}

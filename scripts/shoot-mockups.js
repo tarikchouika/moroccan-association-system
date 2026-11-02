@@ -1,4 +1,5 @@
 // لقطات صور صفحة التطبيق — موك أب الهاتف + دليل Play Protect
+/* eslint-disable @typescript-eslint/no-require-imports */
 const { chromium } = require("playwright");
 const path = require("path");
 

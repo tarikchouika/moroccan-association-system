@@ -1,4 +1,5 @@
 // فحص بصري شامل للنسخة الثابتة — الوضعان الفاتح والقاتم + استجابة الجوال
+/* eslint-disable @typescript-eslint/no-require-imports */
 const { chromium } = require("playwright");
 const http = require("http");
 const fs = require("fs");
