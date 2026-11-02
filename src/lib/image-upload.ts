@@ -25,6 +25,8 @@ export const RESIZE_PRESETS = {
   logo: { maxDim: 512, quality: 0.88, mime: "image/webp" as const, maxBytes: 280 * 1024 },
   /** وثيقة هوية (بطاقة/جواز/رخصة) */
   identity: { maxDim: 1280, quality: 0.82, mime: "image/jpeg" as const, maxBytes: 850 * 1024 },
+  /** وثيقة رسمية لتأسيس الجمعية (قانون أساسي/محضر/وصل) */
+  document: { maxDim: 1400, quality: 0.72, mime: "image/jpeg" as const, maxBytes: 420 * 1024 },
 } satisfies Record<string, ResizeOptions>;
 
 /** تحويل ملف صورة إلى data URL مضغوط — يرفض الملفات غير الصورية */

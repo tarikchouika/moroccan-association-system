@@ -61,11 +61,21 @@ async function proxyToWorker(request, env) {
   return fetch(proxied);
 }
 
-/** تطبيق ترويسات الأمان الناقصة فقط (دون تكرار ما يضبطه التطبيق نفسه) */
+/** تطبيق ترويسات الأمان الناقصة فقط (دون تكرار ما يضبطه التطبيق نفسه)
+ *  + درع ضد النسخ العالقة: كل استجابة HTML من العامل تخرج بـ no-cache —
+ *    OpenNext يضبط للصفحات العامة s-maxage=31536000 (سنة!) فتعلق نسخة قديمة
+ *    في الوسائط المشتركة وذاكرة WebView للتطبيق فيتعذر الدخول ويظهر الداشبورد مشوهاً.
+ *    الأصول المطفأة (المشفرة بأسماء فريدة) تحتفظ بتخزينها الأيدي. */
 function withSecurityHeaders(res) {
   const headers = new Headers(res.headers);
   for (const [key, value] of SECURITY_HEADERS) {
     if (!headers.has(key)) headers.set(key, value);
+  }
+  const contentType = (headers.get("content-type") || "").toLowerCase();
+  if (contentType.includes("text/html")) {
+    headers.set("cache-control", "public, max-age=0, must-revalidate");
+    headers.delete("etag");
+    headers.delete("last-modified");
   }
   return new Response(res.body, {
     status: res.status,

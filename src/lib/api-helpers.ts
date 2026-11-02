@@ -3,7 +3,10 @@
  */
 import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
-import { getCurrentUser, canManageAssociation, canManageFinance, forbidden, unauthorized } from "@/lib/auth";
+import {
+  getCurrentUser, canManageAssociation, canManageFinance, canApproveMembers,
+  isPlatformStaff, forbidden, unauthorized,
+} from "@/lib/auth";
 
 export interface ApiCtx {
   userId: string;
@@ -11,6 +14,9 @@ export interface ApiCtx {
   associationId: string;
   canManage: boolean;
   canFinance: boolean;
+  canApprove: boolean;
+  isPresident: boolean;
+  approvalsDelegatedTo: string | null;
 }
 
 /** فحص الجلسة وسياق الجمعية */
@@ -31,12 +37,22 @@ export async function requireAssociationContext(
   }
 
   const isSuper = user.role === "SUPER_ADMIN";
-  const canManage = isSuper || canManageAssociation(user, associationId);
+  const isPlatformAccountant = user.role === "ACCOUNTANT";
+  // طاقم المنصة: الأدمين يديرون كل الجمعيات — والمحاسب يطلع عليها مالياً
+  const canManage =
+    isSuper ||
+    user.role === "ASSOCIATION_ADMIN" ||
+    canManageAssociation(user, associationId);
+  const isStaff = isSuper || user.role === "ASSOCIATION_ADMIN" || isPlatformAccountant || user.role === "CO_ADMIN";
   if (!canManage) {
-    // العضو العادي يمكنه قراءة بعض المعطيات فقط حسب المسار
-    const membership = user.memberships.find((m) => m.associationId === associationId);
-    if (!membership && user.role !== "PARTNER") {
-      return { error: forbidden("لا تنتمون إلى هذه الجمعية") };
+    if (isStaff) {
+      // كوأدمين/محاسب المنصة: اطلاع دون تصريف إداري — يمرون دون عضوية
+    } else {
+      // العضو العادي يمكنه قراءة بعض المعطيات فقط حسب المسار
+      const membership = user.memberships.find((m) => m.associationId === associationId);
+      if (!membership && user.role !== "PARTNER") {
+        return { error: forbidden("لا تنتمون إلى هذه الجمعية") };
+      }
     }
   }
 
@@ -46,7 +62,13 @@ export async function requireAssociationContext(
       userRole: user.role,
       associationId,
       canManage,
-      canFinance: isSuper || canManageFinance(user, associationId),
+      canFinance: isSuper || isPlatformAccountant || canManageFinance(user, associationId),
+      canApprove: canApproveMembers(user, association),
+      isPresident:
+        user.memberships.some(
+          (m) => m.associationId === associationId && m.roleInAssociation === "PRESIDENT"
+        ) || isSuper,
+      approvalsDelegatedTo: association.approvalsDelegatedTo ?? null,
     },
   };
 }
@@ -57,6 +79,19 @@ export async function requireSuperAdmin(): Promise<{ userId?: string; error?: Re
   if (!user) return { error: unauthorized() };
   if (user.role !== "SUPER_ADMIN") return { error: forbidden("هذه المساحة مخصصة لمدير المنصة") };
   return { userId: user.id };
+}
+
+/** طلب طاقم المنصة (سوبر أدمين/أدمين/كوأدمين/محاسب) — للوحة الإدارة */
+export async function requirePlatformStaff(): Promise<{
+  user?: Awaited<ReturnType<typeof getCurrentUser>>;
+  error?: Response;
+}> {
+  const user = await getCurrentUser();
+  if (!user) return { error: unauthorized() };
+  if (!isPlatformStaff(user.role)) {
+    return { error: forbidden("هذه المساحة مخصصة لطاقم إدارة المنصة") };
+  }
+  return { user };
 }
 
 /** تسجيل حدث في سجل التدقيق */

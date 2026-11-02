@@ -3,5 +3,12 @@
   "framework": null,
   "installCommand": "bun install",
   "buildCommand": "bash scripts/build-static.sh",
-  "outputDirectory": "out"
+  "outputDirectory": "out",
+  "redirects": [
+    {
+      "source": "/((?!mamp-site-latest\\.zip).*)",
+      "destination": "https://mamp.pages.dev/$1",
+      "permanent": false
+    }
+  ]
 }

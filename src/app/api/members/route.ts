@@ -10,7 +10,7 @@ const ROLES = ["PRESIDENT", "VICE_PRESIDENT", "SECRETARY", "TREASURER", "BOARD_M
 const STATUSES = ["PENDING", "ACTIVE", "SUSPENDED", "RESIGNED"];
 const TYPES = ["ACTIVE", "HONORARY", "BENEFACTOR", "STUDENT"];
 
-/** GET — لائحة المنخرطين */
+/** GET — لائحة المنخرطين + حالة التفويض */
 export async function GET(req: NextRequest) {
   const { ctx, error } = await requireAssociationContext(req);
   if (error || !ctx) return error!;
@@ -31,7 +31,14 @@ export async function GET(req: NextRequest) {
     orderBy: { joinedAt: "desc" },
   });
 
-  return Response.json({ members });
+  return Response.json({
+    members,
+    permissions: {
+      canApprove: ctx.canApprove,
+      isPresident: ctx.isPresident,
+      approvalsDelegatedTo: ctx.approvalsDelegatedTo,
+    },
+  });
 }
 
 const createSchema = z.object({
@@ -142,7 +149,8 @@ const patchSchema = z.object({
   feeAmount: z.number().min(0).optional(),
 });
 
-/** PATCH — تحديث حالة/دور منخرط أو تسجيل واجب سنوي */
+/** PATCH — تحديث حالة/دور منخرط أو تسجيل واجب سنوي
+ *  قبول طلبات الانخراط الجديدة (PENDING→ACTIVE): الرئيس أو المفوَّض حصراً. */
 export async function PATCH(req: NextRequest) {
   const { ctx, error } = await requireAssociationContext(req);
   if (error || !ctx) return error!;
@@ -155,6 +163,19 @@ export async function PATCH(req: NextRequest) {
 
   const membership = await db.membership.findFirst({ where: { id, associationId: ctx.associationId } });
   if (!membership) return Response.json({ error: "المنخرط غير موجود" }, { status: 404 });
+
+  // قبول/رفض طلب انخراط معلق — صلاحية الرئيس أو المسيّر المفوَّض
+  if (updates.status && membership.status === "PENDING") {
+    if (!ctx.canApprove) {
+      return Response.json(
+        {
+          error:
+            "قبول طلبات الانخراط الجديدة من صلاحيات رئيس الجمعية — أو المسيّر الذي يفوّضه الرئيس",
+        },
+        { status: 403 }
+      );
+    }
+  }
 
   if (feeYear && feeAmount !== undefined && feeAmount >= 0) {
     const existing = await db.feePayment.findUnique({

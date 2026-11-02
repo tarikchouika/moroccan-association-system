@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "لوحة إدارة المنصة",
-  description: "لوحة تحكم مدير منصة مامب — إحصائيات شاملة وإدارة جميع الجمعيات المسجلة.",
+  description: "لوحة تحكم مدير منصة MAMP — إحصائيات شاملة وإدارة جميع الجمعيات المسجلة.",
   robots: { index: false, follow: false },
 };
 

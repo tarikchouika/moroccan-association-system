@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import {
   Users, TrendingUp, TrendingDown, Wallet, HandCoins, CalendarDays,
-  FileText, Loader2, AlertTriangle, MapPin,
+  FileText, Loader2, AlertTriangle, MapPin, Inbox,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,7 @@ import {
   PieChart, Pie, Cell,
 } from "recharts";
 import { useDash } from "@/components/dashboard/dash-context";
+import { JoinAssociationCard } from "@/components/dashboard/join-association";
 import { fmtMAD, fmtDate } from "@/lib/format";
 
 interface Stats {
@@ -46,29 +47,32 @@ export default function DashboardOverviewPage() {
     enabled: !!associationId,
   });
 
-  // لا جمعيات بعد: دعوة للتسجيل
+  // لا جمعيات بعد: دعوة للتسجيل أو الانخراط في جمعية قائمة
   if (!associationId) {
     return (
-      <div className="mx-auto max-w-lg py-16 text-center">
-        <span className="mx-auto mb-5 grid size-16 place-items-center rounded-2xl bg-secondary">
-          <Users className="size-8 text-primary" />
-        </span>
-        <h1 className="mb-2 text-2xl font-black">أهلاً بكم في لوحة التحكم</h1>
-        <p className="mb-6 text-sm leading-7 text-muted-foreground">
-          {isSuper
-            ? "بصفتكم مدير المنصة، يمكنكم الوصول إلى لوحة إدارة المنصة للاطلاع على كل الجمعيات، أو تسجيل جمعية جديدة من الإعدادات."
-            : "أنتم غير مرتبطين بجمعية حالياً. سجلوا جمعيتكم على المنصة أو انتظروا قبول انخراطكم من طرف المكتب."}
-        </p>
-        <div className="flex justify-center gap-3">
-          <Button asChild className="font-bold">
-            <a href="/dashboard/settings#new">تسجيل جمعية</a>
-          </Button>
-          {isSuper && (
-            <Button asChild variant="outline" className="font-bold">
-              <a href="/admin">لوحة إدارة المنصة</a>
+      <div className="space-y-6">
+        <div className="mx-auto max-w-lg py-6 text-center">
+          <span className="mx-auto mb-5 grid size-16 place-items-center rounded-2xl bg-secondary">
+            <Users className="size-8 text-primary" />
+          </span>
+          <h1 className="mb-2 text-2xl font-black">أهلاً بكم في لوحة التحكم</h1>
+          <p className="mb-6 text-sm leading-7 text-muted-foreground">
+            {isSuper
+              ? "بصفتكم مدير المنصة، يمكنكم الوصول إلى لوحة إدارة المنصة للاطلاع على كل الجمعيات، أو تسجيل جمعية جديدة من الإعدادات."
+              : "أنتم غير مرتبطين بجمعية حالياً: سجلوا جمعيتكم على المنصة، أو انخرطوا في جمعية موثقة قائمة — طلبكم يدرسه رئيس الجمعية (أو المسيّر المفوّض)."}
+          </p>
+          <div className="flex justify-center gap-3">
+            <Button asChild className="font-bold">
+              <a href="/dashboard/settings#new">تسجيل جمعية</a>
             </Button>
-          )}
+            {isSuper && (
+              <Button asChild variant="outline" className="font-bold">
+                <a href="/admin">لوحة إدارة المنصة</a>
+              </Button>
+            )}
+          </div>
         </div>
+        <JoinAssociationCard />
       </div>
     );
   }
@@ -121,6 +125,24 @@ export default function DashboardOverviewPage() {
           </Badge>
         )}
       </div>
+
+      {/* تنبيه طلبات الانخراط المعلقة — للرئيس/المفوَّض */}
+      {s.pendingMembers > 0 && (
+        <a
+          href="/dashboard/members"
+          className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-yellow-300/70 bg-yellow-50 p-4 transition-colors hover:bg-yellow-100 dark:border-yellow-700/50 dark:bg-yellow-950/40 dark:hover:bg-yellow-900/40"
+        >
+          <p className="flex items-center gap-2.5 text-[13.5px] font-extrabold text-yellow-900 dark:text-yellow-200">
+            <Inbox className="size-5 shrink-0 text-yellow-600" />
+            <span>
+              <span className="num">{s.pendingMembers}</span> طلب انخراط جديد في انتظار قراركم — اقبلوه أو ارفضوه من صفحة الأعضاء
+            </span>
+          </p>
+          <span className="rounded-lg bg-yellow-500 px-3.5 py-1.5 text-[12px] font-extrabold text-yellow-950">
+            مراجعة الطلبات ←
+          </span>
+        </a>
+      )}
 
       {/* البطاقات */}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
@@ -235,6 +257,9 @@ export default function DashboardOverviewPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* الانخراط في جمعية أخرى */}
+      {!isSuper && <JoinAssociationCard compact />}
     </div>
   );
 }

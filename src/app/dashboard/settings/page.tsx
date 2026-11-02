@@ -8,7 +8,8 @@ import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   UserCircle2, Loader2, ShieldCheck, IdCard, BookUser, Car, Building2,
-  Upload, Trash2, ImagePlus, Plus, BadgeCheck,
+  Upload, Trash2, ImagePlus, Plus, BadgeCheck, FileText, FileCheck2,
+  ScrollText, Stamp, UserPlus, Users, X,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -50,13 +51,22 @@ export default function SettingsPage() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
 
-  // نموذج جمعية جديدة
+  // نموذج جمعية جديدة — الوثائق الرسمية وأعضاء المكتب إلزاميان (v1.6.0)
   const [newAssoc, setNewAssoc] = useState({
     name: "", acronym: "", category: "تنموية", city: "", region: "",
     description: "", mission: "", address: "", email: "", phone: "", website: "",
     foundedAt: "", legalStatus: "DECLARED", iceNumber: "",
     presidentName: "", presidentEmail: "", presidentPassword: "", logoUrl: "",
   });
+  // الوثائق الرسمية الثلاث (data URLs مضغوطة في المتصفح)
+  const [foundingDocs, setFoundingDocs] = useState<Record<string, string>>({
+    STATUTES: "", FOUNDING_MINUTES: "", DEPOSIT_RECEIPT: "",
+  });
+  // أعضاء المكتب المسير — الكاتب وأمين المال إلزاميان
+  const [boardMembers, setBoardMembers] = useState<
+    Array<{ role: string; fullName: string; email: string; phone: string }>
+  >([]);
+  const [docsBusy, setDocsBusy] = useState<string | null>(null);
 
   const { data: docsData } = useQuery<{ documents: IdentityDoc[]; avatarUrl: string | null }>({
     queryKey: ["myDocs"],
@@ -205,25 +215,55 @@ export default function SettingsPage() {
       const res = await fetch("/api/associations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...newAssoc, logoUrl: newAssoc?.logoUrl ?? "" }),
+        body: JSON.stringify({
+          ...newAssoc,
+          logoUrl: newAssocLogo ?? "",
+          documents: Object.entries(foundingDocs)
+            .filter(([, dataUrl]) => dataUrl)
+            .map(([docType, dataUrl]) => ({ docType, dataUrl })),
+          boardMembers,
+        }),
       });
       const j = await res.json();
       if (!res.ok) throw new Error(j.error);
       return j;
     },
-    onSuccess: () => {
-      toast({ title: t.toastAssocCreated });
+    onSuccess: (j) => {
+      toast({
+        title: t.toastAssocCreated,
+        description: j.boardAccountsCreated
+          ? `أُنشئ حساب لـ ${j.boardAccountsCreated} من أعضاء المكتب (كلمة السر الافتراضية Mamp@2026)`
+          : undefined,
+      });
       setNewAssoc({
         name: "", acronym: "", category: "تنموية", city: "", region: "",
         description: "", mission: "", address: "", email: "", phone: "", website: "",
         foundedAt: "", legalStatus: "DECLARED", iceNumber: "",
         presidentName: "", presidentEmail: "", presidentPassword: "", logoUrl: "",
       });
+      setFoundingDocs({ STATUTES: "", FOUNDING_MINUTES: "", DEPOSIT_RECEIPT: "" });
+      setBoardMembers([]);
       setNewAssocLogo(null);
       routerRefresh();
     },
     onError: (e: Error) => toast({ title: t.toastAssocFailed, description: e.message, variant: "destructive" }),
   });
+
+  // رفع وثيقة تأسيس — ضغط في المتصفح ثم معاينة
+  async function onFoundingDocPick(e: React.ChangeEvent<HTMLInputElement>, docType: string) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setDocsBusy(docType);
+    try {
+      const dataUrl = await fileToResizedDataUrl(file, RESIZE_PRESETS.document);
+      setFoundingDocs((d) => ({ ...d, [docType]: dataUrl }));
+    } catch (err) {
+      toast({ title: t.toastDocFailed, description: err instanceof Error ? err.message : "", variant: "destructive" });
+    } finally {
+      setDocsBusy(null);
+    }
+  }
 
   function routerRefresh() {
     // تحديث بيانات الجلسة (قائمة الجمعيات في الشريط) عبر إعادة تحميل ناعمة
@@ -242,7 +282,26 @@ export default function SettingsPage() {
     newAssoc.region.trim().length >= 2 &&
     newAssoc.presidentName.trim().length >= 3 &&
     /.+@.+\..+/.test(newAssoc.presidentEmail) &&
-    newAssoc.presidentPassword.length >= 8;
+    newAssoc.presidentPassword.length >= 8 &&
+    // الوثائق الرسمية الثلاث إلزامية
+    Object.values(foundingDocs).every(Boolean) &&
+    // الكاتب العام وأمين المال إلزاميان
+    boardMembers.some((m) => m.role === "SECRETARY" && m.fullName.trim().length >= 3 && /.+@.+\..+/.test(m.email)) &&
+    boardMembers.some((m) => m.role === "TREASURER" && m.fullName.trim().length >= 3 && /.+@.+\..+/.test(m.email));
+
+  const DOC_SLOTS: Array<{ type: string; icon: typeof FileText; label: string; hint: string }> = [
+    { type: "STATUTES", icon: ScrollText, label: t.formDocStatutes, hint: t.formDocStatutesHint },
+    { type: "FOUNDING_MINUTES", icon: FileCheck2, label: t.formDocMinutes, hint: "" },
+    { type: "DEPOSIT_RECEIPT", icon: Stamp, label: t.formDocReceipt, hint: "" },
+  ];
+
+  const BOARD_ROLES = [
+    { value: "SECRETARY", label: t.boardRoleSecretary },
+    { value: "TREASURER", label: t.boardRoleTreasurer },
+    { value: "VICE_PRESIDENT", label: t.boardRoleVicePresident },
+    { value: "BOARD_MEMBER", label: t.boardRoleBoardMember },
+    { value: "CO_ADMIN", label: t.boardRoleCoAdmin },
+  ];
 
   return (
     <div className="space-y-5">
@@ -516,6 +575,170 @@ export default function SettingsPage() {
               <Input dir="ltr" className="text-start" type="password" value={newAssoc.presidentPassword} onChange={(e) => setNewAssoc({ ...newAssoc, presidentPassword: e.target.value })} />
               <p className="text-[11px] text-muted-foreground">{t.formPresidentHint}</p>
             </div>
+          </div>
+
+          {/* الوثائق الرسمية للتأسيس — إلزامية */}
+          <div className="mt-6 space-y-3 rounded-xl border border-gold/40 bg-gold-soft/40 p-4">
+            <div>
+              <h3 className="flex items-center gap-2 text-[15px] font-extrabold">
+                <FileText className="size-4.5 text-gold" />
+                {t.newAssocDocsTitle} <span className="text-destructive">*</span>
+              </h3>
+              <p className="mt-1 text-[12px] leading-6 text-muted-foreground">{t.newAssocDocsDesc}</p>
+            </div>
+            <div className="grid gap-3 md:grid-cols-3">
+              {DOC_SLOTS.map(({ type, icon: Icon, label, hint }) => {
+                const dataUrl = foundingDocs[type];
+                return (
+                  <div key={type} className="flex flex-col gap-2 rounded-xl border border-border bg-card p-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="flex min-w-0 items-center gap-1.5 text-[12.5px] font-extrabold">
+                        <Icon className="size-4 shrink-0 text-primary" />
+                        <span className="min-w-0 break-words">{label}</span>
+                      </p>
+                      {dataUrl ? (
+                        <Badge variant="outline" className="gap-1 shrink-0 border-emerald-200 bg-emerald-50 text-[10px] text-emerald-700">
+                          <BadgeCheck className="size-3" />
+                        </Badge>
+                      ) : (
+                        <span className="shrink-0 text-[10px] font-bold text-destructive">*</span>
+                      )}
+                    </div>
+                    {dataUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element -- وثيقة data URL مؤقتة
+                      <img src={dataUrl} alt={label} className="h-28 w-full rounded-lg border border-border bg-background object-contain" />
+                    ) : (
+                      <div className="grid h-28 w-full place-items-center rounded-lg border border-dashed border-border bg-background text-muted-foreground/40">
+                        <Icon className="size-8" />
+                      </div>
+                    )}
+                    <div className="flex flex-wrap gap-1.5">
+                      <input
+                        id={`fdoc-${type}`}
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp"
+                        hidden
+                        onChange={(e) => onFoundingDocPick(e, type)}
+                      />
+                      <label htmlFor={`fdoc-${type}`}>
+                        <Button size="sm" variant="outline" className="gap-1.5 text-[12px] font-bold" asChild disabled={docsBusy === type}>
+                          <span className="cursor-pointer">
+                            {docsBusy === type ? <Loader2 className="size-3.5 animate-spin" /> : <Upload className="size-3.5" />}
+                            {dataUrl ? t.docReplace : t.docUpload}
+                          </span>
+                        </Button>
+                      </label>
+                      {dataUrl && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="gap-1.5 text-[12px] font-bold text-destructive hover:text-destructive"
+                          onClick={() => setFoundingDocs((d) => ({ ...d, [type]: "" }))}
+                        >
+                          <Trash2 className="size-3.5" />
+                          {t.docDelete}
+                        </Button>
+                      )}
+                    </div>
+                    {hint && <p className="text-[10.5px] leading-4 text-muted-foreground">{hint}</p>}
+                  </div>
+                );
+              })}
+            </div>
+            <p className="text-[11px] text-muted-foreground">{t.formDocsHint}</p>
+          </div>
+
+          {/* أعضاء المكتب المسير — حساب لكل عضو */}
+          <div className="mt-4 space-y-3">
+            <div>
+              <h3 className="flex items-center gap-2 text-[15px] font-extrabold">
+                <Users className="size-4.5 text-primary" />
+                {t.boardTitle} <span className="text-destructive">*</span>
+              </h3>
+              <p className="mt-1 text-[12px] leading-6 text-muted-foreground">{t.boardDesc}</p>
+            </div>
+            {boardMembers.length === 0 && (
+              <div className="rounded-xl border border-dashed border-border bg-muted/40 p-4 text-center text-[12px] text-muted-foreground">
+                {t.boardAccountsNote}
+              </div>
+            )}
+            <div className="space-y-2.5">
+              {boardMembers.map((m, i) => (
+                <div key={i} className="grid gap-2.5 rounded-xl border border-border bg-muted/30 p-3 sm:grid-cols-[170px_1fr_1fr_130px_44px] sm:items-end">
+                  <div className="space-y-1">
+                    <Label className="text-[11.5px]">{t.boardRoleLabel}</Label>
+                    <Select
+                      value={m.role}
+                      onValueChange={(v) =>
+                        setBoardMembers((list) => list.map((x, j) => (j === i ? { ...x, role: v } : x)))
+                      }
+                      dir="rtl"
+                    >
+                      <SelectTrigger className="bg-card"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {BOARD_ROLES.map((r) => (
+                          <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-[11.5px]">{t.boardFullName}</Label>
+                    <Input
+                      className="bg-card"
+                      value={m.fullName}
+                      onChange={(e) =>
+                        setBoardMembers((list) => list.map((x, j) => (j === i ? { ...x, fullName: e.target.value } : x)))
+                      }
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-[11.5px]">{t.boardEmail}</Label>
+                    <Input
+                      dir="ltr"
+                      className="bg-card text-start"
+                      type="email"
+                      value={m.email}
+                      onChange={(e) =>
+                        setBoardMembers((list) => list.map((x, j) => (j === i ? { ...x, email: e.target.value } : x)))
+                      }
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-[11.5px]">{t.boardPhone}</Label>
+                    <Input
+                      dir="ltr"
+                      className="bg-card text-start"
+                      value={m.phone}
+                      onChange={(e) =>
+                        setBoardMembers((list) => list.map((x, j) => (j === i ? { ...x, phone: e.target.value } : x)))
+                      }
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="text-destructive hover:text-destructive"
+                    aria-label={t.boardRemoveBtn}
+                    onClick={() => setBoardMembers((list) => list.filter((_, j) => j !== i))}
+                  >
+                    <X className="size-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              className="gap-2 font-bold"
+              onClick={() =>
+                setBoardMembers((list) => [...list, { role: "SECRETARY", fullName: "", email: "", phone: "" }])
+              }
+            >
+              <UserPlus className="size-4" />
+              {t.boardAddBtn}
+            </Button>
           </div>
           <div className="mt-5">
             <Button

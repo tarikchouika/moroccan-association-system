@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
-import { hashPassword, createSession, verifyPassword } from "@/lib/auth";
+import { hashPassword, createSession, verifyPassword, getSession } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -70,8 +70,7 @@ export async function POST(req: NextRequest) {
 /** PUT — تغيير كلمة السر للمستخدم الحالي */
 export async function PUT(req: NextRequest) {
   try {
-    const { getSession: _unused, ...auth } = await import("@/lib/auth");
-    const session = await auth.getSession();
+    const session = await getSession();
     if (!session) return Response.json({ error: "غير مصرح" }, { status: 401 });
 
     let body: Record<string, unknown>;

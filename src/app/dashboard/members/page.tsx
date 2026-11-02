@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Users, Search, UserPlus, Loader2, Trash2, MoreHorizontal, BadgeCheck,
-  ShieldCheck, Receipt, HandCoins,
+  ShieldCheck, Receipt, HandCoins, Inbox, UserCheck, UserX, Crown, KeyRound,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -37,8 +37,15 @@ interface Member {
   joinedAt: string;
   profession: string | null;
   cndpConsent: boolean;
+  notes: string | null;
   user: { id: string; fullName: string; email: string; phone: string | null };
   feePayments: Array<{ year: number; paidAt: string; amount: number; receiptNumber: string }>;
+}
+
+interface Permissions {
+  canApprove: boolean;
+  isPresident: boolean;
+  approvalsDelegatedTo: string | null;
 }
 
 const ROLE_LABELS: Record<string, string> = {
@@ -46,6 +53,8 @@ const ROLE_LABELS: Record<string, string> = {
   TREASURER: "أمين/ة المال", BOARD_MEMBER: "عضو مجلس", CO_ADMIN: "كوأدمين",
   MEMBER: "منخرط/ة", VOLUNTEER: "متطوع/ة",
 };
+
+const DELEGATABLE_ROLES = ["VICE_PRESIDENT", "SECRETARY", "TREASURER", "BOARD_MEMBER", "CO_ADMIN"];
 
 const STATUS_BADGES: Record<string, { label: string; cls: string }> = {
   ACTIVE: { label: "نشط", cls: "border-emerald-200 bg-emerald-50 text-emerald-700" },
@@ -66,7 +75,7 @@ export default function MembersPage() {
     roleInAssociation: "MEMBER", memberType: "ACTIVE", initialFee: "0", cndpConsent: false,
   });
 
-  const { data, isLoading } = useQuery<{ members: Member[] }>({
+  const { data, isLoading } = useQuery<{ members: Member[]; permissions: Permissions }>({
     queryKey: ["members", associationId, status],
     queryFn: async () => {
       const res = await fetch(`/api/members?associationId=${associationId}&status=${status}`);
@@ -75,6 +84,15 @@ export default function MembersPage() {
     },
     enabled: !!associationId,
   });
+
+  const members = data?.members ?? [];
+  const perms = data?.permissions ?? { canApprove: false, isPresident: false, approvalsDelegatedTo: null };
+  const pendingMembers = members.filter((m) => m.status === "PENDING");
+  const delegatable = members.filter(
+    (m) => m.status === "ACTIVE" && DELEGATABLE_ROLES.includes(m.roleInAssociation)
+  );
+  const delegatedToName =
+    members.find((m) => m.user.id === perms.approvalsDelegatedTo)?.user.fullName ?? null;
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ["members", associationId] });
@@ -133,7 +151,31 @@ export default function MembersPage() {
     onError: (e: Error) => toast({ title: "تعذر الحذف", description: e.message, variant: "destructive" }),
   });
 
-  const members = (data?.members ?? []).filter((m) =>
+  // تفويض قبول الانخراط — الرئيس حصراً
+  const delegate = useMutation({
+    mutationFn: async (delegateTo: string) => {
+      const res = await fetch("/api/associations", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: associationId, action: "delegate_approvals", delegateTo }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      return data;
+    },
+    onSuccess: (d) => {
+      toast({
+        title: d.delegatedTo ? "تم التفويض" : "أُلغي التفويض",
+        description: d.delegatedTo
+          ? `صلاحية قبول الانخراط انتقلت إلى ${d.delegatedTo}`
+          : "عادت صلاحية قبول الانخراط إلى الرئيس",
+      });
+      invalidate();
+    },
+    onError: (e: Error) => toast({ title: "تعذر التفويض", description: e.message, variant: "destructive" }),
+  });
+
+  const filtered = members.filter((m) =>
     !q.trim() || m.user.fullName.includes(q.trim()) || m.user.email.includes(q.trim()) || m.membershipNumber.includes(q.trim())
   );
   const year = new Date().getFullYear();
@@ -144,7 +186,7 @@ export default function MembersPage() {
         <div>
           <h1 className="text-2xl font-black">الأعضاء والانخراطات</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            <span className="num font-bold">{data?.members.length ?? 0}</span> منخرط · تتبع الواجبات السنوية والموافقات (قانون 09.08)
+            <span className="num font-bold">{members.length}</span> منخرط · تتبع الواجبات السنوية والموافقات (قانون 09.08)
           </p>
         </div>
         {canManage && (
@@ -235,6 +277,114 @@ export default function MembersPage() {
         )}
       </div>
 
+      {/* صلاحية القبول والتفويض — الرئيس */}
+      <Card className="border-primary/25 bg-secondary/40">
+        <CardContent className="flex flex-wrap items-center justify-between gap-4 p-5">
+          <div className="flex items-start gap-3">
+            <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary">
+              <Crown className="size-5 text-primary" />
+            </span>
+            <div>
+              <p className="text-[14px] font-extrabold">صلاحية قبول طلبات الانخراط</p>
+              <p className="mt-1 text-[12.5px] leading-6 text-muted-foreground">
+                {perms.approvalsDelegatedTo
+                  ? `مفوَّضة حالياً إلى: ${delegatedToName ?? "مسيّر معيَّن"} — يبقى للرئيس الحق في استعادتها في أي وقت.`
+                  : "الرئيس/ة يقبل طلبات الانخراط الجديدة. يمكنه تفويض الصلاحية لأحد المسيّرين (نائب الرئيس، الكاتب، أمين المال، مستشار أو كوأدمين)."}
+              </p>
+            </div>
+          </div>
+          {perms.isPresident && (
+            <div className="flex flex-wrap items-center gap-2">
+              <Select
+                value={perms.approvalsDelegatedTo ?? "none"}
+                onValueChange={(v) => delegate.mutate(v === "none" ? "" : v)}
+                dir="rtl"
+                disabled={delegate.isPending || delegatable.length === 0}
+              >
+                <SelectTrigger className="w-64 bg-card font-bold" aria-label="تفويض قبول الانخراط">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">الرئيس نفسه (بلا تفويض)</SelectItem>
+                  {delegatable.map((m) => (
+                    <SelectItem key={m.id} value={m.user.id}>
+                      {m.user.fullName} — {ROLE_LABELS[m.roleInAssociation]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {delegatable.length === 0 && (
+                <p className="text-[11px] text-muted-foreground">أضيفوا مسيّرين أولاً لتفويض الصلاحية</p>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* طلبات الانخراط المعلقة */}
+      {pendingMembers.length > 0 && (
+        <Card className="border-yellow-300/70">
+          <CardContent className="p-5">
+            <h2 className="mb-1 flex items-center gap-2 text-base font-extrabold">
+              <Inbox className="size-5 text-yellow-600" />
+              طلبات انخراط جديدة
+              <Badge variant="outline" className="num border-yellow-300 bg-yellow-50 text-[11px] text-yellow-800">
+                {pendingMembers.length}
+              </Badge>
+            </h2>
+            <p className="mb-4 text-[12px] text-muted-foreground">
+              {perms.canApprove
+                ? "بانتظار قراركم — القبول يفعّل عضوية المنخرط ورقم انخراطه."
+                : "بانتظار قبول الرئيس أو المسيّر المفوَّض."}
+            </p>
+            <div className="space-y-2.5">
+              {pendingMembers.map((m) => (
+                <div
+                  key={m.id}
+                  className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-background p-3.5"
+                >
+                  <div className="min-w-0">
+                    <p className="font-extrabold">{m.user.fullName}</p>
+                    <p className="text-[11.5px] text-muted-foreground" dir="ltr">{m.user.email}</p>
+                    <p className="mt-0.5 text-[11px] text-muted-foreground">
+                      طُلب في {fmtDate(m.joinedAt)}
+                      {m.notes ? ` · ${m.notes}` : ""}
+                    </p>
+                  </div>
+                  {perms.canApprove ? (
+                    <div className="flex shrink-0 gap-2">
+                      <Button
+                        size="sm"
+                        className="gap-1.5 bg-emerald-600 font-bold text-white hover:bg-emerald-700"
+                        onClick={() => updateMember.mutate({ id: m.id, status: "ACTIVE" })}
+                        disabled={updateMember.isPending}
+                      >
+                        <UserCheck className="size-4" />
+                        قبول الانخراط
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="gap-1.5 border-red-200 font-bold text-red-700 hover:bg-red-50 hover:text-red-800"
+                        onClick={() => updateMember.mutate({ id: m.id, status: "RESIGNED" })}
+                        disabled={updateMember.isPending}
+                      >
+                        <UserX className="size-4" />
+                        رفض
+                      </Button>
+                    </div>
+                  ) : (
+                    <Badge variant="outline" className="border-yellow-200 bg-yellow-50 text-[11px] text-yellow-800">
+                      بانتظار الرئيس/المفوَّض
+                    </Badge>
+                  )}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* المرشحات */}
       <div className="grid gap-3 sm:grid-cols-[1fr_220px]">
         <div className="relative">
@@ -260,7 +410,7 @@ export default function MembersPage() {
             <div className="flex h-48 items-center justify-center">
               <Loader2 className="size-7 animate-spin text-primary" />
             </div>
-          ) : members.length === 0 ? (
+          ) : filtered.length === 0 ? (
             <div className="flex flex-col items-center gap-2 py-16 text-center">
               <Users className="size-10 text-muted-foreground/40" />
               <p className="font-bold">لا منخرطين مطابقين</p>
@@ -280,14 +430,22 @@ export default function MembersPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {members.map((m) => {
+                  {filtered.map((m) => {
                     const st = STATUS_BADGES[m.status] ?? STATUS_BADGES.PENDING;
                     const feePaid = m.feePayments.some((f) => f.year === year);
                     return (
                       <TableRow key={m.id}>
                         <TableCell>
                           <div>
-                            <p className="font-extrabold">{m.user.fullName}</p>
+                            <p className="font-extrabold">
+                              {m.user.fullName}
+                              {perms.approvalsDelegatedTo === m.user.id && (
+                                <Badge variant="secondary" className="ms-1.5 gap-1 bg-gold-soft text-[10px] text-yellow-800">
+                                  <KeyRound className="size-3" />
+                                  مفوَّض بالقبول
+                                </Badge>
+                              )}
+                            </p>
                             <p className="text-[11px] text-muted-foreground" dir="ltr">{m.user.email}</p>
                           </div>
                         </TableCell>
@@ -328,7 +486,7 @@ export default function MembersPage() {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
-                                {m.status !== "ACTIVE" && (
+                                {m.status !== "ACTIVE" && m.status !== "PENDING" && (
                                   <DropdownMenuItem onClick={() => updateMember.mutate({ id: m.id, status: "ACTIVE" })} className="gap-2 font-bold">
                                     <BadgeCheck className="size-4 text-emerald-600" /> تنشيط
                                   </DropdownMenuItem>

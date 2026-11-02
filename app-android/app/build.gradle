@@ -13,7 +13,8 @@ android {
         minSdk 24          // Android 7.0+
         targetSdk 34
         versionCode Integer.parseInt(System.getenv("GITHUB_RUN_NUMBER") ?: "1")
-        versionName "1.0." + (System.getenv("GITHUB_RUN_NUMBER") ?: "1")
+        // محاذاة إصدار التطبيق مع إصدار المنصة (v1.6.0)
+        versionName "1.6." + (System.getenv("GITHUB_RUN_NUMBER") ?: "1")
     }
 
     // إعدادات التوقيع الرقمي — تُقرأ من متغيرات البيئة (GitHub Secrets في CI)

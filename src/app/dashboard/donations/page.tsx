@@ -331,7 +331,7 @@ export default function DonationsPage() {
                 <div className="text-center">
                   <p className="w-28 border-t border-foreground/40 pt-1 text-[11px] font-bold">توقيع أمين/ة المال</p>
                 </div>
-                <p className="text-[10px] text-muted-foreground">صدر إلكترونياً عبر منصة مامب</p>
+                <p className="text-[10px] text-muted-foreground">صدر إلكترونياً عبر منصة MAMP</p>
                 <div className="text-center">
                   <p className="w-28 border-t border-foreground/40 pt-1 text-[11px] font-bold">خاتم الجمعية</p>
                 </div>

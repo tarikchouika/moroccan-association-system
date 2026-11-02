@@ -117,6 +117,9 @@ model Association {
   status      String    @default("PENDING")
   isVerified  Boolean   @default(false) // توثيق من السوبر أدمين
   verifiedAt  DateTime?
+  // تفويض قبول طلبات الانخراط: معرف المستخدم المسيّر المفوّض من الرئيس
+  // (فارغ = الرئيس نفسه يقبل الطلبات)
+  approvalsDelegatedTo String?
   viewCount   Int       @default(0)
   createdBy   String?
   createdAt   DateTime  @default(now())

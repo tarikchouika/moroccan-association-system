@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">منصة مامب</string>
+    <string name="app_name">MAMP</string>
     <string name="offline_title">لا يوجد اتصال بالإنترنت</string>
     <string name="offline_message">تحققوا من اتصالكم بالشبكة ثم أعيدوا المحاولة.</string>
     <string name="retry">إعادة المحاولة</string>

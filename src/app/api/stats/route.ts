@@ -51,8 +51,11 @@ export async function GET(req: NextRequest) {
   const user = await getCurrentUser();
   if (!user) return Response.json({ error: "غير مصرح" }, { status: 401 });
 
+  // طاقم المنصة (أدمين/كوأدمين/محاسب): اطلاع مالي موثق على كل الجمعيات
+  const staffRoles = ["SUPER_ADMIN", "ASSOCIATION_ADMIN", "CO_ADMIN", "ACCOUNTANT"];
+  const isStaff = staffRoles.includes(user.role);
   const membership = user.memberships.find((m) => m.associationId === associationId);
-  if (!membership && user.role !== "SUPER_ADMIN" && user.role !== "PARTNER") {
+  if (!membership && !isStaff && user.role !== "PARTNER") {
     return Response.json({ error: "لا تنتمون إلى هذه الجمعية" }, { status: 403 });
   }
 

@@ -4,7 +4,7 @@ import { AppDownloadBody } from "@/components/site/app-download";
 export const metadata: Metadata = {
   title: "تطبيق أندرويد الرسمي",
   description:
-    "حمّلوا تطبيق منصة مامب لأندرويد — رابط مباشر من كلاودفلير، مع دليل مبسّط بالصور للتنزيل والتثبيت وتجاوز رسالة Play Protect.",
+    "حمّلوا تطبيق منصة MAMP لأندرويد — رابط مباشر من كلاودفلير، مع دليل مبسّط بالصور للتنزيل والتثبيت وتجاوز رسالة Play Protect.",
   alternates: { canonical: "/app/" },
 };
 
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 const appJsonLd = {
   "@context": "https://schema.org",
   "@type": "MobileApplication",
-  name: "منصة مامب — تطبيق أندرويد",
+  name: "منصة MAMP — تطبيق أندرويد",
   operatingSystem: "Android 7.0+",
   applicationCategory: "GovernmentApplication",
   inLanguage: ["ar", "fr", "en", "es", "it", "de", "nl", "ru"],

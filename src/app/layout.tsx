@@ -7,8 +7,8 @@ import { LanguageProvider } from "@/lib/i18n/provider";
 export const metadata: Metadata = {
   metadataBase: new URL("https://mamp.pages.dev"),
   title: {
-    default: "منصة مامب — إدارة الجمعيات المغربية",
-    template: "%s | منصة مامب",
+    default: "MAMP — إدارة الجمعيات المغربية",
+    template: "%s | MAMP",
   },
   description:
     "منصة رقمية احترافية لإدارة الجمعيات المغربية: الانخراطات، المحاسبة، التبرعات، الفعاليات والوثائق الرسمية — وفق القانون 75.00 والظهير الشريف 1.58.376.",
@@ -22,15 +22,15 @@ export const metadata: Metadata = {
     "المساعد الجمعوي",
     "MAMP",
   ],
-  authors: [{ name: "منصة مامب" }],
+  authors: [{ name: "MAMP" }],
   creator: "TARIK CHOUIKA",
-  publisher: "منصة مامب",
+  publisher: "MAMP",
   alternates: { canonical: "/" },
   manifest: "/manifest.webmanifest",
-  applicationName: "منصة مامب",
+  applicationName: "MAMP",
   appleWebApp: {
     capable: true,
-    title: "منصة مامب",
+    title: "MAMP",
     statusBarStyle: "black-translucent",
   },
   icons: {
@@ -45,8 +45,8 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ar_MA",
     url: "/",
-    siteName: "منصة مامب",
-    title: "منصة مامب — إدارة الجمعيات المغربية",
+    siteName: "MAMP",
+    title: "MAMP — إدارة الجمعيات المغربية",
     description:
       "رقمنة إدارة ومحاسبة وعمل الجمعيات المغربية بشكل احترافي وآمن ومتوافق مع القوانين — مع مساعد جمعوي بدون هلوسة.",
     images: [
@@ -54,14 +54,14 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "منصة مامب — إدارة الجمعيات المغربية",
+        alt: "MAMP — إدارة الجمعيات المغربية",
         type: "image/png",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "منصة مامب — إدارة الجمعيات المغربية",
+    title: "MAMP — إدارة الجمعيات المغربية",
     description:
       "رقمنة إدارة ومحاسبة الجمعيات المغربية — وفق القانون 75.00 وبحماية المعطيات وفق القانون 09.08.",
     images: ["/og-image.png"],

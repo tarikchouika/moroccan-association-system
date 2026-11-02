@@ -1,5 +1,5 @@
 /**
- * نظام المصادقة والأدوار — منصة مامب
+ * نظام المصادقة والأدوار — منصة MAMP
  * JWT موقّع (jose) داخل كوكي httpOnly + تشفير كلمات السر عبر scrypt (node:crypto)
  */
 import { SignJWT, jwtVerify } from "jose";
@@ -18,23 +18,47 @@ const SESSION_MAX_AGE = 60 * 60 * 24 * 7; // أسبوع
 // ---------------------------------------------------------------
 export type PlatformRole =
   | "SUPER_ADMIN" // مالك المنصة
-  | "ASSOCIATION_ADMIN" // أدمين (أعضاء مكتب الجمعية)
+  | "ASSOCIATION_ADMIN" // أدمين (أعضاء مكتب الجمعية أو أدمين منصة معرّف من المالك)
   | "CO_ADMIN" // كوأدمين (منخرطون ومتطوعون بصلاحيات)
+  | "ACCOUNTANT" // محاسب المنصة — إشراف مالي على الجمعيات
   | "PARTNER" // جهات حكومية وخاصة مختصة
   | "CITIZEN"; // المواطنون والأجانب
 
+/** طاقم المنصة — يعيّنهم السوبر أدمين للمساعدة على الإدارة */
+export const PLATFORM_STAFF_ROLES = [
+  "SUPER_ADMIN",
+  "ASSOCIATION_ADMIN",
+  "CO_ADMIN",
+  "ACCOUNTANT",
+] as const;
+
+export function isPlatformStaff(role: string | undefined | null): boolean {
+  return !!role && (PLATFORM_STAFF_ROLES as readonly string[]).includes(role);
+}
+
+/** من يملك إجراءات الإشراف على الجمعيات (توثيق/تنشيط/تعليق) */
+export function canModerateAssociations(role: string | undefined | null): boolean {
+  return role === "SUPER_ADMIN" || role === "ASSOCIATION_ADMIN";
+}
+
 export const ROLE_LABELS: Record<PlatformRole, string> = {
   SUPER_ADMIN: "المدير العام للمنصة",
-  ASSOCIATION_ADMIN: "أدمين الجمعية",
+  ASSOCIATION_ADMIN: "أدمين",
   CO_ADMIN: "كوأدمين",
+  ACCOUNTANT: "محاسب المنصة",
   PARTNER: "جهة شريكة",
   CITIZEN: "مواطن",
 };
 
 export const ROLE_DESCRIPTIONS: Record<PlatformRole, string> = {
-  SUPER_ADMIN: "مالك المنصة: إدارة الجمعيات، التوثيق، الإشراف العام وسجل التدقيق.",
-  ASSOCIATION_ADMIN: "أعضاء مكتب الجمعية: التسيير الكامل لجمعيتهم (أعضاء، محاسبة، وثائق).",
-  CO_ADMIN: "المنخرطون والمتطوعون: صلاحيات محدودة يمنحها المكتب (الفعاليات، التواصل).",
+  SUPER_ADMIN:
+    "مالك المنصة: إدارة الجمعيات والمستخدمين والصلاحيات، التوثيق، الإشراف العام وسجل التدقيق.",
+  ASSOCIATION_ADMIN:
+    "أدمين منصة يعيّنه المالك: إشراف على الجمعيات (توثيق وتنشيط وتعليق) — في حين تأتي سلطات أعضاء مكاتب الجمعيات من عضوياتهم داخل جمعياتهم.",
+  CO_ADMIN:
+    "الكوأدمين: صلاحيات محدودة يمنحها المالك أو المكتب (الفعاليات، التواصل، الاطلاع).",
+  ACCOUNTANT:
+    "محاسب المنصة: اطلاع مالي موثق على محاسبة الجمعيات (المداخيل، المصاريف، التقارير).",
   PARTNER: "الجهات الحكومية والخاصة المختصة: اطلاع موثق على المعطيات المصرح بها.",
   CITIZEN: "المواطنون والأجانب: التصفح، التبرع، التسجيل في الفعاليات العامة.",
 };
@@ -158,12 +182,13 @@ export function membershipIn(
   );
 }
 
-/** هل يملك المستخدم صلاحيات إدارية داخل جمعية؟ */
+/** هل يملك المستخدم صلاحيات إدارية داخل جمعية؟
+ *  (طاقم المنصة من الأدمين يديرون كل الجمعيات لمساعدة المالك) */
 export function canManageAssociation(
   user: Awaited<ReturnType<typeof getCurrentUser>>,
   associationId: string
 ): boolean {
-  if (user?.role === "SUPER_ADMIN") return true;
+  if (user?.role === "SUPER_ADMIN" || user?.role === "ASSOCIATION_ADMIN") return true;
   const m = membershipIn(user, associationId);
   if (!m) return false;
   return ["PRESIDENT", "VICE_PRESIDENT", "SECRETARY", "TREASURER", "CO_ADMIN"].includes(
@@ -171,15 +196,30 @@ export function canManageAssociation(
   );
 }
 
-/** هل يملك صلاحيات مالية (أمين مال/رئيس/سوبر أدمين)؟ */
+/** هل يملك صلاحيات مالية (أمين مال/رئيس/سوبر أدمين/محاسب المنصة)؟ */
 export function canManageFinance(
   user: Awaited<ReturnType<typeof getCurrentUser>>,
   associationId: string
 ): boolean {
-  if (user?.role === "SUPER_ADMIN") return true;
+  if (user?.role === "SUPER_ADMIN" || user?.role === "ACCOUNTANT") return true;
   const m = membershipIn(user, associationId);
   if (!m) return false;
   return ["PRESIDENT", "TREASURER"].includes(m.roleInAssociation);
+}
+
+/** من يملك قبول طلبات الانخراط الجديدة في جمعية؟
+ *  القاعدة (طلب المالك): الرئيس حصراً — أو من يفوّضه من المسيّرين،
+ *  مع السوبر أدمين وأدمين المنصة للإشراف الاستثنائي. */
+export function canApproveMembers(
+  user: Awaited<ReturnType<typeof getCurrentUser>>,
+  association: { id: string; approvalsDelegatedTo?: string | null }
+): boolean {
+  if (!user) return false;
+  if (user.role === "SUPER_ADMIN" || user.role === "ASSOCIATION_ADMIN") return true;
+  const m = membershipIn(user, association.id);
+  if (!m) return false;
+  if (m.roleInAssociation === "PRESIDENT") return true;
+  return !!association.approvalsDelegatedTo && association.approvalsDelegatedTo === user.id;
 }
 
 export function unauthorized(message = "غير مصرح لك بالوصول") {

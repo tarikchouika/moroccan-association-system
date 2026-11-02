@@ -54,7 +54,8 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
     ] as const
   ).filter((n) => {
     if (!associationId) return n.key === "overview" || n.key === "settings";
-    if (n.key === "accounting" && !canFinance && assoc?.roleInAssociation !== "SECRETARY") return true;
+    // المحاسبة: للماليين حصراً (رئيس/أمين مال/محاسب المنصة/السوبر) والكاتب العام للتوثيق
+    if (n.key === "accounting" && !canFinance && assoc?.roleInAssociation !== "SECRETARY") return false;
     return true;
   });
 
@@ -93,7 +94,7 @@ export function DashboardChrome({
 }) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
-  const { user, associations, associationId, setAssociationId, isSuper } = useDash();
+  const { user, associations, associationId, setAssociationId, isSuper, isStaff } = useDash();
   const assoc = useSelectedAssociation();
   const { d } = useI18n();
   const m = d.dash.menu;
@@ -176,7 +177,7 @@ export function DashboardChrome({
                   </div>
                 </DropdownMenuItem>
               ))}
-              {isSuper && (
+              {isStaff && (
                 <>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>

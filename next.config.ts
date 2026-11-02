@@ -57,6 +57,18 @@ const nextConfig: NextConfig = isStaticExport
             source: "/:path*",
             headers: SECURITY_HEADERS,
           },
+          // صفحات الدخول والتسجيل الديناميكية: لا تخزين مؤقت إطلاقاً —
+          // OpenNext كان يضع لها s-maxage=31536000 (سنة كاملة!) فتعلق نسخة
+          // قديمة في الوسائط المشتركة وذاكرة WebView للتطبيق ويستحيل الدخول.
+          // (الأصول المطفأة /_next/static تحتفظ بتخزينها الأيدي)
+          {
+            source: "/login",
+            headers: [{ key: "Cache-Control", value: "public, max-age=0, must-revalidate" }],
+          },
+          {
+            source: "/register",
+            headers: [{ key: "Cache-Control", value: "public, max-age=0, must-revalidate" }],
+          },
         ];
       },
     };

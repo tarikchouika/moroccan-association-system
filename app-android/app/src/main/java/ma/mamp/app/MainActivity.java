@@ -3,6 +3,8 @@ package ma.mamp.app;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Insets;
 import android.net.Uri;
@@ -23,7 +25,7 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 /**
- * النشاط الرئيسي لتطبيق منصة مامب — بدون أي اعتماديات خارجية (صفر مكتبات)
+ * النشاط الرئيسي لتطبيق MAMP — بدون أي اعتماديات خارجية (صفر مكتبات)
  * غلاف ويب رسمي للمنصة مع:
  *   • وضع الانغماس الكامل: ملء الشاشة 100% وإخفاء شريطي النظام العلوي والسفلي
  *     (يظهران مؤقتاً بالسحب من الأعلى/الأسفل — IMMERSIVE STICKY)
@@ -40,6 +42,8 @@ public class MainActivity extends Activity {
     private static final String OFFLINE_URL = "file:///android_asset/offline.html";
     private static final String ALLOWED_HOST = "mamp.pages.dev";
     private static final int REFRESH_SWIPE_PX = 260;
+    private static final String PREFS_NAME = "mamp_prefs";
+    private static final String KEY_LAST_VERSION = "last_version_code";
 
     /** ألوان الهوية الرسمية للوغو المنصة */
     private static final String COLOR_NAVY = "#0a1128";   // كحلي الخلفية
@@ -63,6 +67,9 @@ public class MainActivity extends Activity {
 
         applyImmersiveMode();
         applyKeyboardInsets();
+        // تنظيف الذاكرة المؤقتة عند تحديث التطبيق لإصدار جديد — يمنع بقاء نسخة
+        // قديمة من الواجهة عالقة في WebView بعد نشر تحديث للمنصة
+        purgeCacheOnUpgrade();
 
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
@@ -123,6 +130,36 @@ public class MainActivity extends Activity {
             webView.restoreState(savedInstanceState);
         } else {
             webView.loadUrl(HOME_URL);
+        }
+    }
+
+    /**
+     * عند ترقية التطبيق (versionCode جديد): تُفرّغ الذاكرة المؤقتة وبيانات
+     * النماذج المرتبطة بالنسخ السابقة — يضمن وصول كل تحديث للمنصة فوراً
+     * دون صفحات أو أصول عالقة من إصدار سابق.
+     */
+    private void purgeCacheOnUpgrade() {
+        try {
+            SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+            int current = getVersionCode();
+            int last = prefs.getInt(KEY_LAST_VERSION, -1);
+            if (last != -1 && last != current) {
+                webView.clearCache(true);
+                webView.clearFormData();
+            }
+            if (last != current) {
+                prefs.edit().putInt(KEY_LAST_VERSION, current).apply();
+            }
+        } catch (Exception ignored) {
+            // التنظيف تحسين لا يوقف التشغيل
+        }
+    }
+
+    private int getVersionCode() {
+        try {
+            return getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
+        } catch (Exception e) {
+            return -1;
         }
     }
 

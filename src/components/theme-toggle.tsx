@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * مبدّل الوضع القاتم/الفاتح — منصة مامب
+ * مبدّل الوضع القاتم/الفاتح — منصة MAMP
  * يحفظ الاختيار في localStorage ويحترم تفضيل النظام (mamp-theme).
  */
 import { useEffect, useState } from "react";

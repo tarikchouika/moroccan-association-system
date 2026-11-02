@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n/provider";
 
 /**
- * شعار منصة مامب — اللوغو الرسمي (درع MAMP)
+ * شعار منصة MAMP — اللوغو الرسمي (درع MAMP)
  * • الوضع الفاتح: اللوغو الأصلي
  * • الوضع القاتم: نسخة مرتفعة الظلال كي تبقى التفاصيل مرئية على الكحلي
  * • light=true: للأقسام الكحلية الداكنة دائماً (الفوتر، الشريط الجانبي…)
@@ -23,7 +23,7 @@ export function Logo({
   /** أصناف إضافية لسطر الشعار الصغير (مثال: إخفاؤه تحت 2xl في الشريط الضيق) */
   taglineClassName?: string;
 }) {
-  const { d, lang } = useI18n();
+  const { d } = useI18n();
   return (
     <span className={cn("inline-flex items-center gap-2.5 select-none", className)}>
       <span className="relative grid h-10 w-11 place-items-center">
@@ -65,7 +65,7 @@ export function Logo({
               light ? "text-white" : "text-foreground"
             )}
           >
-            {lang === "ar" ? "مـامـب" : "MAMP"}
+            {"MAMP"}
           </span>
           <span
             className={cn(

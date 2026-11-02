@@ -30,6 +30,8 @@ interface Ctx {
   canManage: boolean;
   canFinance: boolean;
   isSuper: boolean;
+  /** طاقم إدارة المنصة (سوبر أدمين/أدمين/كوأدمين/محاسب) — يرون رابط لوحة الإدارة */
+  isStaff: boolean;
 }
 
 const DashboardCtx = createContext<Ctx | null>(null);
@@ -86,15 +88,18 @@ export function DashboardShell({
 
   const current = associations.find((a) => a.id === associationId) ?? null;
   const isSuper = user.role === "SUPER_ADMIN";
+  const isStaff = isSuper || ["ASSOCIATION_ADMIN", "CO_ADMIN", "ACCOUNTANT"].includes(user.role);
+  // التصريف الإداري: المالك وأدمين المنصة وأعضاء المكتب — الكوأدمين والمحاسبون اطلاع
   const canManage =
     isSuper ||
+    user.role === "ASSOCIATION_ADMIN" ||
     (!!current && ["PRESIDENT", "VICE_PRESIDENT", "SECRETARY", "TREASURER", "CO_ADMIN"].includes(current.roleInAssociation));
-  const canFinance = isSuper || (!!current && ["PRESIDENT", "TREASURER"].includes(current.roleInAssociation));
+  const canFinance = isSuper || user.role === "ACCOUNTANT" || (!!current && ["PRESIDENT", "TREASURER"].includes(current.roleInAssociation));
 
   return (
     <QueryClientProvider client={queryClient}>
       <DashboardCtx.Provider
-        value={{ user, associations, associationId, setAssociationId, canManage, canFinance, isSuper }}
+        value={{ user, associations, associationId, setAssociationId, canManage, canFinance, isSuper, isStaff }}
       >
         {children}
       </DashboardCtx.Provider>
