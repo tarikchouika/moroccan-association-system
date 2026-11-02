@@ -60,7 +60,7 @@ export default function AccountingPage() {
 
   const addTx = useMutation({
     mutationFn: async () => {
-      const res = await fetch("/api/transactions", {
+      const res = await fetch(`/api/transactions?associationId=${associationId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...form, amount: Number(form.amount) }),

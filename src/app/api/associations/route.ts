@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { getCurrentUser, hashPassword } from "@/lib/auth";
-import { audit, readJson, requireSuperAdmin } from "@/lib/api-helpers";
+import { audit, readJson, requireSuperAdmin, nextMembershipNumber } from "@/lib/api-helpers";
 
 export const dynamic = "force-dynamic";
 
@@ -125,14 +125,13 @@ export async function POST(req: NextRequest) {
 
   // عضوية الرئيس
   const year = new Date().getFullYear();
-  const count = await db.membership.count({ where: { associationId: association.id } });
   await db.membership.create({
     data: {
       userId: presidentId,
       associationId: association.id,
       roleInAssociation: "PRESIDENT",
       memberType: "ACTIVE",
-      membershipNumber: `${(d.acronym || "ASM").replace(/\s/g, "")}-${String(count + 1).padStart(4, "0")}`,
+      membershipNumber: await nextMembershipNumber(association.id),
       status: "ACTIVE",
       cndpConsent: true,
       cndpConsentAt: new Date(),

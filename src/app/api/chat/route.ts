@@ -32,7 +32,12 @@ const SYSTEM_PROMPT = `أنت «المساعد الجمعوي» (Assistant Al-Ja
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    let body: Record<string, unknown>;
+    try {
+      body = await req.json();
+    } catch {
+      return Response.json({ error: "طلب غير صالح" }, { status: 400 });
+    }
     const message: string = String(body.message ?? "").trim();
     const history: Array<{ role: string; content: string }> = Array.isArray(body.history)
       ? body.history.slice(-6).filter((m) => m && (m.role === "user" || m.role === "assistant"))

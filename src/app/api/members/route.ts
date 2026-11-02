@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { hashPassword } from "@/lib/auth";
-import { audit, readJson, requireAssociationContext } from "@/lib/api-helpers";
+import { audit, readJson, requireAssociationContext, nextMembershipNumber, nextSequence } from "@/lib/api-helpers";
 
 export const dynamic = "force-dynamic";
 
@@ -85,7 +85,6 @@ export async function POST(req: NextRequest) {
   }
 
   const association = await db.association.findUnique({ where: { id: ctx.associationId } });
-  const count = await db.membership.count({ where: { associationId: ctx.associationId } });
   const prefix = (association?.acronym || association?.name || "ASM").replace(/\s/g, "").slice(0, 6);
 
   const membership = await db.membership.create({
@@ -94,7 +93,7 @@ export async function POST(req: NextRequest) {
       associationId: ctx.associationId,
       roleInAssociation: d.roleInAssociation,
       memberType: d.memberType,
-      membershipNumber: `${prefix}-${String(count + 1).padStart(4, "0")}`,
+      membershipNumber: await nextMembershipNumber(ctx.associationId),
       status: "ACTIVE",
       profession: d.profession || null,
       cndpConsent: true,
@@ -105,13 +104,12 @@ export async function POST(req: NextRequest) {
   // واجب انخراط أولي إن حُدد
   if (d.initialFee && d.initialFee > 0) {
     const year = new Date().getFullYear();
-    const seq = await db.feePayment.count({ where: { associationId: ctx.associationId } });
     await db.feePayment.create({
       data: {
         year,
         amount: d.initialFee,
         method: "CASH",
-        receiptNumber: `${prefix}-FEE-${year}-${String(seq + 1).padStart(3, "0")}`,
+        receiptNumber: await nextSequence(association?.acronym || "ASM", "fee"),
         membershipId: membership.id,
         associationId: ctx.associationId,
       },
@@ -124,7 +122,7 @@ export async function POST(req: NextRequest) {
         category: "انخراطات",
         amount: d.initialFee,
         paymentMethod: "CASH",
-        receiptNumber: `${prefix}-TX-${year}-${String((await db.transaction.count({ where: { associationId: ctx.associationId } })) + 1).padStart(3, "0")}`,
+        receiptNumber: await nextSequence(association?.acronym || "ASM", "transaction"),
         associationId: ctx.associationId,
         approvedById: ctx.userId,
       },

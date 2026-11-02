@@ -71,7 +71,7 @@ export default function EventsPage() {
 
   const create = useMutation({
     mutationFn: async () => {
-      const res = await fetch("/api/events", {
+      const res = await fetch(`/api/events?associationId=${associationId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...form, maxParticipants: form.maxParticipants ? Number(form.maxParticipants) : undefined }),
@@ -91,7 +91,7 @@ export default function EventsPage() {
 
   const setStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      const res = await fetch("/api/events", {
+      const res = await fetch(`/api/events?associationId=${associationId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, status }),

@@ -85,7 +85,9 @@ export async function readJson<T>(req: NextRequest): Promise<T | null> {
   }
 }
 
-/** توليد رقم تسلسلي بصيغة PREFIX-YYYY-NNN */
+/** توليد رقم تسلسلي بصيغة PREFIX-YYYY-NNN — آمن ضد التعارض العالمي
+ *  (receiptNumber فريد عالمياً في المخطط، وتوليد سابق بالعدّ فقط كان يصطدم
+ *   بين جمعيتين تحملان نفس الاختصار أو بعد حذف سجلات — الآن نفحص الوجود ونتقدم) */
 export async function nextSequence(
   associationAcronym: string,
   table: "donation" | "transaction" | "fee"
@@ -102,5 +104,35 @@ export async function nextSequence(
   } else {
     count = await db.feePayment.count({ where: { receiptNumber: { startsWith: prefix } } });
   }
-  return `${prefix}-${String(count + 1).padStart(3, "0")}`;
+
+  // تقدّم آمن: نفحص كل مرشح ضد القاعدة قبل اعتماده (فريد عالمياً)
+  for (let i = count + 1; i <= count + 100; i++) {
+    const candidate = `${prefix}-${String(i).padStart(3, "0")}`;
+    const exists =
+      table === "fee"
+        ? await db.feePayment.findUnique({ where: { receiptNumber: candidate } })
+        : null;
+    // donation/transaction: receiptNumber غير مفروض فريداً في المخطط — يكفي التقدم التسلسلي
+    if (table === "fee" && exists) continue;
+    return candidate;
+  }
+  // احتياط نهائي: لاحقة زمنية قصيرة تضمن التفرد في كل الأحوال
+  return `${prefix}-${Date.now().toString(36).toUpperCase().slice(-6)}`;
+}
+
+/** توليد رقم انخراط فريد عالمياً بصيغة PREFIX-NNNN
+ *  (membershipNumber @unique عالمياً في المخطط — كان يولَّد بعدّ الجمعية فقط
+ *   فيصطدم بين جمعيتين بنفس الاختصار أو بعد الحذف؛ الآن نفحص ونتقدم بثبات) */
+export async function nextMembershipNumber(associationId: string): Promise<string> {
+  const association = await db.association.findUnique({ where: { id: associationId } });
+  const prefix = (association?.acronym || association?.name || "ASM").replace(/\s/g, "").slice(0, 6);
+  const count = await db.membership.count({ where: { associationId } });
+
+  for (let i = count + 1; i <= count + 100; i++) {
+    const candidate = `${prefix}-${String(i).padStart(4, "0")}`;
+    const exists = await db.membership.findUnique({ where: { membershipNumber: candidate } });
+    if (!exists) return candidate;
+  }
+  // احتياط نهائي: لاحقة زمنية قصيرة
+  return `${prefix}-M${Date.now().toString(36).toUpperCase().slice(-6)}`;
 }

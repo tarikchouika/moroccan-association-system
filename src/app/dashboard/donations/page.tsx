@@ -60,7 +60,7 @@ export default function DonationsPage() {
 
   const addDonation = useMutation({
     mutationFn: async () => {
-      const res = await fetch("/api/donations", {
+      const res = await fetch(`/api/donations?associationId=${associationId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...form, amount: Number(form.amount) || 0 }),

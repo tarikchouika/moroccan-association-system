@@ -12,7 +12,13 @@ const schema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    let body: unknown;
+    try {
+      body = await req.json();
+    } catch {
+      // جسم غير صالح (JSON تالف) — 400 لا 500
+      return Response.json({ error: "طلب غير صالح" }, { status: 400 });
+    }
     const parsed = schema.safeParse(body);
     if (!parsed.success) {
       return Response.json(

@@ -14,7 +14,12 @@ const schema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    let body: unknown;
+    try {
+      body = await req.json();
+    } catch {
+      return Response.json({ error: "طلب غير صالح" }, { status: 400 });
+    }
     const parsed = schema.safeParse(body);
     if (!parsed.success) {
       return Response.json(
@@ -69,7 +74,12 @@ export async function PUT(req: NextRequest) {
     const session = await auth.getSession();
     if (!session) return Response.json({ error: "غير مصرح" }, { status: 401 });
 
-    const body = await req.json();
+    let body: Record<string, unknown>;
+    try {
+      body = await req.json();
+    } catch {
+      return Response.json({ error: "طلب غير صالح" }, { status: 400 });
+    }
     const oldPassword = String(body.oldPassword ?? "");
     const newPassword = String(body.newPassword ?? "");
     if (newPassword.length < 8 || !/[a-zA-Z]/.test(newPassword) || !/[0-9]/.test(newPassword)) {
