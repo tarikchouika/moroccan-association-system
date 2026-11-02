@@ -1,0 +1,49 @@
+name: deploy-pages
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "public/_worker.js"
+      - "scripts/build-static.sh"
+      - ".github/workflows/deploy-pages.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: بناء ونشر mamp.pages.dev
+    runs-on: ubuntu-latest
+    steps:
+      - name: استخراج الكود
+        uses: actions/checkout@v4
+
+      - name: تجهيز Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: تثبيت الحزم
+        run: bun install
+
+      - name: بناء النسخة الثابتة
+        run: bash scripts/build-static.sh
+
+      - name: التحقق من _worker.js
+        run: |
+          test -f out/_worker.js
+          ls -l out/_worker.js
+          node --check out/_worker.js
+
+      - name: النشر إلى Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::error::أسرار Cloudflare غير مضبوطة"
+            exit 1
+          fi
+          npx --yes wrangler@3 pages deploy out --project-name=mamp --branch=main
