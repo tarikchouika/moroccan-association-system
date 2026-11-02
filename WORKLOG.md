@@ -55,6 +55,7 @@
 ### المهمة 28: Vercel + سير عمل APK ✅
 - **Vercel**: بناء نظيف من نسخة مستنسخة حديثة (محاكاة CI كاملة: clone → bun install → build-static.sh → 17 صفحة) — المستودع جاهز؛ أُضيف قسم إعداد لوحة Vercel في README (Framework: Other + الأوامر من vercel.json).
 - **APK**: توليد مخزن التوقيع `CN=TARIK CHOUIKA, OU=MAMP, O=Plateforme MAMP, L=Casablanca, C=MA` بصلاحية 10950 يوماً (2026→2056) ونسخة احتياطية في `.secrets/mamp-release.p12` (خارج git) + رفع 6 أسرار إلى المستودع (KEYSTORE_BASE64/PASSWORD/ALIAS/KEY_PASSWORD + CLOUDFLARE_TOKEN/ACCOUNT) عبر واجهة GitHub المشفرة (libsodium) — `scripts/upload-gh-secrets.py`.
+- **نتيجة السير العمل**: إصداران ناجحان (v1.0.8 وv1.0.9) — APK موقّع (كتلة توقيع v2 مؤكدة + سلامة أرشيف) مع ملاحظات إصدار تضم الشهادة وبصمتي الشهادة والملف ومخططات التوقيع؛ الروابط الدائمة تعمل: GitHub Releases (`releases/latest/download/mamp.apk`) وكلاودفلير (`mamp-dl.pages.dev/mamp.apk` + `latest.json` تقرأها بطاقة الإصدار في الموقع حية).
 
 ---
 
