@@ -52,6 +52,9 @@ model User {
   createdEvents    Event[]      @relation("EventCreator")
   approvedTx       Transaction[] @relation("TxApprover")
   createdProjects  CollaborativeProject[] @relation("ProjectCreator")
+  articles        Article[]
+  articleComments ArticleComment[]
+  articleLikes    ArticleLike[]
 
   @@index([role])
   @@index([email])
@@ -113,6 +116,15 @@ model Association {
   // تفويض قبول طلبات الانخراط: معرف المستخدم المسيّر المفوّض من الرئيس
   // (فارغ = الرئيس نفسه يقبل الطلبات)
   approvalsDelegatedTo String?
+  // ---- معلومات استقبال التبرعات والمساهمات (تُعرض للعموم عند التفعيل) ----
+  donationsEnabled     Boolean  @default(false) // تفعيل استقبال التبرعات
+  donationBankName     String? // اسم البنك المستقبل
+  donationRib          String? // رقم الحساب البنكي RIB المخصص للتبرعات
+  donationCcp          String? // حساب البريد CCP
+  donationOnlineUrl    String? // رابط الدفع/المنصة الإلكترونية
+  donationInstructions String? // تعليمات التبرع (نص حر)
+  acceptInKind         Boolean  @default(true) // قبول التبرعات العينية
+  inKindNeeds          String? // الاحتياجات العينية الحالية
   viewCount   Int       @default(0)
   createdBy   String?
   createdAt   DateTime  @default(now())
@@ -129,6 +141,7 @@ model Association {
   chatMessages   ChatMessage[]
   ledProjects        CollaborativeProject[] @relation("ProjectLead")
   projectParticipations ProjectParticipant[]
+  articles           Article[]
 
   @@index([status])
   @@index([category])
@@ -314,6 +327,12 @@ model Donation {
   donorEmail   String?
   donorPhone   String?
   isAnonymous  Boolean  @default(false)
+  // نوع المتبرع: MEMBER (منخرط) | ENTITY (جهة داعمة) | CITIZEN (مواطن) | OTHER (آخر)
+  donorType    String   @default("OTHER")
+  // اسم الجهة الداعمة (عند donorType = ENTITY)
+  entityName   String?
+  // ربط المساهمة بانخراط المتبرع (عند donorType = MEMBER)
+  membershipId String?
   amount       Float    @default(0)
   // MONEY (نقدي) | IN_KIND (عيني)
   type         String   @default("MONEY")
@@ -475,4 +494,65 @@ model ChatMessage {
   associationId String?
 
   @@index([sessionId])
+}
+
+// ============================================================================
+// المقالات وتبادل الخبرات — بين أفراد الجمعيات والمتطوعين
+// ============================================================================
+
+model Article {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  title     String
+  summary   String? // ملخص قصير يظهر في القوائم
+  content   String // النص الكامل (فقرات مفصولة بأسطر فارغة)
+  // فئات تبادل الخبرات: تنظيمية | تدبير مالي | شراكات | تطوع | تواصل | تكوين | أخرى
+  category  String   @default("أخرى")
+  tags      String? // كلمات مفتاحية مفصولة بفواصل
+  coverUrl  String? // صورة الغلاف (data URL مضغوطة)
+  // DRAFT (مسودة) | PUBLISHED (منشور) | ARCHIVED (مؤرشف)
+  status    String   @default("DRAFT")
+  views     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author   User  @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId String
+  association    Association? @relation(fields: [associationId], references: [id], onDelete: SetNull)
+  associationId  String? // جمعية صاحب المقال (اختياري — قد يكون خبرة شخصية)
+
+  comments ArticleComment[]
+  likes    ArticleLike[]
+
+  @@index([status])
+  @@index([category])
+  @@index([createdAt])
+  @@index([authorId])
+}
+
+model ArticleComment {
+  id        String   @id @default(cuid())
+  body      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  article  Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  articleId String
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId   String
+
+  @@index([articleId])
+  @@index([userId])
+}
+
+model ArticleLike {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  article  Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  articleId String
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId   String
+
+  @@unique([articleId, userId])
 }

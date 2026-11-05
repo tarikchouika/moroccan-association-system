@@ -197,7 +197,7 @@ export function AssociationDetailBody({
             ))}
           </div>
 
-          {/* بطاقة التبرع */}
+          {/* بطاقة التبرع — مع وسائل الاستقبال الفعلية عند تفعيلها */}
           <Card id="donate" className="scroll-mt-24 overflow-hidden">
             <div className="gradient-dark zellige-pattern p-6 text-white">
               <HeartHandshake className="mb-3 size-8 text-gold" />
@@ -205,9 +205,53 @@ export function AssociationDetailBody({
               <p className="mt-2 text-[13px] leading-6 text-white/75">
                 {d.associationDetail.donateCardDesc}
               </p>
-              <p className="mt-3 rounded-lg border border-white/15 bg-white/5 p-3 text-[11px] leading-5 text-white/60">
-                {d.associationDetail.donateCardNote}
-              </p>
+
+              {a.donationsEnabled ? (
+                <div className="mt-4 space-y-2.5 text-[12px] leading-6">
+                  <p className="font-extrabold text-gold">{d.associationDetail.receptionTitle}</p>
+                  {a.donationBankName && a.donationRib && (
+                    <div className="rounded-lg border border-white/15 bg-white/5 p-3">
+                      <p className="flex items-center gap-1.5 font-bold text-white/90">
+                        <Landmark className="size-3.5 text-gold" /> {d.associationDetail.receptionBank}
+                      </p>
+                      <p className="mt-1 text-white/75">{a.donationBankName}</p>
+                      <p className="num mt-0.5 font-bold tracking-wider text-white" dir="ltr">{a.donationRib}</p>
+                    </div>
+                  )}
+                  {a.donationCcp && (
+                    <div className="rounded-lg border border-white/15 bg-white/5 p-3">
+                      <p className="font-bold text-white/90">{d.associationDetail.receptionCcp}</p>
+                      <p className="num mt-0.5 font-bold text-white" dir="ltr">{a.donationCcp}</p>
+                    </div>
+                  )}
+                  {a.donationOnlineUrl && (
+                    <a
+                      href={a.donationOnlineUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block rounded-lg border border-gold/40 bg-gold/15 p-3 font-bold text-gold hover:bg-gold/25"
+                    >
+                      {d.associationDetail.receptionOnline} ↗
+                    </a>
+                  )}
+                  {a.donationInstructions && (
+                    <p className="rounded-lg border border-white/15 bg-white/5 p-3 text-white/75">
+                      {a.donationInstructions}
+                    </p>
+                  )}
+                  {a.acceptInKind && a.inKindNeeds && (
+                    <div className="rounded-lg border border-white/15 bg-white/5 p-3">
+                      <p className="font-bold text-white/90">{d.associationDetail.receptionInKind}</p>
+                      <p className="mt-1 text-white/75">{a.inKindNeeds}</p>
+                    </div>
+                  )}
+                  <p className="text-[11px] leading-5 text-white/50">{d.associationDetail.receptionEnabled}</p>
+                </div>
+              ) : (
+                <p className="mt-3 rounded-lg border border-white/15 bg-white/5 p-3 text-[11px] leading-5 text-white/60">
+                  {d.associationDetail.donateCardNote}
+                </p>
+              )}
             </div>
           </Card>
         </div>

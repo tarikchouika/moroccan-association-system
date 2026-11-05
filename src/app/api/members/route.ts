@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { hashPassword } from "@/lib/auth";
-import { audit, readJson, requireAssociationContext, nextMembershipNumber, nextSequence } from "@/lib/api-helpers";
+import { audit, nextMembershipNumber, nextSequence, readJson, requireAssociationContext } from "@/lib/api-helpers";
 
 export const dynamic = "force-dynamic";
 
@@ -164,6 +164,22 @@ export async function PATCH(req: NextRequest) {
   const membership = await db.membership.findFirst({ where: { id, associationId: ctx.associationId } });
   if (!membership) return Response.json({ error: "المنخرط غير موجود" }, { status: 404 });
 
+  // ---- تحصين حوكمة الرئاسة (تدقيق الدورة 11) ----
+  // ① لا أحد يعدّل عضويته الشخصية (منع الترقية الذاتية) إلا السوبر أدمين
+  if (membership.userId === ctx.userId && ctx.userRole !== "SUPER_ADMIN") {
+    return Response.json({ error: "لا يمكن تعديل عضويتكم الشخصية من هنا" }, { status: 403 });
+  }
+  // ② منصب الرئيس محمي: لا يُمنح ولا يُسلب ولا تُعدّل عضويته إلا من مالك المنصة
+  //    (انتقال الرئاسة يوثقه الجمع العام وينفذه المالك — منع أي مسيّر من ترقية نفسه)
+  const involvesPresident =
+    membership.roleInAssociation === "PRESIDENT" || updates.roleInAssociation === "PRESIDENT";
+  if (involvesPresident && ctx.userRole !== "SUPER_ADMIN") {
+    return Response.json(
+      { error: "منصب الرئيس يُدار من مالك المنصة حصراً — تواصلوا معه لتوثيق تغيير المكتب" },
+      { status: 403 }
+    );
+  }
+
   // قبول/رفض طلب انخراط معلق — صلاحية الرئيس أو المسيّر المفوَّض
   if (updates.status && membership.status === "PENDING") {
     if (!ctx.canApprove) {
@@ -186,12 +202,13 @@ export async function PATCH(req: NextRequest) {
     if (existing) {
       await db.feePayment.update({ where: { id: existing.id }, data: { amount: feeAmount, paidAt: new Date() } });
     } else {
-      const seq = await db.feePayment.count({ where: { associationId: ctx.associationId } });
+      // أرقام وصول مقاومة للتعارض عبر المولّد الموحد (كانت قبلاً بالعدّ فقط)
+      const feeReceipt = await nextSequence(prefix, "fee");
       await db.feePayment.create({
         data: {
           year: feeYear,
           amount: feeAmount,
-          receiptNumber: `${prefix}-FEE-${feeYear}-${String(seq + 1).padStart(3, "0")}`,
+          receiptNumber: feeReceipt,
           membershipId: id,
           associationId: ctx.associationId,
         },
@@ -204,7 +221,7 @@ export async function PATCH(req: NextRequest) {
             type: "INCOME",
             category: "انخراطات",
             amount: feeAmount,
-            receiptNumber: `${prefix}-TX-${feeYear}-${String((await db.transaction.count({ where: { associationId: ctx.associationId } })) + 1).padStart(3, "0")}`,
+            receiptNumber: await nextSequence(prefix, "transaction"),
             associationId: ctx.associationId,
             approvedById: ctx.userId,
           },

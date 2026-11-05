@@ -5,15 +5,17 @@ import { audit, nextSequence, readJson, requireAssociationContext } from "@/lib/
 
 export const dynamic = "force-dynamic";
 
-/** GET — سجل التبرعات */
+/** GET — سجل التبرعات (مع تصفية بنوع المتبرع) */
 export async function GET(req: NextRequest) {
   const { ctx, error } = await requireAssociationContext(req);
   if (error || !ctx) return error!;
 
   const year = Number(req.nextUrl.searchParams.get("year") ?? new Date().getFullYear());
+  const donorType = req.nextUrl.searchParams.get("donorType") ?? "";
   const donations = await db.donation.findMany({
     where: {
       associationId: ctx.associationId,
+      ...(donorType ? { donorType } : {}),
       date: { gte: new Date(year, 0, 1), lt: new Date(year + 1, 0, 1) },
     },
     orderBy: { date: "desc" },
@@ -26,6 +28,10 @@ const createSchema = z.object({
   donorEmail: z.string().email().optional().or(z.literal("")),
   donorPhone: z.string().optional().or(z.literal("")),
   isAnonymous: z.boolean().default(false),
+  // نوع المتبرع: MEMBER (منخرط) | ENTITY (جهة داعمة) | CITIZEN (مواطن) | OTHER
+  donorType: z.enum(["MEMBER", "ENTITY", "CITIZEN", "OTHER"]).default("OTHER"),
+  entityName: z.string().max(160).optional().or(z.literal("")),
+  membershipId: z.string().optional().or(z.literal("")),
   amount: z.number().min(0).default(0),
   type: z.enum(["MONEY", "IN_KIND"]),
   inKindDescription: z.string().optional().or(z.literal("")),
@@ -57,6 +63,28 @@ export async function POST(req: NextRequest) {
   if (d.type === "IN_KIND" && !d.inKindDescription) {
     return Response.json({ error: "وصف التبرع العيني مطلوب" }, { status: 400 });
   }
+  // جهة داعمة: اسم الجهة مطلوب
+  if (d.donorType === "ENTITY" && !d.entityName?.trim()) {
+    return Response.json({ error: "اسم الجهة الداعمة مطلوب" }, { status: 400 });
+  }
+  // منخرط: التحقق من الانخراط داخل الجمعية
+  let memberDonor: {
+    id: string;
+    associationId: string;
+    user: { fullName: string; email: string | null; phone: string | null };
+  } | null = null;
+  if (d.donorType === "MEMBER") {
+    if (!d.membershipId) {
+      return Response.json({ error: "اختيار المنخرط المتبرع مطلوب" }, { status: 400 });
+    }
+    memberDonor = await db.membership.findUnique({
+      where: { id: d.membershipId },
+      include: { user: { select: { fullName: true, email: true, phone: true } } },
+    });
+    if (!memberDonor || memberDonor.associationId !== ctx.associationId) {
+      return Response.json({ error: "الانخراط غير موجود في هذه الجمعية" }, { status: 404 });
+    }
+  }
 
   const association = await db.association.findUnique({ where: { id: ctx.associationId } });
   const receiptNumber = await nextSequence(association?.acronym || "ASM", "donation");
@@ -64,9 +92,12 @@ export async function POST(req: NextRequest) {
   const donation = await db.donation.create({
     data: {
       donorName: d.isAnonymous ? "متبرع مجهول" : d.donorName.trim(),
-      donorEmail: d.donorEmail || null,
-      donorPhone: d.donorPhone || null,
+      donorEmail: d.donorEmail || memberDonor?.user.email || null,
+      donorPhone: d.donorPhone || memberDonor?.user.phone || null,
       isAnonymous: d.isAnonymous,
+      donorType: d.donorType,
+      entityName: d.donorType === "ENTITY" ? d.entityName?.trim() ?? null : null,
+      membershipId: d.donorType === "MEMBER" ? memberDonor?.id ?? null : null,
       amount: d.type === "MONEY" ? d.amount : 0,
       type: d.type,
       inKindDescription: d.inKindDescription || null,

@@ -57,8 +57,11 @@ const createSchema = z.object({
 export async function POST(req: NextRequest) {
   const { ctx, error } = await requireAssociationContext(req);
   if (error || !ctx) return error!;
-  if (!ctx.canFinance) {
-    return Response.json({ error: "تسجيل العمليات المالية محجوز لأمين المال والرئيس" }, { status: 403 });
+  if (!ctx.canFinanceWrite) {
+    return Response.json(
+      { error: "تسجيل العمليات المالية محجوز لأمين المال والرئيس — محاسب المنصة للإطلاع دون التنفيذ" },
+      { status: 403 }
+    );
   }
 
   const body = await readJson<Record<string, unknown>>(req);
@@ -99,7 +102,7 @@ export async function POST(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   const { ctx, error } = await requireAssociationContext(req);
   if (error || !ctx) return error!;
-  if (!ctx.canFinance) return Response.json({ error: "صلاحية مالية مطلوبة" }, { status: 403 });
+  if (!ctx.canFinanceWrite) return Response.json({ error: "صلاحية مالية مطلوبة" }, { status: 403 });
 
   const id = req.nextUrl.searchParams.get("id") ?? "";
   const tx = await db.transaction.findFirst({ where: { id, associationId: ctx.associationId } });

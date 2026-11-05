@@ -28,7 +28,15 @@ export const DEMO_DATA: DemoData = {
       "memberCount": 10,
       "donationCount": 7,
       "iceNumber": "002587410000073",
-      "logoUrl": null
+      "logoUrl": null,
+      "donationsEnabled": true,
+      "donationBankName": "القرض الشعبي المغربي — وكالة الدار البيضاء أنفا",
+      "donationRib": "181 810 2121167890345120 34",
+      "donationCcp": "2456178",
+      "donationOnlineUrl": "https://mamp.pages.dev/associations/association-nadwa-tanmiya",
+      "donationInstructions": "تُوجَّل إشعارات التحويل إلى بريد الجمعية مع الاسم الكامل للداعم.",
+      "acceptInKind": true,
+      "inKindNeeds": "تجهيزات رقمية · كتب تكوينية · عتاد ورشات المقاولاتية"
     },
     {
       "slug": "association-al-mashriq-thaqafiya",
@@ -46,7 +54,15 @@ export const DEMO_DATA: DemoData = {
       "memberCount": 2,
       "donationCount": 0,
       "iceNumber": "003162980000021",
-      "logoUrl": null
+      "logoUrl": null,
+      "donationsEnabled": true,
+      "donationBankName": "بنك أفريقيا — وكالة الرباط أكدال",
+      "donationRib": "013 780 0000245819370215 61",
+      "donationCcp": null,
+      "donationOnlineUrl": null,
+      "donationInstructions": "الدعم العيني يُستقبل بمقر الجمعية أيام الأربعاء والجمعة.",
+      "acceptInKind": true,
+      "inKindNeeds": "بطانيات شتوية · مواد غذائية غير قابلة للتلف"
     },
     {
       "slug": "association-mido-biya",

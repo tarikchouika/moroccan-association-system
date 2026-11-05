@@ -14,6 +14,9 @@ export interface ApiCtx {
   associationId: string;
   canManage: boolean;
   canFinance: boolean;
+  /** الكتابة/الحذف في الدفتر المالي: الرئيس أو أمين المال داخل جمعيتهم + السوبر أدمين.
+   *  (محاسب المنصة يطلع — لا يكتب: تدقيق الدورة 11) */
+  canFinanceWrite: boolean;
   canApprove: boolean;
   isPresident: boolean;
   approvalsDelegatedTo: string | null;
@@ -48,13 +51,26 @@ export async function requireAssociationContext(
     if (isStaff) {
       // كوأدمين/محاسب المنصة: اطلاع دون تصريف إداري — يمرون دون عضوية
     } else {
-      // العضو العادي يمكنه قراءة بعض المعطيات فقط حسب المسار
-      const membership = user.memberships.find((m) => m.associationId === associationId);
+      // العضو يمكنه قراءة بعض المعطيات فقط حسب المسار —
+      // بشرط عضوية نشيطة (PENDING/SUSPENDED/RESIGNED لا يقرؤون بيانات الجمعية:
+      // تدقيق الدورة 11 — كان المسار يقبل أي حالة عضوية)
+      const membership = user.memberships.find(
+        (m) => m.associationId === associationId && m.status === "ACTIVE"
+      );
       if (!membership && user.role !== "PARTNER") {
         return { error: forbidden("لا تنتمون إلى هذه الجمعية") };
       }
     }
   }
+
+  // الكتابة المالية: الرئيس/أمين المال النشيطان داخل جمعيتهم + السوبر أدمين.
+  // المحاسب: اطلاع (canFinance) دون تنفيذ (canFinanceWrite = false)
+  const financeWriteMembership = user.memberships.find(
+    (m) =>
+      m.associationId === associationId &&
+      m.status === "ACTIVE" &&
+      ["PRESIDENT", "TREASURER"].includes(m.roleInAssociation)
+  );
 
   return {
     ctx: {
@@ -63,6 +79,7 @@ export async function requireAssociationContext(
       associationId,
       canManage,
       canFinance: isSuper || isPlatformAccountant || canManageFinance(user, associationId),
+      canFinanceWrite: isSuper || !!financeWriteMembership,
       canApprove: canApproveMembers(user, association),
       isPresident:
         user.memberships.some(

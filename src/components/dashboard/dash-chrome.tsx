@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard, Users, Wallet, HandCoins, CalendarDays, FileText,
   BarChart3, Settings, LogOut, Menu, X, Building2, ShieldCheck,
-  Landmark, ChevronDown, Inbox, Sparkles, Handshake,
+  Landmark, ChevronDown, Inbox, Sparkles, Handshake, MessagesSquare, Newspaper,
 } from "lucide-react";
 import { Logo } from "@/components/site/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -31,6 +31,8 @@ const NAV_ICONS = {
   events: CalendarDays,
   documents: FileText,
   reports: BarChart3,
+  messages: MessagesSquare,
+  articles: Newspaper,
   settings: Settings,
 } as const;
 
@@ -45,6 +47,8 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const links = (
     [
       { href: "/dashboard", key: "overview", label: t.overview },
+      { href: "/dashboard/messages", key: "messages", label: t.messages },
+      { href: "/dashboard/articles", key: "articles", label: t.articles },
       { href: "/dashboard/projects", key: "projects", label: t.projects },
       { href: "/dashboard/members", key: "members", label: t.members },
       { href: "/dashboard/accounting", key: "accounting", label: t.accounting },
@@ -53,6 +57,8 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
       { href: "/dashboard/settings", key: "settings", label: t.settings },
     ] as const
   ).filter((n) => {
+    // المراسلة والمقالات والخبرات: متاحان لكل المستخدمين — عبر الجمعيات
+    if (n.key === "messages" || n.key === "articles") return true;
     if (!associationId) return n.key === "overview" || n.key === "settings";
     // المحاسبة: للماليين حصراً (رئيس/أمين مال/محاسب المنصة/السوبر) والكاتب العام للتوثيق
     if (n.key === "accounting" && !canFinance && assoc?.roleInAssociation !== "SECRETARY") return false;

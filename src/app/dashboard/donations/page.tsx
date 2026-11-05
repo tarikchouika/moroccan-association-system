@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
-  HandCoins, Plus, Loader2, Trash2, Receipt, Printer, Globe2, Search,
+  HandCoins, Plus, Loader2, Trash2, Receipt, Printer, Globe2, Search, Settings2, Landmark,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +26,8 @@ interface Donation {
   donorEmail: string | null;
   donorPhone: string | null;
   isAnonymous: boolean;
+  donorType: string;
+  entityName: string | null;
   amount: number;
   type: "MONEY" | "IN_KIND";
   inKindDescription: string | null;
@@ -33,6 +35,24 @@ interface Donation {
   message: string | null;
   receiptNumber: string | null;
 }
+
+interface ReceptionSettings {
+  donationsEnabled: boolean;
+  donationBankName: string | null;
+  donationRib: string | null;
+  donationCcp: string | null;
+  donationOnlineUrl: string | null;
+  donationInstructions: string | null;
+  acceptInKind: boolean;
+  inKindNeeds: string | null;
+}
+
+const DONOR_TYPE_LABELS: Record<string, string> = {
+  MEMBER: "منخرط",
+  ENTITY: "جهة داعمة",
+  CITIZEN: "مواطن",
+  OTHER: "آخر",
+};
 
 export default function DonationsPage() {
   const { associationId, canManage } = useDash();
@@ -46,6 +66,12 @@ export default function DonationsPage() {
     donorName: "", donorEmail: "", donorPhone: "",
     isAnonymous: false, amount: "", type: "MONEY", inKindDescription: "",
     message: "", foreignSource: false,
+    donorType: "OTHER", entityName: "", membershipId: "",
+  });
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsForm, setSettingsForm] = useState<ReceptionSettings>({
+    donationsEnabled: false, donationBankName: "", donationRib: "", donationCcp: "",
+    donationOnlineUrl: "", donationInstructions: "", acceptInKind: true, inKindNeeds: "",
   });
 
   const { data, isLoading } = useQuery<{ donations: Donation[] }>({
@@ -58,12 +84,59 @@ export default function DonationsPage() {
     enabled: !!associationId,
   });
 
+  // إعدادات استقبال التبرعات
+  const { data: settingsData } = useQuery<{ settings: ReceptionSettings }>({
+    queryKey: ["donation-settings", associationId],
+    queryFn: async () => {
+      const res = await fetch(`/api/donations/settings?associationId=${associationId}`);
+      if (!res.ok) throw new Error((await res.json()).error ?? "خطأ");
+      return res.json();
+    },
+    enabled: !!associationId,
+  });
+
+  // لائحة المنخرطين النشيطين (لاختيار المتبرع المنخرط)
+  const { data: membersData } = useQuery<{
+    members: { id: string; user: { fullName: string; email: string | null } }[];
+  }>({
+    queryKey: ["members-for-donations", associationId],
+    queryFn: async () => {
+      const res = await fetch(`/api/members?associationId=${associationId}&status=ACTIVE`);
+      if (!res.ok) throw new Error("خطأ");
+      return res.json();
+    },
+    enabled: !!associationId && canManage,
+  });
+
+  const saveSettings = useMutation({
+    mutationFn: async () => {
+      const res = await fetch(`/api/donations/settings?associationId=${associationId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(settingsForm),
+      });
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error);
+      return d;
+    },
+    onSuccess: () => {
+      toast({ title: "حُفظت معلومات استقبال التبرعات" });
+      setSettingsOpen(false);
+      qc.invalidateQueries({ queryKey: ["donation-settings", associationId] });
+    },
+    onError: (e: Error) => toast({ title: "تعذر الحفظ", description: e.message, variant: "destructive" }),
+  });
+
   const addDonation = useMutation({
     mutationFn: async () => {
       const res = await fetch(`/api/donations?associationId=${associationId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, amount: Number(form.amount) || 0 }),
+        body: JSON.stringify({
+          ...form,
+          amount: Number(form.amount) || 0,
+          donorName: form.donorType === "ENTITY" && form.entityName ? form.entityName : form.donorName,
+        }),
       });
       const d = await res.json();
       if (!res.ok) throw new Error(d.error);
@@ -72,7 +145,7 @@ export default function DonationsPage() {
     onSuccess: (d) => {
       toast({ title: "سُجل التبرع", description: `الوصل ${d.donation.receiptNumber} جاهز للطبع` });
       setOpen(false);
-      setForm({ ...form, donorName: "", donorEmail: "", donorPhone: "", amount: "", inKindDescription: "", message: "" });
+      setForm({ ...form, donorName: "", donorEmail: "", donorPhone: "", amount: "", inKindDescription: "", message: "", entityName: "", membershipId: "" });
       qc.invalidateQueries({ queryKey: ["donations", associationId] });
       qc.invalidateQueries({ queryKey: ["stats", associationId] });
       setReceipt(d.donation);
@@ -100,6 +173,21 @@ export default function DonationsPage() {
   );
   const total = (data?.donations ?? []).filter((d) => d.type === "MONEY").reduce((s, d) => s + d.amount, 0);
 
+  const openSettings = () => {
+    const s = settingsData?.settings;
+    setSettingsForm({
+      donationsEnabled: s?.donationsEnabled ?? false,
+      donationBankName: s?.donationBankName ?? "",
+      donationRib: s?.donationRib ?? "",
+      donationCcp: s?.donationCcp ?? "",
+      donationOnlineUrl: s?.donationOnlineUrl ?? "",
+      donationInstructions: s?.donationInstructions ?? "",
+      acceptInKind: s?.acceptInKind ?? true,
+      inKindNeeds: s?.inKindNeeds ?? "",
+    });
+    setSettingsOpen(true);
+  };
+
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -110,7 +198,12 @@ export default function DonationsPage() {
           </p>
         </div>
         {canManage && (
-          <Dialog open={open} onOpenChange={setOpen}>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={openSettings} className="gap-2 font-bold">
+              <Settings2 className="size-4" />
+              معلومات استقبال التبرعات
+            </Button>
+            <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button className="gap-2 font-extrabold">
                 <Plus className="size-4" />
@@ -125,10 +218,23 @@ export default function DonationsPage() {
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4">
+                {/* نوع المتبرع + نوع التبرع */}
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
-                    <Label>اسم المتبرع *</Label>
-                    <Input value={form.donorName} onChange={(e) => setForm({ ...form, donorName: e.target.value })} placeholder="الاسم الكامل أو المقاولة" />
+                    <Label>نوع المتبرع</Label>
+                    <Select
+                      value={form.donorType}
+                      onValueChange={(v) => setForm({ ...form, donorType: v, membershipId: "", entityName: "" })}
+                      dir="rtl"
+                    >
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="MEMBER">منخرط</SelectItem>
+                        <SelectItem value="ENTITY">جهة داعمة</SelectItem>
+                        <SelectItem value="CITIZEN">مواطن</SelectItem>
+                        <SelectItem value="OTHER">آخر</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-1.5">
                     <Label>نوع التبرع</Label>
@@ -140,6 +246,50 @@ export default function DonationsPage() {
                       </SelectContent>
                     </Select>
                   </div>
+                </div>
+
+                {/* جهة داعمة: اسم الجهة */}
+                {form.donorType === "ENTITY" && (
+                  <div className="space-y-1.5">
+                    <Label>اسم الجهة الداعمة *</Label>
+                    <Input
+                      value={form.entityName}
+                      onChange={(e) => setForm({ ...form, entityName: e.target.value, donorName: e.target.value })}
+                      placeholder="مثال: مؤسسة التعاون الوطني / مقاولة خاصة"
+                    />
+                  </div>
+                )}
+
+                {/* منخرط: اختيار من اللائحة */}
+                {form.donorType === "MEMBER" && (
+                  <div className="space-y-1.5">
+                    <Label>المنخرط المتبرع *</Label>
+                    <Select
+                      value={form.membershipId}
+                      onValueChange={(v) => {
+                        const m = (membersData?.members ?? []).find((x) => x.id === v);
+                        setForm({
+                          ...form,
+                          membershipId: v,
+                          donorName: m?.user.fullName ?? "",
+                          donorEmail: m?.user.email ?? "",
+                        });
+                      }}
+                      dir="rtl"
+                    >
+                      <SelectTrigger><SelectValue placeholder="اختر منخرطاً..." /></SelectTrigger>
+                      <SelectContent>
+                        {(membersData?.members ?? []).map((m) => (
+                          <SelectItem key={m.id} value={m.id}>{m.user.fullName}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                <div className="space-y-1.5">
+                  <Label>اسم المتبرع *</Label>
+                  <Input value={form.donorName} onChange={(e) => setForm({ ...form, donorName: e.target.value })} placeholder="الاسم الكامل أو المقاولة" />
                 </div>
 
                 {form.type === "MONEY" ? (
@@ -192,7 +342,13 @@ export default function DonationsPage() {
               <DialogFooter>
                 <Button
                   onClick={() => addDonation.mutate()}
-                  disabled={addDonation.isPending || !form.donorName || (form.type === "MONEY" && !form.amount) || (form.type === "IN_KIND" && !form.inKindDescription)}
+                  disabled={
+                    addDonation.isPending || !form.donorName ||
+                    (form.type === "MONEY" && !form.amount) ||
+                    (form.type === "IN_KIND" && !form.inKindDescription) ||
+                    (form.donorType === "ENTITY" && !form.entityName) ||
+                    (form.donorType === "MEMBER" && !form.membershipId)
+                  }
                   className="font-extrabold"
                 >
                   {addDonation.isPending && <Loader2 className="me-2 size-4 animate-spin" />}
@@ -201,8 +357,34 @@ export default function DonationsPage() {
               </DialogFooter>
             </DialogContent>
           </Dialog>
+          </div>
         )}
       </div>
+
+      {/* بطاقة معلومات استقبال التبرعات */}
+      <Card className="border-primary/20">
+        <CardContent className="flex flex-wrap items-center justify-between gap-3 p-5">
+          <div className="flex items-start gap-3">
+            <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/10">
+              <Landmark className="size-5 text-primary" />
+            </span>
+            <div>
+              <p className="font-extrabold">معلومات استقبال التبرعات والمساهمات</p>
+              <p className="mt-0.5 text-[12px] leading-6 text-muted-foreground">
+                {settingsData?.settings.donationsEnabled
+                  ? "مفعّلة — تُعرض وسائل الدعم في الصفحة العمومية للجمعية."
+                  : "غير مفعّلة — فعّلوها لنشر وسائل الدعم (بنك/بريد/رابط إلكتروني) على صفحة الجمعية."}
+              </p>
+            </div>
+          </div>
+          {canManage && (
+            <Button variant={settingsData?.settings.donationsEnabled ? "default" : "outline"} onClick={openSettings} className="gap-2 font-bold">
+              <Settings2 className="size-4" />
+              {settingsData?.settings.donationsEnabled ? "تعديل المعلومات" : "تفعيل واستقبال"}
+            </Button>
+          )}
+        </CardContent>
+      </Card>
 
       {/* البحث */}
       <div className="relative max-w-md">
@@ -240,7 +422,15 @@ export default function DonationsPage() {
                     <TableRow key={d.id}>
                       <TableCell className="num text-[11px] font-bold text-muted-foreground" dir="ltr">{d.receiptNumber}</TableCell>
                       <TableCell className="font-bold">
-                        {d.isAnonymous ? "متبرع مجهول" : d.donorName}
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          {d.isAnonymous ? "متبرع مجهول" : d.donorName}
+                          {d.donorType && d.donorType !== "OTHER" && (
+                            <Badge variant="outline" className="text-[10px]">{DONOR_TYPE_LABELS[d.donorType] ?? d.donorType}</Badge>
+                          )}
+                        </div>
+                        {d.entityName && d.donorType === "ENTITY" && (
+                          <p className="text-[10px] font-normal text-muted-foreground">{d.entityName}</p>
+                        )}
                         {d.message && <p className="text-[10px] font-normal text-muted-foreground">«{d.message}»</p>}
                       </TableCell>
                       <TableCell>
@@ -278,6 +468,111 @@ export default function DonationsPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* نافذة إعدادات استقبال التبرعات */}
+      <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
+        <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>معلومات استقبال التبرعات والمساهمات</DialogTitle>
+            <DialogDescription>
+              تُعرض هذه المعلومات للعموم في صفحة الجمعية عند التفعيل — لتسهيل دعم المنخرطين والجهات الداعمة.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4">
+            <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-border bg-muted/40 p-3 text-[13px]">
+              <Checkbox
+                checked={settingsForm.donationsEnabled}
+                onCheckedChange={(v) => setSettingsForm({ ...settingsForm, donationsEnabled: v === true })}
+              />
+              <span className="font-bold">تفعيل استقبال التبرعات ونشر المعلومات</span>
+            </label>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>اسم البنك</Label>
+                <Input
+                  value={settingsForm.donationBankName ?? ""}
+                  onChange={(e) => setSettingsForm({ ...settingsForm, donationBankName: e.target.value })}
+                  placeholder="مثال: القرض الشعبي"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>رقم الحساب البنكي (RIB)</Label>
+                <Input
+                  dir="ltr"
+                  className="num text-start"
+                  value={settingsForm.donationRib ?? ""}
+                  onChange={(e) => setSettingsForm({ ...settingsForm, donationRib: e.target.value })}
+                  placeholder="000 000 0000000000000000 00"
+                  maxLength={34}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>حساب البريد (CCP)</Label>
+                <Input
+                  dir="ltr"
+                  className="num text-start"
+                  value={settingsForm.donationCcp ?? ""}
+                  onChange={(e) => setSettingsForm({ ...settingsForm, donationCcp: e.target.value })}
+                  placeholder="0000000"
+                  maxLength={20}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>رابط الدفع الإلكتروني</Label>
+                <Input
+                  dir="ltr"
+                  className="text-start"
+                  value={settingsForm.donationOnlineUrl ?? ""}
+                  onChange={(e) => setSettingsForm({ ...settingsForm, donationOnlineUrl: e.target.value })}
+                  placeholder="https://..."
+                  type="url"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label>تعليمات وتوجيهات التبرع</Label>
+              <Input
+                value={settingsForm.donationInstructions ?? ""}
+                onChange={(e) => setSettingsForm({ ...settingsForm, donationInstructions: e.target.value })}
+                placeholder="مثال: تُوجَّل الإشعارات إلى البريد الإلكتروني للجمعية"
+                maxLength={1000}
+              />
+            </div>
+
+            <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-border bg-muted/40 p-3 text-[13px]">
+              <Checkbox
+                checked={settingsForm.acceptInKind}
+                onCheckedChange={(v) => setSettingsForm({ ...settingsForm, acceptInKind: v === true })}
+              />
+              <span className="font-bold">قبول التبرعات والمساهمات العينية</span>
+            </label>
+
+            {settingsForm.acceptInKind && (
+              <div className="space-y-1.5">
+                <Label>الاحتياجات العينية الحالية</Label>
+                <Input
+                  value={settingsForm.inKindNeeds ?? ""}
+                  onChange={(e) => setSettingsForm({ ...settingsForm, inKindNeeds: e.target.value })}
+                  placeholder="مثال: تجهيزات مدرسية · بطانيات · مواد غذائية"
+                  maxLength={600}
+                />
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSettingsOpen(false)}>إغلاق</Button>
+            <Button onClick={() => saveSettings.mutate()} disabled={saveSettings.isPending} className="font-extrabold">
+              {saveSettings.isPending && <Loader2 className="me-2 size-4 animate-spin" />}
+              حفظ المعلومات
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* وصل التبرع — قابل للطبع */}
       <Dialog open={!!receipt} onOpenChange={(o) => !o && setReceipt(null)}>

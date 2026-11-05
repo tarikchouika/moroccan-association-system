@@ -71,6 +71,14 @@ async function main() {
       donationCount: a._count.donations,
       iceNumber: a.iceNumber,
       logoUrl: (a as { logoUrl?: string | null }).logoUrl ?? null,
+      donationsEnabled: a.donationsEnabled,
+      donationBankName: a.donationBankName,
+      donationRib: a.donationRib,
+      donationCcp: a.donationCcp,
+      donationOnlineUrl: a.donationOnlineUrl,
+      donationInstructions: a.donationInstructions,
+      acceptInKind: a.acceptInKind,
+      inKindNeeds: a.inKindNeeds,
     })),
     events: associations.flatMap((a) =>
       a.events.map((e) => ({

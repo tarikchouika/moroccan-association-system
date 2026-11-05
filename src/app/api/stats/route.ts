@@ -54,7 +54,11 @@ export async function GET(req: NextRequest) {
   // طاقم المنصة (أدمين/كوأدمين/محاسب): اطلاع مالي موثق على كل الجمعيات
   const staffRoles = ["SUPER_ADMIN", "ASSOCIATION_ADMIN", "CO_ADMIN", "ACCOUNTANT"];
   const isStaff = staffRoles.includes(user.role);
-  const membership = user.memberships.find((m) => m.associationId === associationId);
+  // العضوية النشطة حصراً — PENDING/SUSPENDED/RESIGNED لا يقرؤون الإحصائيات
+  // (تدقيق الدورة 11: كانت البوابة تقبل أي حالة عضوية)
+  const membership = user.memberships.find(
+    (m) => m.associationId === associationId && m.status === "ACTIVE"
+  );
   if (!membership && !isStaff && user.role !== "PARTNER") {
     return Response.json({ error: "لا تنتمون إلى هذه الجمعية" }, { status: 403 });
   }

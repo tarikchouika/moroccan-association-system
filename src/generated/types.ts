@@ -17,6 +17,15 @@ export interface DemoAssociation {
   donationCount: number;
   iceNumber: string | null;
   logoUrl?: string | null;
+  /** معلومات استقبال التبرعات (تظهر للعموم عند التفعيل) */
+  donationsEnabled?: boolean;
+  donationBankName?: string | null;
+  donationRib?: string | null;
+  donationCcp?: string | null;
+  donationOnlineUrl?: string | null;
+  donationInstructions?: string | null;
+  acceptInKind?: boolean;
+  inKindNeeds?: string | null;
 }
 
 export interface DemoEvent {
